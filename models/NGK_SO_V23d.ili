@@ -1,0 +1,802 @@
+﻿INTERLIS 2.3;
+
+MODEL NGKSO2021 (de)
+AT "http://geo7.ch"
+VERSION "2022-01-01"  =
+
+IMPORTS INTERLIS;
+IMPORTS Units, Time, CoordSys, GeometryCHLV95_V1;
+
+DOMAIN
+
+  Jaehrlichkeit = 0 .. 9999999;
+  JaehrlichkeitRestgefaehrdung = 300 .. 9999999;
+  Einzelflaeche = SURFACE WITH (STRAIGHTS) VERTEX GeometryCHLV95_V1.Coord2 WITHOUT OVERLAPS > 0.1;
+
+  /** Beschreibung des Auftrags. Hier wird definiert,
+    - wer bestellt (Auftraggeber, z.B. Kanton)
+    - bei wem (Auftragnehmer =  Buero)
+    - fuer welches Gebiet (hier nur: Abklaerungsperimeter, Prozessquelle wird unter Befunde definiert)
+    - welche Produkte (Nachfuehrung, GKnM, etc.)
+    - welche Teilprozesse und Szenarien (Grundszenarien, freie Jaehrlichkeiten, etc.)
+    Der Auftragnehmer muss am Ende des Auftrages im Abklaerungsperimeter deklarieren, bis zu welchem Grad die Beurteilung vorgenommen wurde.
+  */
+  TOPIC Auftrag =
+
+    DOMAIN
+      /** Werte fuer Deklaration der Beurteilung*/
+      Beurteilungen = (
+        nicht_beurteilt,
+        beurteilung_nicht_noetig,
+        beurteilt_und_vollstaendig,
+        beurteilt_und_nicht_vollstaendig,
+        beurteilt_und_nicht_bestimmbar,
+        beurteilt_und_in_abklaerung
+      );
+
+      /** Wertebereich fuer permanente Teilprozesse*/
+      TeilprozessePermanent = (
+        permanente_Rutschung,
+        Einsturz,
+        Absenkung
+      );
+
+      /** Wertebereich fuer Teilprozesse der Hauptprozesse Rutsch und Sturz*/
+      TeilprozesseRutschSturz = (
+        spontane_Rutschung,
+        Hangmure,
+        Stein_Blockschlag,
+        Fels_Bergsturz,
+        Eisschlag
+      );
+
+      /** Wertebereich fuer Teilprozesse des Hauptprozess Wasser*/
+      TeilprozesseWasser = (
+        Ueberschwemmung_statisch,
+        Ueberschwemmung_dynamisch,
+        Ubermurung
+      );
+
+      /** Art der Nachfuehrung der Gefahrenkarte*/
+      Deklarationen = (
+        Nachfuehrung,
+        BeurteilungNachMassnahmen,
+        Neubeurteilung
+      );
+
+    /** Auftragnehmer, Buero welches fuer Auftrag/Befund verantwortlich ist */
+    STRUCTURE Autor =
+      /** ID des Autors, wird durch Kanton vergeben */  
+      ID : MANDATORY INTERLIS.UUIDOID;
+      /** Name des Bueros */
+      Buero : MANDATORY TEXT*80;
+      /** Standort des Bueros/Filiale, welche den Auftrag abwickelt */
+      Filiale : MANDATORY TEXT*80;
+    END Autor;
+
+    /** Beurteilung: gibt an, welcher Teilprozesse im Abklaerungsperimeter zu welchem Grad untersucht wurde. Zulaessige Werte siehe Wertebereich Beurteilungen */
+    STRUCTURE Beurteilung =
+      w_Ueberschwemmung_statisch : MANDATORY Beurteilungen;
+      w_Ueberschwemmung_dynamisch : MANDATORY Beurteilungen;
+      w_Uebermurung : MANDATORY Beurteilungen;
+      w_Ufererosion : MANDATORY Beurteilungen;
+      ea_Einsturz : MANDATORY Beurteilungen;
+      ea_Absenkung : MANDATORY Beurteilungen;
+      s_Stein_Blockschlag : MANDATORY Beurteilungen;
+      s_Berg_Felssturz : MANDATORY Beurteilungen;
+      s_Eisschlag : MANDATORY Beurteilungen;
+      r_Hangmure : MANDATORY Beurteilungen;
+      r_Spontane_Rutschung : MANDATORY Beurteilungen;
+      r_Permanente_Rutschung : MANDATORY Beurteilungen;
+    END Beurteilung;
+
+    /** Abklaerungsperimeter = Perimeter, welcher untersucht werden soll */
+    CLASS Abklaerungsperimeter =
+      /** ID Abklaerungsperimeter */
+      APID : MANDATORY INTERLIS.UUIDOID;
+      /** Name des Abklaerungsperimeters */
+      Name : MANDATORY TEXT*80;
+      !!@ CRS=2056
+      Geometrie : MANDATORY Einzelflaeche;
+      /** Beurteilung, welcher Teilprozess zu welchem Grad untersucht wurde */
+      Beurteilungsstatus: MANDATORY Beurteilung;
+    END Abklaerungsperimeter;
+
+    /** Beschreibung des Auftrages*/
+    CLASS Auftrag =
+      /** ID des Auftrags */  
+      AuftragsID : MANDATORY INTERLIS.UUIDOID;
+      /** Beschreibung des Auftrags */
+      Name : MANDATORY TEXT*80;
+      /** Auftraggeber */
+      Fachstelle : MANDATORY TEXT*80;
+      /** Art der Gefahrenbeurteilung -> siehe Wertebereich Deklarationen*/
+      Deklaration : MANDATORY Deklarationen;
+      /** Bemerkung zum Auftrag */
+      Bemerkung : TEXT*100;
+    END Auftrag;
+
+    /** Bericht */
+    CLASS Bericht = 
+      /** Bezeichnung des Berichts (z.B. Technischer Bericht, Anhang, etc.) */
+      Bericht : MANDATORY TEXT*80;
+      /** Dateiname des Berichts inkl. Datum im Format YYYYMMDD */
+      Dateiname: MANDATORY TEXT*100;
+    END Bericht;
+
+    /** TEILAUFTRAG RAUMBEZUG (Abstrakte Klasse)
+    *   pro Teilauftrag ist jeweils entweder ein Abklaerungsperimeter, eine Prozessquelle oder beides zu eroeffnen.
+    * Teilauftrag mit Abklaerungsperimeter: Es sind saemtliche Prozesse im Abklaerungsperimeter zu untersuchen. Prozessquellen sind nicht bekannt und muessen neu definiert werden.
+    *   Teilauftrag mit Prozessquelle: Prozessquelle wurde bereits in einem alten Projekt erfasst und ist bekannt. Es erfolgt eine Nachfuehrung fuer eine bestimmte Prozessquelle (z.B. Veraenderungen durch Bautaetigkeiten und dadurch ist eine neue Gefaehrdungssituation entstanden)
+    *   Teilauftrag mit Abklaerungsperimeter und Prozessquelle: Fuer eine "lange" Prozessquelle (z.B. Aare) soll nur in einem bestimmten Perimeter (z.B. in Olten) die Gefahrenkarte erneuert werden.
+    *   Folgende Teilabklaerungsarten gibt es:
+    *   Szenariobezogen: Prozesse mit Jaehrlichkeiten
+    *     > Rutsch/Sturz/Wasser/Murgang
+    *   Ohne Szenarien:
+    *     > Permanente Prozesse
+    *     > Hinweisprozesse
+    */
+    CLASS TeilauftragRaumbezug (ABSTRACT) =
+      /** Eindeutige ID des Teilauftrags */  
+      TAID : MANDATORY INTERLIS.UUIDOID;
+      /** Bemerkung zum Teilauftrag*/
+      Bemerkung : TEXT*100;
+      /** Auftragnehmer gemaess Autorenliste */
+      Auftragnehmer : MANDATORY Autor;
+    END TeilauftragRaumbezug;
+
+    /** TEILAUFTRAG SZENARIEN (Abstrakte Klasse)
+    *   Fuer Prozesse mit Jaehrlichkeiten. Unterscheidung von Prozessen wo 
+    *   - Kennwerte fakultativ bestellt werden koennen (Wasserprozesse)
+    *   - Keine Kennwerte bestellt werden
+    *   Angabe, ob nur Grundszenarien (Szenarien 30/100/300/Extrem) bestellt werden und/oder weitere Szenarien mit frei waehlbarer Jaehrlichkeit (Wert zwischen 0 und 9999999)
+     */
+    CLASS TeilauftragSzenarien (ABSTRACT)
+    EXTENDS TeilauftragRaumbezug =
+      /** True = Nur Grundszenarien werden bestellt (Szenarien 30/100/300/Extrem)
+      *   False = Es wird ein frei waehlbares Szenario bestellt (z.B. Jaehrlichkeit 10) */  
+      Grundszenarien : MANDATORY BOOLEAN;
+      /** Bestellung eines Szenario mit frei waehlbarer Jaehrlichkeit. Wert zwischen 0 und 9999999*/
+      Jaehrlichkeit : Jaehrlichkeit;
+    END TeilauftragSzenarien;
+
+    /** Konkretisiert die abstraken Klasse TeilauftragSzenarien */
+    CLASS TeilauftragRutschSturz
+    EXTENDS TeilauftragSzenarien =
+      /** Angabe, welches Teilprozess untersucht werden soll. Moegliche Werte siehe Wertebereich TeilprozesseRutschSturz */
+      Teilprozess : MANDATORY TeilprozesseRutschSturz;
+    END TeilauftragRutschSturz;
+
+    /** Konkretisiert die abstrakte Klasse TeilauftragSzenarien. */
+    CLASS TeilauftragUeberschwemmungMurgang
+    EXTENDS TeilauftragSzenarien =
+      /** Angabe, welcher Teilprozess untersucht werden soll. Moegliche Werte siehe Wertebereich TeilprozesseRutschSturz*/  
+      Teilprozess : MANDATORY TeilprozesseWasser;
+      /** True = es werden Kennwerte (v, h, v x h), je nach Teilprozess, bestellt
+      *   False = es werden keine Kennwerte verlangt */
+      Kennwerte : MANDATORY BOOLEAN;
+      /** Aufloesung Detailliert: 
+      *   True = Die Abgabe der Werte muss gemäss den detaillierten Werten erfolgen.
+      *   False = Die Abgabe der Werte muss gemäss den Standardwerten erfolgen.
+      */
+      AufloesungDetailliert: MANDATORY BOOLEAN;
+    END TeilauftragUeberschwemmungMurgang;
+
+    /** Konkretisiert die abstrakte Klasse TeilauftragRaumbezug. */
+    CLASS TeilauftragPermanenteProzesse
+    EXTENDS TeilauftragRaumbezug =
+      /** Angabe, welcher Teilprozess untersucht werden soll. Moegliche Werte siehe Wertebereich TeilprozessePermanent */  
+      Teilprozess : MANDATORY TeilprozessePermanent;
+    END TeilauftragPermanenteProzesse;
+
+    /** Konkretisiert die abstrakte Klasse TeilauftragRaumbezug.
+    *   Diese Klasse hat keine weiteren Attribute.
+    */
+    CLASS TeilauftragUfererosion
+    EXTENDS TeilauftragRaumbezug =
+    END TeilauftragUfererosion;
+
+    /* BEZIEHUNGEN zwischen den Klassen */
+
+    /** Beziehung zwischen den Auftrag und Teilauftrag */
+    ASSOCIATION AuftragTeilauftrag =
+      /** Jeder Auftrag hat mindestens einen Teilauftrag */  
+      assocAuftragTeilauftrag -- {1..*} TeilauftragRaumbezug;
+      /** Jeder Teilauftrag hat genau einen Auftrag */
+      assocTeilauftragAuftrag -<> {1} Auftrag;
+    END AuftragTeilauftrag;
+
+    /** Beziehung zwischen Teilauftrag und Abklaerungsperimeter */
+    ASSOCIATION TeilauftragAbklaerungsperimeter =
+      /** Jeder Teilauftrag hat entweder keinen oder genau einen Abklaerungsperimeter
+      *   (Ein Teilauftrag hat entweder einen Abklaerungsperimeter, eine Prozessquelle oder beides)
+      */
+      assocAbklaerungsperimeterTeilauftrag -- {0..1} Abklaerungsperimeter;
+      /** Jeder Abklaerungsperimeter hat genau einen Teilauftrag */
+      assocTeilauftragAbklaerungsperimeter -- {1} TeilauftragRaumbezug;
+    END TeilauftragAbklaerungsperimeter;
+
+    /** Beziehung zwischen Auftrag und Bericht */
+    ASSOCIATION AuftragBericht =
+      /** Jeder Auftrag hat mindestens einen Bericht */
+      assocAuftragBericht -- {1..*} Bericht;
+      /** Jeder Bericht hat genau einen Auftrag */
+      assocBerichtAuftrag -<> {1} Auftrag;
+    END AuftragBericht;
+  END Auftrag;
+
+   /** Im TOPIC Befunde werden die Prozessquellen definiert und die Befunde der Gefahrenbeurteilungen gespeichert. 
+  *   Pro Teilprozess wird je eine eigene Klasse zur Verfügung gestellt. 
+  *   Fuer die Teilprozesse Ueberschwemmung und Uebermurung koennen zusaetzlich Kennwerte in eigenen Klassen gespeichert werden. 
+  *   Fuer Prozesse mit einer Jaerhlichkeit koennen auch Szenarien mit freier Jaehrlichkeit gespeichert werden.
+  */
+  TOPIC Befunde =
+    DEPENDS ON Auftrag;
+
+    DOMAIN
+        
+      /** Wertebereiche fuer Prozessquellenbeschreibung Hauptprozesse*/
+      Hauptprozess = (
+        Wasser,
+        Rutschung,
+        Sturz,
+        Absenkung_Einsturz
+      );
+
+      /** Wertebereiche fuer Prozessquellenbeschreibung Teilprozesse*/
+      Teilprozesse = (
+        Ueberschwemmung_statisch,
+        Ueberschwemmung_dynamisch,
+        Ubermurung,
+        spontane_Rutschung,
+        Hangmure,
+        Stein_Blockschlag,
+        Fels_Bergsturz,
+        Eisschlag,
+        permanente_Rutschung,
+        Einsturz,
+        Absenkung,
+        Ufererosion
+      );
+      
+      /** Wertebereich fuer Prozessquellenbeschreibung fuer Prozess Stein/Blockschlag*/
+      AspektForm = (
+        zylindrisch,
+        kubisch,
+        plattig,
+        tetraedrisch
+      );
+
+      /** Wertebereich fuer Befunde mit Jaehrlichkeiten --> Intensitaeten */
+       Intensitaeten = (
+        schwach,
+        mittel,
+        stark
+      );
+
+      /** Wertebereiche fuer Prozess Rutsch: Beschleunigung */
+       rBeschleunigung = (
+        keine,
+        /**< 2fach Mittelwert von v */
+        gering,
+        /**2fach bis 5fach Mittelwert von v */
+        mittel,
+        /**> 5fach Mittelwert von v */
+        stark
+      );
+
+      /** Wertebereich fuer Prozess Rutsch: Differentialbewegung */
+      rDifferentialbewegung = (
+        keine,
+        /** bis 2 cm/Jahr/10m */
+        gering,
+        /** groesser 2 cm/Jahr/10m */
+        hoch
+      );
+
+      /** Wertebereich fuer Prozess Rutsch: Korrektur */
+      rKorrektur = (
+        Entschaerfung1,
+        keine,
+        Verschaerfung1,
+        Verschaerfung2
+      );
+
+      /** Wertebereich Rutschgeschwindigkeit */
+      
+      rRutschgeschwindigkeit = (
+        /** 0-2 cm/Jahr */
+        substabil,
+        /** 2-10 cm/Jahr */
+        wenig_aktiv,
+        /** > 10 cm/Jahr */
+        aktiv,
+        keine
+      );
+
+      /** Wertebereich fuer Prozess Rutsch: Tiefe Gleitflaeche */
+      rTiefeGleitflaeche = (
+        /** oberflaechlich: Tiefe 0 < t <= 2 m */
+        oberflaechlich,
+        /** mitteltief: Tiefe 2 < t <= 10 m */
+        mitteltief,
+        /** tief: Tiefe 10 < t <= 40 m */
+        tief,
+        /** sehr tief: Tiefe t > 40m */
+        sehr_tief,
+        /** unbestimmt: Tiefe t <= 40 m */
+        unbestimmt,
+        keine
+      );
+      
+      /** Standardwertebereich fuer Teilprozess Ueberschwemmung: Fliesstiefe [m]*/
+      wFliesstiefe = (
+        von_0_bis_25_cm,
+        von_25_bis_50_cm,
+        von_50_bis_75_cm,
+        von_75_bis_100_cm,
+        von_100_bis_150_cm,
+        von_150_bis_200_cm,
+        mehr_als_200_cm
+      );
+  
+      /** Detaillierter Wertebereich fuer Teilprozess Ueberschwemmung: Fliesstiefe [m]*/
+      wFliesstiefeDetail = (
+        von_0_bis_5_cm,
+        von_5_bis_10_cm,
+        von_10_bis_15_cm,
+        von_15_bis_20_cm,
+        von_20_bis_25_cm,
+        von_25_bis_30_cm,
+        von_30_bis_35_cm,
+        von_35_bis_40_cm,
+        von_40_bis_45_cm,
+        von_45_bis_50_cm,
+        von_50_bis_55_cm,
+        von_55_bis_60_cm,
+        von_60_bis_65_cm,
+        von_65_bis_70_cm,
+        von_70_bis_75_cm,
+        von_75_bis_80_cm,
+        von_80_bis_85_cm,
+        von_85_bis_90_cm,
+        von_90_bis_95_cm,
+        von_95_bis_100_cm,
+        von_100_bis_105_cm,
+        von_105_bis_110_cm,
+        von_110_bis_115_cm,
+        von_115_bis_120_cm,
+        von_120_bis_125_cm,
+        von_125_bis_130_cm,
+        von_130_bis_135_cm,
+        von_135_bis_140_cm,
+        von_140_bis_145_cm,
+        von_145_bis_150_cm,
+        von_150_bis_155_cm,
+        von_155_bis_160_cm,
+        von_160_bis_165_cm,
+        von_165_bis_170_cm,
+        von_170_bis_175_cm,
+        von_175_bis_180_cm,
+        von_180_bis_185_cm,
+        von_185_bis_190_cm,
+        von_190_bis_195_cm,
+        von_195_bis_200_cm,
+        mehr_als_200_cm
+      );
+
+      /** Standardwertebereich fuer Teilprozess Uebermurung: Fliessgeschwindigkeit [m/s] */
+      wUbermurungFliessgeschwindigkeit = (
+        bis_1_m_s,
+        mehr_als_1_m_s
+        );
+
+      /** Standard Wertebereich fuer Prozess Ueberschwemmung: Fliessgeschwindigkeit [m/s]*/
+      wUeberschwemmungFliessgeschwindigkeit = (
+        bis_0_5_m_s,
+        von_0_5_bis_2_m_s,
+        mehr_als_2_m_s
+        );
+
+      /** Detaillierter Wertebereich fuer Teilprozess Ueberschwemmung und Uebermurung: Fliessgeschwindigkeit [m/s] */
+        wFliessgeschwindigkeitDetail = (
+        von_0_bis_0_1_m_s,
+        von_0_1_bis_0_2_m_s,
+        von_0_2_bis_0_3_m_s,
+        von_0_3_bis_0_4_m_s,
+        von_0_4_bis_0_5_m_s,
+        von_0_5_bis_0_6_m_s,
+        von_0_6_bis_0_7_m_s,
+        von_0_7_bis_0_8_m_s,
+        von_0_8_bis_0_9_m_s,
+        von_0_9_bis_1_0_m_s,
+        von_1_0_bis_1_1_m_s,
+        von_1_1_bis_1_2_m_s,
+        von_1_2_bis_1_3_m_s,
+        von_1_3_bis_1_4_m_s,
+        von_1_4_bis_1_5_m_s,
+        von_1_5_bis_1_6_m_s,
+        von_1_6_bis_1_7_m_s,
+        von_1_7_bis_1_8_m_s,
+        von_1_8_bis_1_9_m_s,
+        von_1_9_bis_2_0_m_s,
+        mehr_als_2_0_m_s
+      );
+
+      /** Standardwertebereich Produkt h x v in [m2/s]. */
+      wProduktHxV = (
+        bis_0_5_m2_s,
+        von_0_5_bis_2_0_m2_s,
+        mehr_als_2_0_m2_s
+        );
+        
+      /** Detaillierter Wertebereich Produkt h x v in [m2/s]. */
+      wProduktHxVDetail = (
+        von_0_0_bis_0_1_m2_s,
+        von_0_1_bis_0_2_m2_s,
+        von_0_2_bis_0_3_m2_s,
+        von_0_3_bis_0_4_m2_s,
+        von_0_4_bis_0_5_m2_s,
+        von_0_5_bis_0_6_m2_s,
+        von_0_6_bis_0_7_m2_s,
+        von_0_7_bis_0_8_m2_s,
+        von_0_8_bis_0_9_m2_s,
+        von_0_9_bis_1_0_m2_s,
+        von_1_0_bis_1_1_m2_s,
+        von_1_1_bis_1_2_m2_s,
+        von_1_2_bis_1_3_m2_s,
+        von_1_3_bis_1_4_m2_s,
+        von_1_4_bis_1_5_m2_s,
+        von_1_5_bis_1_6_m2_s,
+        von_1_6_bis_1_7_m2_s,
+        von_1_7_bis_1_8_m2_s,
+        von_1_8_bis_1_9_m2_s,
+        von_1_9_bis_2_0_m2_s,
+        mehr_als_2_0_m2_s
+      );
+  
+      /** Wertebereich fuer Teilprozesse Ueberschwemmung statisch & dynamisch, Steinschlag, Blockschlag, Spontane Rutschung;
+      *   Restgefaehrdung mit Intensitaeten;
+      */
+       IWCodeStandard = (
+        rot_stark_30,
+        rot_stark_100,
+        rot_stark_300,
+
+        rot_mittel_30,
+        blau_mittel_30,
+        blau_mittel_100,
+        blau_mittel_300,
+        gelb_mittel_300,
+        
+        blau_schwach_30,
+        blau_schwach_100,
+        gelb_schwach_100,
+        gelb_schwach_300,
+        
+        restgefaehrdung_schwach,
+        restgefaehrdung_mittel,
+        restgefaehrdung_stark
+      );
+
+      /** Wertebereich fuer Teilprozess: Uebermurung */
+       IWCodeUebermurung = (
+        rot_stark_30,
+        rot_stark_100,
+        rot_stark_300,
+
+        rot_mittel_30,
+        blau_mittel_100,
+        blau_mittel_300,
+
+        restgefaehrdung_mittel,
+        restgefaehrdung_stark		
+      );
+
+      /** Wertebereich fuer Teilprozess: Berg- und Felssturz */
+      IWCodeBergFelssturz = (
+        rot_stark_30,
+        rot_stark_100,
+        rot_stark_300,
+        restgefaehrdung_stark
+      );
+
+      /** Wertebereich fuer permanente Teilprozesse: Permanente Rutschung, Absenkung, Einsturz */
+      IWCodePermanent = (
+        rot_stark_permanent,
+        blau_mittel_permanent,
+        gelb_schwach_permanent,
+        restgefaehrdung_schwach,
+        restgefaehrdung_mittel,
+        restgefaehrdung_stark
+      );
+
+    /** Beschreibung der Prozessquelle */
+    CLASS Prozessquelle =
+      /** ID fuer Prozessquelle */
+      PQID : MANDATORY INTERLIS.UUIDOID;
+      /** Name der Prozessquelle (Dorfbach) */
+      ProzessquellenName : MANDATORY TEXT*80;
+      /** Hauptprozess der Prozessquelle. Moegliche Werte siehe Wertebereich Hauptprozess */
+      Hauptprozess : MANDATORY Hauptprozess;
+    END Prozessquelle;
+
+    /** Abstrakte Klasse fuer Detailbeschreibung der Prozessquelle bei Stein- und Blockschlag */
+    CLASS ProzessquelleSteinBlockschlag (ABSTRACT) =
+      /** Beschreibung der Geologie */
+      Geologie : MANDATORY TEXT*200;  
+      /** Volumen der Prozessquelle */
+      Volumen_m3 : MANDATORY 1 .. 999999999;
+      /** Beschreibung der Form. Moegliche Werte siehe Wertebereich AspektForm */
+      Form : MANDATORY AspektForm;
+      /** Jaehrlichkeit fuer Modellierung. Wert zwischen 0 und 9999999 */
+      Jaehrlichkeit : MANDATORY Jaehrlichkeit;
+    END ProzessquelleSteinBlockschlag;
+
+    /** Konkretisiert die Klasse ProzessquelleSteinBlockschlag. Beschreibt die Prozessquelle mit einem Polygon
+    Prozessquelle -> Hauptprozess muss Sturz sein
+    */
+    CLASS ProzessquelleSteinBlockschlagPolygon
+    EXTENDS ProzessquelleSteinBlockschlag =
+    /** Polygon der Prozessquelle */
+    !!@ CRS=2056
+    Geometrie : MANDATORY Einzelflaeche;
+    END ProzessquelleSteinBlockschlagPolygon;
+    
+    /** Konkretisiert die Klasse ProzessquelleSteinBlockschlag. Beschreibt die Prozessquelle mit einem Punkt
+    Prozessquelle -> Hauptprozess muss Sturz sein*/
+    CLASS ProzessquelleSteinBlockschlagPunkt
+    EXTENDS ProzessquelleSteinBlockschlag =
+      /** Punkt der Prozessquelle */  
+      !!@ CRS=2056
+      Geometrie : MANDATORY GeometryCHLV95_V1.Coord3;
+    END ProzessquelleSteinBlockschlagPunkt;
+
+    /** Abstrakte Klasse fuer Befunde.
+    *   Prozess Wasser: Ueberschwemmung statisch/dynamisch, Ubermurung, Ufererosion
+    *   Prozess Rutsch: Hangmure, Spontane/Permanente Rutschung
+    *   Prozess Sturz: Stein-/Blockschlag, Berg-/Felssturz, Eisschlag
+    *   Prozess Einsturz/Absenkung: Einsturz, Absenkung
+    *   Konkretisiert werden die Befunde durch saemtliche Teilprozesse, Kennwerte fuer Wasserprozesse und freie Befunde mit Jaehrlichkeit. 
+    */
+    CLASS Befund (ABSTRACT) =
+      /** Polygon des Befunds */  
+      !!@ CRS=2056
+      Geometrie : MANDATORY Einzelflaeche;
+      /** Angabe der Jaehrlichkeit bei Restgefaerdung. Wert zwischen 300 und 9999999*/
+      RestgefaehrdungJaehrlichkeit : JaehrlichkeitRestgefaehrdung;
+      /** Bemerkung zum Befund */
+      Bemerkung : TEXT*100;
+    END Befund;
+
+    /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Einsturz/Absenkung sein */
+    CLASS BefundAbsenkung
+    EXTENDS Befund =
+      /** IW Code fuer permanente Prozesse. Moegliche Werte siehe Wertebereich IWCodePermanent */  
+      IWCode : MANDATORY IWCodePermanent;
+    END BefundAbsenkung;
+
+    /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Einsturz/Absenkung sein */
+    CLASS BefundEinsturz
+    EXTENDS Befund =
+      /** IW Code fuer Einsturz. Moegliche Werte siehe Wertebereich IWCodePermanent */    
+      IWCode : MANDATORY IWCodePermanent;
+    END BefundEinsturz;
+    
+
+    /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Sturz sein */
+    CLASS BefundSteinBlockschlag
+    EXTENDS Befund =
+      /** IW Code fuer Stein-/Blockschlag. Moegliche Werte siehe Wertebereich IWCodeStandard */
+      IWCode : MANDATORY IWCodeStandard;
+    END BefundSteinBlockschlag;
+    
+    /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Sturz sein */
+    CLASS BefundBergFelssturz
+    EXTENDS Befund =
+      /** IW Code fuer Berg/Felssturz. Moegliche Werte siehe Wertebereich IWCodeBerg/Felssturz */    
+      IWCode : MANDATORY IWCodeBergFelssturz;
+    END BefundBergFelssturz;
+    
+    /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Sturz sein */
+    CLASS BefundEisschlag
+    EXTENDS Befund =
+      /** IW Code fuer Eisschlag . Moegliche Werte siehe Wertebereich IWCodeStandard */    
+      IWCode : MANDATORY IWCodeStandard;
+    END BefundEisschlag;
+
+    
+
+    /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Rutsch sein */
+    CLASS BefundHangmure
+    EXTENDS Befund =
+    /** IW Code fuer Hangmure. Moegliche Werte siehe Wertebereich IWCodeStandard */    
+    IWCode : MANDATORY IWCodeStandard;
+    END BefundHangmure;
+    
+    /** Konkretisiert die Klasse Befund.
+    *   Fuer den Teilprozess permanente Rutschuung sind die Kennwerte zu Rutschgeschwindigkeit, Tiefe der Gleitfaleche, Differentailbewerung, Beschleunigung und Korrekturterme anzugeben.
+    Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Rutsch sein
+    */
+    CLASS BefundPermanenteRutschung
+    EXTENDS Befund =
+      /** Moegliche Werte siehe rRutschgeschwindigkeit */
+      Rutschgeschwindigkeit : MANDATORY rRutschgeschwindigkeit;
+      /** Moegliche Werte siehe rTiefeGleitflaeche */
+      Tiefe_Gleitflaeche : MANDATORY rTiefeGleitflaeche;
+      /** Moegliche Werte siehe rDifferentialbewegung */
+      Differentialbewegung : MANDATORY rDifferentialbewegung;
+      /** Moegliche Werte siehe rBeschleunigung */
+      Beschleunigung : MANDATORY rBeschleunigung;
+      /** Moegliche Werte siehe rKorrektur */
+      Korrektur : MANDATORY rKorrektur;
+      /** IW Code fuer permanente Rutschung. Moegliche Werte siehe Wertebereich IWCodePermanent */
+      IWCode : MANDATORY IWCodePermanent;
+    END BefundPermanenteRutschung;
+
+    /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Rutsch sein */
+    CLASS BefundSpontaneRutschung
+    EXTENDS Befund =
+      /** IW Code fuer spontane Rutschung. Moegliche Werte siehe Wertebereich IWCodeStandard */  
+      IWCode : MANDATORY IWCodeStandard;
+    END BefundSpontaneRutschung;
+    
+    
+    /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Wasser sein */
+    CLASS BefundUebermurung
+    EXTENDS Befund =
+      /** IW Code fuer Uebermurung. Moegliche Werte siehe Wertebereich IWCodeUebermurung */
+      IWCode : MANDATORY IWCodeUebermurung;
+    END BefundUebermurung;
+    
+    /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Wasser sein */
+    CLASS BefundUeberschwemmungDynamisch
+    EXTENDS Befund =
+    /** IW Code fuer dynamische Ueberschwemmung. Moegliche Werte siehe Wertebereich IWCodeStandard */
+    IWCode : MANDATORY IWCodeStandard;
+    END BefundUeberschwemmungDynamisch;
+    
+    /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Wasser sein */
+    CLASS BefundUeberschwemmungStatisch
+    EXTENDS Befund =
+    /** IW Code fuer statische Ueberschwemmung. Moegliche Werte siehe Wertebereich IWCodeStandard */
+    IWCode : MANDATORY IWCodeStandard;
+    END BefundUeberschwemmungStatisch;
+    
+    /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Wasser sein
+    *   Diese Klasse hat keine weiteren Attribute.
+    */
+    CLASS BefundUfererosion
+    EXTENDS Befund =
+    END BefundUfererosion;
+
+    /** Befunde fuer freie Jaehrlichkeit. Hier sind Jaehrlichkeit, Intensitaet Teilprozess anzugeben. */
+    CLASS BefundeJaehrlichkeit
+    EXTENDS Befund =
+      /** Jaehrlichkeit des Befunds. Wert zwischen 0 und 9999999 */  
+      Jaehrlichkeit : MANDATORY Jaehrlichkeit;
+      /** Moegliche Werte gemaess Intensitaeten */  
+      Intensitaet : MANDATORY Intensitaeten;
+      /** Moegliche Werte gemaess Teilprozess */  
+      Teilprozess : MANDATORY Teilprozesse;
+    END BefundeJaehrlichkeit;
+
+    /** Befunde mit Kennwert (Fliesstiefe) fuer Prozess Uberschwemmung
+    *   Prozessquelle -> Hauptprozess muss Wasser sein
+    */
+    CLASS KennwertUeberschwemmungFliesstiefe
+    EXTENDS Befund =
+      /** Moegliche Werte gemaess wFliesstiefe. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */
+      h : wFliesstiefe;
+      hDetail : wFliesstiefeDetail;
+    END KennwertUeberschwemmungFliesstiefe;
+
+    
+    /** Befunde mit Kennwert (Fliessgeschwindigkeit) fuer Prozess Uberschwemmung
+    *   Prozessquelle -> Hauptprozess muss Wasser sein
+    */
+    CLASS KennwertUeberschwemmungFliessgeschwindigkeit
+    EXTENDS Befund =
+      /** Moegliche Werte gemaess wUeberschwemmungFliessgeschwindigkeit. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */
+      v : wUeberschwemmungFliessgeschwindigkeit;
+      vDetail : wFliessgeschwindigkeitDetail;
+    END KennwertUeberschwemmungFliessgeschwindigkeit;
+    
+    /** Befunde mit Kennwert (Produkt v x h) fuer Prozess Uberschwemmung
+    *   Prozessquelle -> Hauptprozess muss Wasser sein
+    */
+    CLASS KennwertUeberschwemmungProduktVxH
+    EXTENDS Befund =
+      /** Moegliche Werte gemaess wProduktHxV. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */
+      v_mal_h : wProduktHxV;
+      v_mal_hDetail: wProduktHxVDetail;
+    END KennwertUeberschwemmungProduktVxH;
+
+    /** Befunde mit Kennwert (Fliesstiefe) fuer Prozess Uebermurung
+    *   Prozessquelle -> Hauptprozess muss Wasser sein
+    */
+    CLASS KennwertUbermurungFliesstiefe
+    EXTENDS Befund =
+      /** Moegliche Werte gemaess wFliesstiefe. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */
+      h : wFliesstiefe;
+      hDetail : wFliesstiefeDetail;
+    END KennwertUbermurungFliesstiefe;
+
+    /** Befunde mit Kennwert (Fliessgeschwindigkeit) fuer Prozess Uebermurung
+    *   Prozessquelle -> Hauptprozess muss Wasser sein
+    */
+    CLASS KennwertUbermurungFliessgeschwindigkeit
+    EXTENDS Befund =
+      /** Moegliche Werte gemaess wUbermurungFliessgeschwindigkeit. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */  
+      v : wUbermurungFliessgeschwindigkeit;
+      vDetail : wFliessgeschwindigkeitDetail;
+    END KennwertUbermurungFliessgeschwindigkeit;
+    
+    /* BEZIEHUNGEN zwischen den Klassen */
+    
+    /** Beziehung zwischen Teilauftrag und Prozessquelle */
+    ASSOCIATION TeilauftragProzessquelle =
+      /** Ein Teilauftrag hat entweder keine oder eine Prozessquelle.
+      *   (Ein Teilauftrag hat entweder einen Abklaerungsperimeter, eine Prozessquelle oder beides)
+      *   Hat ein Teilauftrag KEINE Prozessquelle, ist durch den Auftragnehmer eine Prozessquelle zu definieren.
+       */
+      assocTeilauftragProzessquelle -- {0..1} Prozessquelle;
+      /** Eine Prozessquelle hat genau einen Auftrag */
+      assocProzessquelleTeilauftrag (EXTERNAL) -- {1} NGKSO2021.Auftrag.TeilauftragRaumbezug;
+    END TeilauftragProzessquelle;
+
+    /** Beziehung zwischen Prozessquelle und Detail zur Prozessquelle */
+    ASSOCIATION ProzessquelleDetail =
+      /** Eine Prozessquelle hat entweder kein oder genau ein Detail bezüglich Stein oder Blockschlag*/
+      assocProzessquelle -- {0..1} ProzessquelleSteinBlockschlag;
+      /** Ein Detail zur Prozessquelle hat genau eine Prozessquelle */
+      assocProzessquelleDetail -<> {1} Prozessquelle;
+    END ProzessquelleDetail;
+
+    /** Beziehungen zwischen Prozessquelle und Befund */
+    ASSOCIATION ProzessquelleBefund =
+      /** Jede Prozessquelle hat mindestens einen Befund */
+      assocProzessquelleBefund -- {1..*} Befund;
+      /** Jeder Befund hat genau eine Prozessquelle */
+      assocBefundProzessquelle (EXTERNAL) -- {1} Prozessquelle;
+    END ProzessquelleBefund;
+
+  END Befunde;  
+
+  /** Im TOPIC kartographische Produkte werden Fliessrichtungspfeile und speziell identifizierte Untergeschosse festgehalten.*/
+  TOPIC Kartographische_Produkte =
+    DEPENDS ON Befunde;
+
+    /** Fliessrichtungspfeile zeigen die Richtung des Wassers an */
+    CLASS Fliessrichtungspfeile =
+      /** Ort des Fliessrichtungspfeils */  
+      !!@ CRS=2056
+      Geometrie : MANDATORY GeometryCHLV95_V1.Coord2;
+      /** Richtung des Fliessrichtungspfeils */
+      Azimuth : MANDATORY GeometryCHLV95_V1.Orientation;
+      /** Skalierung des Fliessrichtungspfeils (z.B. fuer kleine/grosse Geschwindigkeiten) */
+      Skalierung : MANDATORY 1 .. 10;
+      /** Jaehrlichkeit, bei welchem der Fliessrichtungspfeil dargestellt werden soll. Wert zwischen 0 und 9999999 */
+      Jaehrlichkeit : MANDATORY Jaehrlichkeit;
+    END Fliessrichtungspfeile;
+
+    /** Standort von Gebaeuden mit Untergeschossen */
+    CLASS Untergeschosse =
+      /** Standort des Darstellung des Untergeschosses */  
+      !!@ CRS=2056
+      Geometrie : MANDATORY GeometryCHLV95_V1.Coord2;
+      /**Eidgenössische Gebäudeidentifikator (EGID) */
+      EGID : MANDATORY 1 .. 1000000000000000000000;
+    END Untergeschosse;
+
+    /** Beziehung zwischen PRozessquelle und Fliessrichtungspfeil */
+    ASSOCIATION ProzessquelleFliessrichtungspfeil =
+      /** Jede Proezssquelle hat keinen oder mindestens einen Fliessrichtungspfeil */
+      assocProzessquelleFliessrichtung -- {0..*} Fliessrichtungspfeile;
+      /** Jeder Fliessrichtungspfeil hat genau eine Prozessquelle */
+      assocFliessrichtungProzessquelle (EXTERNAL) -- {1} NGKSO2021.Befunde.Prozessquelle;
+    END ProzessquelleFliessrichtungspfeil;
+
+  END Kartographische_Produkte;
+
+END NGKSO2021.
