@@ -558,7 +558,7 @@ DOMAIN
    EXTENDS Befund =
       IWCode : MANDATORY IWCodePermanent;
    /* Req.10 */
-   SET CONSTRAINT GeoW_FunctionsExt.CheckBefundIntegrity(ALL, >Prozessquelle, xxxJaherlichkeitxxx) > 5;
+   SET CONSTRAINT GeoW_FunctionsExt.CheckBefundIntegrity(ALL, >Prozessquelle, "xxxJaherlichkeitxxx");
    END BefundAbsenkung;
 
    /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Einsturz/Absenkung sein */

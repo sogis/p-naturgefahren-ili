@@ -35,7 +35,7 @@ CONTRACTED MODEL GeoW_FunctionsExt
     FUNCTION GetHolesCount (Objects: OBJECTS OF ANYCLASS; AreaAttr: TEXT): NUMERIC;
 
     FUNCTION IsContainedBy (Objects: OBJECTS OF ANYCLASS; Objects: OBJECTS OF ANYCLASS; AreaAttr: TEXT): BOOLEAN;
-
     
+    FUNCTION CheckBefundIntegrity (Objects: OBJECTS OF ANYCLASS; Objects: OBJECTS OF ANYCLASS; AreaAttr: TEXT): BOOLEAN;
 
 END GeoW_FunctionsExt.
