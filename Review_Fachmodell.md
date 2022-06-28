@@ -31,18 +31,21 @@
 
 ### Fragen
 
-Zusammenhang zu MGDM???:
-
+* Auftrag.Autor.ID: MANDATORY INTERLIS.UUIDOID; ist das gewollt? bzw. entspricht dies der ID?
 * Auftrag.AuftragsID: MANDATORY INTERLIS.UUIDOID; ist das gewollt? bzw. entspricht dies der ID?
 * Prozessquelle.PQID: MANDATORY INTERLIS.UUIDOID; ist das gewollt? bzw. entspricht dies der ID? Vergabe durch Kanton (analog Auftrag)?
-* Abklaerungsperimeter.APID: MANDATORY INTERLIS.UUIDOID; ist das gewollt? bzw. entspricht dies der ID? Vergabe durch Kanton (analog Auftrag)?
+* TeilauftragRaumbezug.APID: MANDATORY INTERLIS.UUIDOID; ist das gewollt? bzw. entspricht dies der ID? Vergabe durch Kanton (analog Auftrag)?
 * TeilauftragRaumbezug.TAID: MANDATORY INTERLIS.UUIDOID; ist das gewollt? bzw. entspricht dies der ID? Vergabe durch Kanton (analog Auftrag)?
+* Jaehrlichkeit ist sehr divers modelliert und kann widersprüchlich definiert werden.
+* Abklaerungsperimeter neu 1:1 zu Teilauftrag zugewiesen (Constraint Req.30). Daher Attribute in Klasse TeilauftragRaumbezug integriert.
+* Kennwert-Klassen haben keinen Bezug zu Befund.
+* Req.27 und 30 stehen im Widerspruch
+* Klassen Kennwerte und BefundJaehrlichkeit: wirklich vererbt und nicht assoziiert? Jaehrlichkeit ist dadurch teilweise nicht gegeben (zB. BefundAbsenkung)
+* Req.10: Auf welche Jaehrlichkeit bezieht sich das Kriterium?
+* Req. 29 ist unklar
 
-## ili2gpkg Parametrisierung
 
-ili2gpkg-4.6.1.jar --schemaimport --dbfile NGKSO2021-202206080900.gpkg --createEnumTabs --createNumChecks --createFk --createFkIdx --createGeomIdx --createMetaInfo --createTypeConstraint --createEnumTabsWithId (?) --createTidCol --smart2Inheritance --strokeArcs --defaultSrsCode 2056 --models NGKSO2021 NGK_SO_V23d_edited.ili
-
-## Erfassungsprozesse
+## Erfassungsprozess
 
 ### Erfassungsreihenfolge
 
@@ -57,18 +60,23 @@ ili2gpkg-4.6.1.jar --schemaimport --dbfile NGKSO2021-202206080900.gpkg --createE
 * Befunde sind auf 13 Klassen verteilt. Dieser Umstand bedingt, dass die Klassierung stets vor der Erfassung der Geometrie passiert (dies entspricht u.E. aber auch der Denk- und Arbeitsweise)
 * Dadurch, dass die Befunde auf verschiedene Klassen verteilt sind, ist die Zuordnung aller Befunde zu einer Prozessquelle umständlich (bzw. verteilt)
 
-#### alternative Erfassungsmethode
+### alternative Erfassungsmethode
 
 1. Vorbereitung: Erfassung Auftrag - Bericht / Erfassung Abklerungsperimeter / Erfassung Autor
-2. Setin- / Blockschlag Prozesse: Einstieg auf ProzessquellePolygon bzw. -Punkt ()
+2. Stein- / Blockschlag Prozesse: Einstieg auf ProzessquellePolygon bzw. -Punkt ()
 3. alle anderen Prozesse: Einstieg auf Prozessquelle
 4. Erfassung Teilauftrag XY und Zuweisung Autor
-5. Zuordnung Perimeter
-6. Zuordnung Auftrag (Bericht)
-7. Erfassung Befund
-8. Erfassung Fliessrichtungspfeile
-
+5. Zuordnung Auftrag (Bericht)
+6. Erfassung Befund
+7. Erfassung Fliessrichtungspfeile
 fertig
+
+```mermaid
+  graph TD;
+      Auftrag-->Bericht;
+      Prozessquelle-->Teilauftrag-->Autor-->Auftrag;
+      Befund-->Prozessquelle-->Fliessrichtungspfeile;
+```
 
 ### Erfassungshinweise
 
@@ -77,3 +85,9 @@ fertig
 ### Verschiedene Hinweise
 
 * TeilAuftragRutschSturz kriegt von ModelBaker auch Beziehungselemente zu den anderen TeilAuftrags-Klassen. Falsch!!
+
+## ili2gpkg Parametrisierung
+
+~~~
+ili2gpkg-4.6.1.jar --schemaimport --dbfile NGKSO2021-202206080900.gpkg --createEnumTabs --createNumChecks --createFk --createFkIdx --createGeomIdx --createMetaInfo --createTypeConstraint --createEnumTabsWithId (?) --createTidCol --smart2Inheritance --strokeArcs --defaultSrsCode 2056 --models NGKSO2021 NGK_SO_V23d_GeoW.ili
+~~~

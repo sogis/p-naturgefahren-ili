@@ -16,6 +16,7 @@ VERSION "2022-08-01" =
 
 IMPORTS UNQUALIFIED Units, Time, CoordSys;
 IMPORTS GeometryCHLV95_V1;
+IMPORTS GeoW_FunctionsExt;
 
 DOMAIN
 
@@ -100,15 +101,6 @@ DOMAIN
      r_Permanente_Rutschung : MANDATORY Beurteilungsart;
    END Beurteilung;
 
-   /** Abklaerungsperimeter = Perimeter, welcher untersucht werden soll */
-   CLASS Abklaerungsperimeter =
-     APID : MANDATORY INTERLIS.UUIDOID;
-     Name : MANDATORY TEXT*80;
-     Geometrie : MANDATORY Einzelflaeche;
-     /** Beurteilung, welcher Teilprozess zu welchem Grad untersucht wurde */
-     Beurteilungsstatus: MANDATORY Beurteilung;
-   END Abklaerungsperimeter;
-
    CLASS Auftrag =
      AuftragsID : MANDATORY INTERLIS.UUIDOID;
      /** Beschreibung des Auftrags */
@@ -118,6 +110,8 @@ DOMAIN
      /** Art der Gefahrenbeurteilung -> siehe Wertebereich Deklarationen*/
      Deklaration : MANDATORY Deklaration;
      Bemerkung : TEXT*100;
+     /* Req.24 */
+   MANDATORY CONSTRAINT INTERLIS.objectCount(THIS)==1;
    END Auftrag;
 
    CLASS Bericht = 
@@ -145,6 +139,22 @@ DOMAIN
      Bemerkung : TEXT*100;
      /** Auftragnehmer gemaess Autorenliste */
      Auftragnehmer : MANDATORY Autor;
+
+     /** TODO: evtl. in Structure packen? */
+   /** Abklaerungsperimeter = Perimeter, welcher untersucht werden soll */
+     APID : MANDATORY INTERLIS.UUIDOID;
+     Name : MANDATORY TEXT*80;
+     Geometrie : MANDATORY Einzelflaeche;
+     /** Beurteilung, welcher Teilprozess zu welchem Grad untersucht wurde */
+     Beurteilungsstatus: MANDATORY Beurteilung;
+     /* Req.4 */
+     MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 100;
+     /* Req.3 */
+     MANDATORY CONSTRAINT GeoW_FunctionsExt.IsInsideSO(THIS, "Geometrie");
+     /* Req.5 */
+     MANDATORY CONSTRAINT GeoW_FunctionsExt.GetHolesCount(THIS, "Geometrie") == 0;
+     /* Req.28 */
+     UNIQUE Geometrie;
    END TeilauftragRaumbezug;
 
    /** TEILAUFTRAG SZENARIEN (Abstrakte Klasse)
@@ -164,7 +174,7 @@ DOMAIN
 
    CLASS TeilauftragRutschSturz
    EXTENDS TeilauftragSzenarien =
-     /** Angabe, welches Teilprozess untersucht werden soll. Moegliche Werte siehe Wertebereich TeilprozessRutschSturz */
+     /** Angabe, welcher Teilprozess untersucht werden soll. Moegliche Werte siehe Wertebereich TeilprozessRutschSturz */
      Teilprozess : MANDATORY TeilprozessRutschSturz;
    END TeilauftragRutschSturz;
 
@@ -197,14 +207,6 @@ DOMAIN
      TeilauftragAuftrag -<> {1} Auftrag;
    END AuftragTeilauftrag;
 
-   ASSOCIATION TeilauftragAbklaerungsperimeter =
-     /** Jeder Teilauftrag hat entweder keinen oder genau einen Abklaerungsperimeter
-     *   (Ein Teilauftrag hat entweder einen Abklaerungsperimeter, eine Prozessquelle oder beides)
-     */
-     AbklaerungsperimeterTeilauftrag -- {0..1} Abklaerungsperimeter;
-     TeilauftragAbklaerungsperimeter -- {1} TeilauftragRaumbezug;
-   END TeilauftragAbklaerungsperimeter;
-
    ASSOCIATION AuftragBericht =
      AuftragBericht -- {1..*} Bericht;
      BerichtAuftrag -<> {1} Auftrag;
@@ -215,7 +217,7 @@ DOMAIN
   /** Im TOPIC Befunde werden die Prozessquellen definiert und die Befunde der Gefahrenbeurteilungen gespeichert. 
  *   Pro Teilprozess wird je eine eigene Klasse zur Verfügung gestellt. 
  *   Fuer die Teilprozesse Ueberschwemmung und Uebermurung koennen zusaetzlich Kennwerte in eigenen Klassen gespeichert werden. 
- *   Fuer Prozesse mit einer Jaerhlichkeit koennen auch Szenarien mit freier Jaehrlichkeit gespeichert werden.
+ *   Fuer Prozesse mit einer Jaehrlichkeit koennen auch Szenarien mit freier Jaehrlichkeit gespeichert werden.
  */
  TOPIC Befunde =
    DEPENDS ON Auftraege;
@@ -254,7 +256,7 @@ DOMAIN
        tetraedrisch
      );
 
-     /** Wertebereich fuer Befunde mit Jaehrlichkeiten --> Intensitaeten */
+     /** Wertebereich fuer Befunde mit Jaehrlichkeiten --> Intensitaet */
       Intensitaet = (
        schwach,
        mittel,
@@ -505,8 +507,6 @@ DOMAIN
      /** Name der Prozessquelle (Dorfbach) */
      ProzessquellenName : MANDATORY TEXT*80;
      Hauptprozess : MANDATORY Hauptprozess;
-   UNIQUE
-     ProzessquellenName;
    END Prozessquelle;
 
    /** Abstrakte Klasse fuer Detailbeschreibung der Prozessquelle bei Stein- und Blockschlag */
@@ -541,15 +541,24 @@ DOMAIN
    *   Konkretisiert werden die Befunde durch saemtliche Teilprozesse, Kennwerte fuer Wasserprozesse und freie Befunde mit Jaehrlichkeit. 
    */
    CLASS Befund (ABSTRACT) =
-     Geometrie : MANDATORY Einzelflaeche;
+     /* Req.19,20 */   
+     Geometrie : MANDATORY AREA WITH (STRAIGHTS) VERTEX GeometryCHLV95_V1.Coord2 WITHOUT OVERLAPS > 0.1;
      RestgefaehrdungJaehrlichkeit : JaehrlichkeitRestgefaehrdung;
      Bemerkung : TEXT*100;
+     /* Req.21 */
+     MANDATORY CONSTRAINT GeoW_FunctionsExt.GetHolesCount(THIS, "Geometrie") == 0;
+     /* Req.9,14 */
+     MANDATORY CONSTRAINT GeoW_FunctionsExt.IsContainedBy(THIS, >SO_AFU_Naturgefahren_20220801.Auftraege.TeilauftragRaumbezug, "Geometrie");
+     /* Req.11 */
+     MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
    END Befund;
 
    /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Einsturz/Absenkung sein */
    CLASS BefundAbsenkung
    EXTENDS Befund =
       IWCode : MANDATORY IWCodePermanent;
+   /* Req.10 */
+   SET CONSTRAINT GeoW_FunctionsExt.CheckBefundIntegrity(ALL, >Prozessquelle, xxxJaherlichkeitxxx) > 5;
    END BefundAbsenkung;
 
    /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Einsturz/Absenkung sein */
@@ -602,7 +611,6 @@ DOMAIN
      IWCode : MANDATORY IWCodeStandard;
    END BefundSpontaneRutschung;
    
-   
    /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Wasser sein */
    CLASS BefundUebermurung
    EXTENDS Befund =
@@ -627,12 +635,12 @@ DOMAIN
    END BefundUfererosion;
 
    /** Befunde fuer freie Jaehrlichkeit. Hier sind Jaehrlichkeit, Intensitaet Teilprozess anzugeben. */
-   CLASS BefundeJaehrlichkeit
+   CLASS BefundJaehrlichkeit
    EXTENDS Befund =
      Jaehrlichkeit : MANDATORY Jaehrlichkeit; 
      Intensitaet : MANDATORY Intensitaet; 
      Teilprozess : MANDATORY Teilprozess;
-   END BefundeJaehrlichkeit;
+   END BefundJaehrlichkeit;
 
    /** Befunde mit Kennwert (Fliesstiefe) fuer Prozess Uberschwemmung
    *   Prozessquelle -> Hauptprozess muss Wasser sein
@@ -642,9 +650,10 @@ DOMAIN
      /** Moegliche Werte gemaess wFliesstiefe. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */
      h : wFliesstiefe;
      hDetail : wFliesstiefeDetail;
+     /* Req.18 */
+     MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
    END KennwertUeberschwemmungFliesstiefe;
 
-   
    /** Befunde mit Kennwert (Fliessgeschwindigkeit) fuer Prozess Uberschwemmung
    *   Prozessquelle -> Hauptprozess muss Wasser sein
    */
@@ -653,6 +662,8 @@ DOMAIN
      /** Moegliche Werte gemaess wUeberschwemmungFliessgeschwindigkeit. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */
      v : wUeberschwemmungFliessgeschwindigkeit;
      vDetail : wFliessgeschwindigkeitDetail;
+     /* Req.18 */
+     MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
    END KennwertUeberschwemmungFliessgeschwindigkeit;
    
    /** Befunde mit Kennwert (Produkt v x h) fuer Prozess Uberschwemmung
@@ -663,6 +674,8 @@ DOMAIN
      /** Moegliche Werte gemaess wProduktHxV. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */
      v_mal_h : wProduktHxV;
      v_mal_hDetail: wProduktHxVDetail;
+     /* Req.18 */
+     MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
    END KennwertUeberschwemmungProduktVxH;
 
    /** Befunde mit Kennwert (Fliesstiefe) fuer Prozess Uebermurung
@@ -673,6 +686,8 @@ DOMAIN
      /** Moegliche Werte gemaess wFliesstiefe. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */
      h : wFliesstiefe;
      hDetail : wFliesstiefeDetail;
+     /* Req.18 */
+     MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
    END KennwertUbermurungFliesstiefe;
 
    /** Befunde mit Kennwert (Fliessgeschwindigkeit) fuer Prozess Uebermurung
@@ -683,8 +698,9 @@ DOMAIN
      /** Moegliche Werte gemaess wUbermurungFliessgeschwindigkeit. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */  
      v : wUbermurungFliessgeschwindigkeit;
      vDetail : wFliessgeschwindigkeitDetail;
+     /* Req.18 */
+     MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
    END KennwertUbermurungFliessgeschwindigkeit;
-   
    
    ASSOCIATION TeilauftragProzessquelle =
      /** Ein Teilauftrag hat entweder keine oder eine Prozessquelle.
@@ -704,6 +720,92 @@ DOMAIN
      ProzessquelleBefund -- {1..*} Befund;
      BefundProzessquelle (EXTERNAL) -- {1} Prozessquelle;
    END ProzessquelleBefund;
+
+   !!@ name = "BefundSteinBlockschlag muss Hauptprozess>Sturz zugeordnet sein"
+   CONSTRAINTS OF BefundSteinBlockschlag =
+    MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Sturz;
+   END;
+
+   !!@ name = "BefundBergFelssturz muss Hauptprozess>Sturz zugeordnet sein"
+   CONSTRAINTS OF BefundBergFelssturz =
+    MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Sturz;
+   END;
+
+   !!@ name = "BefundEisschlag muss Hauptprozess>Sturz zugeordnet sein"
+   CONSTRAINTS OF BefundEisschlag =
+    MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Sturz;
+   END;
+
+   !!@ name = "BefundHangmure muss Hauptprozess>Rutschung zugeordnet sein"
+   CONSTRAINTS OF BefundHangmure =
+    MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Rutschung;
+   END;
+
+   !!@ name = "BefundUfererosion muss Hauptprozess>Wasser zugeordnet sein"   
+   CONSTRAINTS OF BefundUfererosion =
+    MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Wasser;
+   END;
+
+   !!@ name = "BefundAbsenkung muss Hauptprozess>Absenkung_Einsturz zugeordnet sein"   
+   CONSTRAINTS OF BefundAbsenkung =
+    MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Absenkung_Einsturz;
+   END;
+
+   !!@ name = "BefundEinsturz muss Hauptprozess>Absenkung_Einsturz zugeordnet sein"   
+   CONSTRAINTS OF BefundEinsturz =
+    MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Absenkung_Einsturz;
+   END;
+
+   !!@ name = "BefundPermanenteRutschung muss Hauptprozess>Rutschung zugeordnet sein" 
+   CONSTRAINTS OF BefundPermanenteRutschung =
+    MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Rutschung;
+   END;   
+
+   !!@ name = "BefundSpontaneRutschung muss Hauptprozess>Rutschung zugeordnet sein" 
+   CONSTRAINTS OF BefundSpontaneRutschung =
+    MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Rutschung;
+   END;      
+
+   !!@ name = "BefundUebermurung muss Hauptprozess>Wasser zugeordnet sein" 
+   CONSTRAINTS OF BefundUebermurung =
+    MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Wasser;
+   END;
+
+   !!@ name = "BefundUeberschwemmungDynamisch muss Hauptprozess>Wasser zugeordnet sein"    
+   CONSTRAINTS OF BefundUeberschwemmungDynamisch =
+    MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Wasser;
+   END;
+
+   !!@ name = "BefundUeberschwemmungStatisch muss Hauptprozess>Wasser zugeordnet sein"       
+   CONSTRAINTS OF BefundUeberschwemmungStatisch =
+    MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Wasser;
+   END;
+
+   /* Req.8 
+   TODO: Dritte Quelle noch einbauen*/
+   VIEW BefundWasser
+    UNION OF Pq ~ Prozessquelle, Bf ~ Befund;
+    =
+    Geometrie: Einzelflaeche;
+    SET CONSTRAINT INTERLIS.areAreas(ALL, UNDEFINED, >> Geometrie);
+   END BefundWasser;
+
+   /* Req.23: Hilfsview für Constraint */
+   VIEW BefundUeberschwemmung
+    UNION OF BUsD ~ BefundUeberschwemmungDynamisch, BUsS ~ BefundUeberschwemmungStatisch;
+    =
+    Geometrie: Einzelflaeche;
+   END BefundUeberschwemmung;
+
+   /* Req.10 */
+  !!VIEW Grenzpunkt_Gueltig
+  !! PROJECTION OF Grenzpunkt;
+  !! WHERE DEFINED(Grenzpunkt->Entstehung) AND Grenzpunkt->Entstehung->Status==#gueltig AND (NOT(DEFINED(Grenzpunkt->Untergang)) OR Grenzpunkt->Untergang->Status<>#gueltig);
+  !! =
+  !! ALL OF Grenzpunkt;
+  !!NIQUE Geometrie;
+  !!ND Grenzpunkt_Gueltig;
+
 
  END Befunde;  
 
@@ -725,6 +827,8 @@ DOMAIN
      Geometrie : MANDATORY GeometryCHLV95_V1.Coord2;
      /**Eidgenössische Gebäudeidentifikator (EGID) */
      EGID : MANDATORY 1..900000000;
+     /* Req.23 */
+     MANDATORY CONSTRAINT GeoW_FunctionsExt.IsInside(THIS, "Geometrie", >SO_AFU_Naturgefahren_20220801.Befunde.BefundUeberschwemmung);
    END Untergeschosse;
 
    ASSOCIATION ProzessquelleFliessrichtungspfeil =

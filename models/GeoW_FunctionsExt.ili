@@ -1,0 +1,41 @@
+INTERLIS 2.3;
+CONTRACTED MODEL GeoW_FunctionsExt
+  AT "mailto:info@geowerkstatt.ch" VERSION "2022-03-09" =
+    /**
+    * Geometrie-Funktionen
+    */
+    !!@ fn.description = "Ermittelt die Länge einer (bzw. die Summe mehrer) Linien-Geometrien. Für 'Objects' können Objekte oder Geometrien angegeben werden. Für 'LineAttr' soll der Pfad zur Linien-Geometrie in INTERLIS 2 Syntax angegeben werden. Falls 'Objects' bereits die Geometrien enthält, soll für 'LineAttr' 'UNDEFINED' übergeben werden. Wird über eine Beziehung die gleiche Geometrie mehrmals gefunden, wird dessen Länge mehrmals gezählt.";
+    !!@ fn.param = "Objects: Ausgangsobjekte oder Geometrien. LineAttr: Pfad zum Geometrieattribut oder UNDEFINED";
+    !!@ fn.return = "Länge der Geometrie";
+    !!@ fn.since = "2021-11-15";
+    FUNCTION GetLength (Objects: OBJECTS OF ANYCLASS; LineAttr: TEXT): NUMERIC;
+
+    !!@ fn.description = "Ermittelt die Fläche einer (bzw. die Summe mehrer) Polygon-Geometrien. Für 'Objects' können Objekte oder Geometrien angegeben werden. Für 'AreaAttr' soll der Pfad zur Flächen-Geometrie in INTERLIS 2 Syntax angegeben werden. Falls 'Objects' bereits die Geometrien enthält, soll für 'AreaAttr' 'UNDEFINED' übergeben werden. Wird über eine Beziehung die gleiche Geometrie mehrmals gefunden, wird dessen Fläche mehrmals gezählt.";
+    !!@ fn.param = "Objects: Ausgangsobjekte oder Geometrien. AreaAttr: Pfad zum Geometrieattribut oder UNDEFINED";
+    !!@ fn.return = "Fläche der Geometrie";
+    !!@ fn.since = "2021-11-15";
+    FUNCTION GetArea (Objects: OBJECTS OF ANYCLASS; AreaAttr: TEXT): NUMERIC;
+
+    !!@ fn.description = "Überprüft, ob sich das 'TestObject' mit einer Instanz von 'BaseClass' überschneidet.";
+    !!@ fn.param = "TestObject: Das zu überprüfende Objekt. BaseClass: Klasse oder Struktur, deren Instanzen in der Überprüfung verwendet werden.";
+    !!@ fn.return = "true, wenn es Koordinaten gibt, die gleichzeitig teil von 'TestObject' und einer Instanz von 'BaseClass' sind. Sonst false.";
+    !!@ fn.since = "2022-03-21";
+    FUNCTION NplagHasIntersection (TestObject: OBJECT OF ANYCLASS; BaseClass: ANYSTRUCTURE): BOOLEAN;
+
+    !!@ fn.description = "Überprüft, ob TextVal dem angegebenen Pattern entspricht.";
+    !!@ fn.param = "TextVal: Zu untersuchendes Textattribut. Pattern: Ein Regular Expression Pattern";
+    !!@ fn.return = "Ob TextVal durch das Regular Expression Pattern gematched wird";
+    !!@ fn.since = "2022-03-09";
+    FUNCTION IsMatch (TextVal: TEXT; Pattern: TEXT): BOOLEAN;
+
+    FUNCTION IsInsideSO (Objects: OBJECTS OF ANYCLASS; AreaAttr: TEXT): BOOLEAN;
+
+    FUNCTION IsInside (Objects: OBJECTS OF ANYCLASS; AreaAttr: TEXT; Objects: OBJECTS OF ANYCLASS): BOOLEAN;
+
+    FUNCTION GetHolesCount (Objects: OBJECTS OF ANYCLASS; AreaAttr: TEXT): NUMERIC;
+
+    FUNCTION IsContainedBy (Objects: OBJECTS OF ANYCLASS; Objects: OBJECTS OF ANYCLASS; AreaAttr: TEXT): BOOLEAN;
+
+    
+
+END GeoW_FunctionsExt.
