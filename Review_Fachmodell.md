@@ -9,6 +9,7 @@
 * Header, Revision-History AGI Solothurn fehlt
 * Issuer auf geo.so.ch/models/AFU gesetzt
 * VERSION aktualisiert
+* Indentation vereinheitlicht und angepasst
 
 ### Betitelung der Objekte
 
@@ -38,22 +39,10 @@
 * TeilauftragRaumbezug.APID: MANDATORY INTERLIS.UUIDOID; ist das gewollt? bzw. entspricht dies der ID? Vergabe durch Kanton (analog Auftrag)?
 * TeilauftragRaumbezug.TAID: MANDATORY INTERLIS.UUIDOID; ist das gewollt? bzw. entspricht dies der ID? Vergabe durch Kanton (analog Auftrag)?
 
-## Erfassungsprozess
+## Erfassungsprozess QGIS
 
 ### Erfassungsreihenfolge
 
-1. Abklärungsperimeter
-2. Auftrag - Bericht
-3. Teilauftrag und Zuordnung zu Auftrag, Abklärungsperimeter und Autor (1 Maske)
-4. Prozessquelle (optional, kann ich auch in Schritt 5 passieren)
-5. ProzessquelleSteinBlockschlagPunkt und Zuordnung zu Prozessquelle (1 Maske)
-6. Fliessrichtung und Zuordnung zu Prozessquelle (1 Maske)
-7. Befund und Zuordnung zu Prozessquelle (1 Maske)
-
-* Befunde sind auf 13 Klassen verteilt. Dieser Umstand bedingt, dass die Klassierung stets vor der Erfassung der Geometrie passiert (dies entspricht u.E. aber auch der Denk- und Arbeitsweise)
-* Dadurch, dass die Befunde auf verschiedene Klassen verteilt sind, ist die Zuordnung aller Befunde zu einer Prozessquelle umständlich (bzw. verteilt)
-
-### alternative Erfassungsmethode
 
 1. Vorbereitung: Erfassung Auftrag - Bericht / Erfassung Abklerungsperimeter / Erfassung Autor
 2. Stein- / Blockschlag Prozesse: Einstieg auf ProzessquellePolygon bzw. -Punkt ()
@@ -62,26 +51,17 @@
 5. Zuordnung Auftrag (Bericht)
 6. Erfassung Befund
 7. Erfassung Fliessrichtungspfeile
+8. Erfassung Untergeschosse
 
 ```mermaid
   graph TD;
-      Auftrag-->Bericht;
-      Prozessquelle-->Teilauftrag-->Autor-->Auftrag;
-      Befund-->Prozessquelle-->Fliessrichtungspfeile;
+      Prozessquelle-->Teilauftrag-->Autor-->Auftrag-->Bericht;
+      Befund-->Prozessquelle-->Fliessrichtungspfeile-->Untergeschosse;
 ```
 
 ![Image](./Workflow_Model.png)
 
-### Erfassungshinweise
-
-* Drehwinkel (zB. Richtungspfeile): Aktuell über Eingabe des Azimut-Wertes, Symbolisierung variabel -> Kontrolle
-
 ### Verschiedene Hinweise
 
-* TeilAuftragRutschSturz kriegt von ModelBaker auch Beziehungselemente zu den anderen TeilAuftrags-Klassen. Falsch!!
-
-## ili2gpkg Parametrisierung
-
-~~~
-ili2gpkg-4.6.1.jar --schemaimport --dbfile NGKSO2021-202206080900.gpkg --createEnumTabs --createNumChecks --createFk --createFkIdx --createGeomIdx --createMetaInfo --createTypeConstraint --createEnumTabsWithId (?) --createTidCol --smart2Inheritance --strokeArcs --defaultSrsCode 2056 --models NGKSO2021 NGK_SO_V23d_GeoW.ili
-~~~
+* TeilAuftragRutschSturz kriegt von ModelBaker (v7.1.7) auch Beziehungselemente zu den anderen TeilAuftrags-Klassen. Dies ist falsch und muss im Fall einer ModelBaker-Verwendung korrigiert werden.
+* Drehwinkel (zB. Richtungspfeile): Aktuell über Eingabe des Azimut-Wertes, Symbolisierung variabel -> Kontrolle
