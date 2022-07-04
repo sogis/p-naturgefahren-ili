@@ -4,11 +4,11 @@
 
 ### Aufbau der ILI-Datei
 
-* Codierung 'UTF-8 ohne BOM' führt zu Lesefehler bei ilitools: korrigieren
-* tendenziell etwas überkommentiert. Auf Kommentare, welche die ILI Syntax repetieren, entfernen.
+* Codierung 'UTF-8 ohne BOM' führt zu Lesefehler bei ilitools: korrigiert
+* tendenziell etwas überkommentiert. Kommentare, welche die ILI Syntax repetieren, entfernt.
 * Header, Revision-History AGI Solothurn fehlt
-* Issuer auf geo.so.ch/models/AFU setzen
-* VERSION aktualisieren
+* Issuer auf geo.so.ch/models/AFU gesetzt
+* VERSION aktualisiert
 
 ### Betitelung der Objekte
 
@@ -22,12 +22,13 @@
 ## Syntaktische Aspekte ili Modellbeschreibung
 
 * IMPORTS von INTERLIS muss nicht explizit aufgeführt werden.
-* IMPORTS Basismodelle auf UNQUALIFIED  gesetzt
-* Feststellung: Das Modell enthält keine Elemente, welche per se von ili2gpkg oder Geopackage aktuell nicht unterstützt werden. (Klassen mit mehreren Geometriefeldern)
+* IMPORTS Basismodelle auf UNQUALIFIED gesetzt
 * Optimierung: Verwendung von Einheiten im Eigenschaftsnamen (zB. "ProzessquelleSteinBlockschlag.Volumen_m3") wird besser mittels konkreter Typisierung gelöst. !!TODO (Abhängigkeit zu MGDM)
 * UNIQUE Constraint auf Prozessquelle (sinnvoll aufgrund der Erfassungsmethodik über Prozessquelle)
 * die beiden Structures sind sinnvoll gewählt
-* Kartographische_Produkte.Untergeschosse.EGID Nummernbereich angepasst (gemäss DM.flex). Alter Nummernbereich führte zu Fehler in GPKG (Eigenschaft kann nicht erfasst werden)
+* Kartographische_Produkte.Untergeschosse.EGID Nummernbereich angepasst (gemäss DM.flex). Alter Nummernbereich führte zu Fehler in GPKG (Nummernbereich zu gross dimensioniert, Eigenschaft kann nicht erfasst werden)
+* Ansonsten enthält das Modell keine Elemente, welche per se von ili2gpkg oder Geopackage aktuell nicht unterstützt werden.
+* Abklaerungsperimeter neu 1:1 zu Teilauftrag zugewiesen (Constraint Req.30). Daher Attribute in Klasse TeilauftragRaumbezug integriert.
 
 ### Fragen
 
@@ -36,14 +37,6 @@
 * Prozessquelle.PQID: MANDATORY INTERLIS.UUIDOID; ist das gewollt? bzw. entspricht dies der ID? Vergabe durch Kanton (analog Auftrag)?
 * TeilauftragRaumbezug.APID: MANDATORY INTERLIS.UUIDOID; ist das gewollt? bzw. entspricht dies der ID? Vergabe durch Kanton (analog Auftrag)?
 * TeilauftragRaumbezug.TAID: MANDATORY INTERLIS.UUIDOID; ist das gewollt? bzw. entspricht dies der ID? Vergabe durch Kanton (analog Auftrag)?
-* Jaehrlichkeit ist sehr divers modelliert und kann widersprüchlich definiert werden.
-* Abklaerungsperimeter neu 1:1 zu Teilauftrag zugewiesen (Constraint Req.30). Daher Attribute in Klasse TeilauftragRaumbezug integriert.
-* Kennwert-Klassen haben keinen Bezug zu Befund.
-* Req.27 und 30 stehen im Widerspruch
-* Klassen Kennwerte und BefundJaehrlichkeit: wirklich vererbt und nicht assoziiert? Jaehrlichkeit ist dadurch teilweise nicht gegeben (zB. BefundAbsenkung)
-* Req.10: Auf welche Jaehrlichkeit bezieht sich das Kriterium?
-* Req. 29 ist unklar
-
 
 ## Erfassungsprozess
 
@@ -69,7 +62,6 @@
 5. Zuordnung Auftrag (Bericht)
 6. Erfassung Befund
 7. Erfassung Fliessrichtungspfeile
-fertig
 
 ```mermaid
   graph TD;
@@ -77,6 +69,8 @@ fertig
       Prozessquelle-->Teilauftrag-->Autor-->Auftrag;
       Befund-->Prozessquelle-->Fliessrichtungspfeile;
 ```
+
+![Image](./Workflow_Model.png)
 
 ### Erfassungshinweise
 
