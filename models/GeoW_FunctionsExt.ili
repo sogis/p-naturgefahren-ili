@@ -36,6 +36,6 @@ CONTRACTED MODEL GeoW_FunctionsExt
 
     FUNCTION IsContainedBy (Objects: OBJECTS OF ANYCLASS; Objects: OBJECTS OF ANYCLASS; AreaAttr: TEXT): BOOLEAN;
     
-    FUNCTION CheckBefundIntegrity (Objects: OBJECTS OF ANYCLASS; Objects: OBJECTS OF ANYCLASS; AreaAttr: TEXT): BOOLEAN;
+    FUNCTION CheckBefundIntegrity (Objects: OBJECTS OF ANYCLASS; RefAttr: TEXT; AreaAttr: TEXT): BOOLEAN;
 
 END GeoW_FunctionsExt.

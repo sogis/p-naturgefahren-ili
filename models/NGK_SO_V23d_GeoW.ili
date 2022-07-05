@@ -146,14 +146,14 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
       /** Beurteilung, welcher Teilprozess zu welchem Grad untersucht wurde */
       Beurteilungsstatus: MANDATORY Beurteilung;
 
-      /* Req.4 */
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 100;
-      /* Req.3 */
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.IsInsideSO(THIS, "Geometrie");
-      /* Req.5 */
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetHolesCount(THIS, "Geometrie") == 0;
-      /* Req.28 */
-      UNIQUE Geometrie;
+    /* Req.4 */
+    MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 100;
+    /* Req.3 */
+    MANDATORY CONSTRAINT GeoW_FunctionsExt.IsInsideSO(THIS, "Geometrie");
+    /* Req.5 */
+    MANDATORY CONSTRAINT GeoW_FunctionsExt.GetHolesCount(THIS, "Geometrie") == 0;
+    /* Req.28 */
+    UNIQUE Geometrie;
     END TeilauftragRaumbezug;
 
     /** TEILAUFTRAG SZENARIEN (Abstrakte Klasse)
@@ -521,7 +521,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     */
     CLASS ProzessquelleSteinBlockschlagPolygon
     EXTENDS ProzessquelleSteinBlockschlag =
-    Geometrie : MANDATORY Einzelflaeche;
+      Geometrie : MANDATORY Einzelflaeche;
     END ProzessquelleSteinBlockschlagPolygon;
    
     /** Konkretisiert die Klasse ProzessquelleSteinBlockschlag. Beschreibt die Prozessquelle mit einem Punkt
@@ -543,12 +543,12 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
       Geometrie : MANDATORY AREA WITH (STRAIGHTS) VERTEX GeometryCHLV95_V1.Coord2 WITHOUT OVERLAPS > 0.1;
       RestgefaehrdungJaehrlichkeit : JaehrlichkeitRestgefaehrdung;
       Bemerkung : TEXT*100;
-      /* Req.21 */
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetHolesCount(THIS, "Geometrie") == 0;
-      /* Req.9,14 */
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.IsContainedBy(THIS, >SO_AFU_Naturgefahren_20220801.Auftraege.TeilauftragRaumbezug, "Geometrie");
-      /* Req.11 */
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
+    /* Req.21 */
+    MANDATORY CONSTRAINT GeoW_FunctionsExt.GetHolesCount(THIS, "Geometrie") == 0;
+    /* Req.9,14 */
+    MANDATORY CONSTRAINT GeoW_FunctionsExt.IsContainedBy(THIS, >SO_AFU_Naturgefahren_20220801.Auftraege.TeilauftragRaumbezug, "Geometrie");
+    /* Req.11 */
+    MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
     END Befund;
 
     /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Einsturz/Absenkung sein */
@@ -556,37 +556,47 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     EXTENDS Befund =
         IWCode : MANDATORY IWCodePermanent;
     /* Req.10 */
-    SET CONSTRAINT GeoW_FunctionsExt.CheckBefundIntegrity(ALL, >Prozessquelle, "xxxJaherlichkeitxxx");
+    SET CONSTRAINT GeoW_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "IWCode");
     END BefundAbsenkung;
 
     /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Einsturz/Absenkung sein */
     CLASS BefundEinsturz
     EXTENDS Befund = 
       IWCode : MANDATORY IWCodePermanent;
+    /* Req.10 */
+    SET CONSTRAINT GeoW_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "IWCode");
     END BefundEinsturz; 
 
     /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Sturz sein */
     CLASS BefundSteinBlockschlag
     EXTENDS Befund =
       IWCode : MANDATORY IWCodeStandard;
+    /* Req.10 */
+    SET CONSTRAINT GeoW_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "IWCode");
     END BefundSteinBlockschlag;
     
     /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Sturz sein */
     CLASS BefundBergFelssturz
     EXTENDS Befund =   
       IWCode : MANDATORY IWCodeBergFelssturz;
+    /* Req.10 */
+    SET CONSTRAINT GeoW_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "IWCode");
     END BefundBergFelssturz;
     
     /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Sturz sein */
     CLASS BefundEisschlag
     EXTENDS Befund = 
       IWCode : MANDATORY IWCodeStandard;
+    /* Req.10 */
+    SET CONSTRAINT GeoW_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "IWCode");
     END BefundEisschlag;
 
     /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Rutsch sein */
     CLASS BefundHangmure
     EXTENDS Befund =
       IWCode : MANDATORY IWCodeStandard;
+    /* Req.10 */
+    SET CONSTRAINT GeoW_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "IWCode");
     END BefundHangmure;
     
     /** Konkretisiert die Klasse Befund.
@@ -607,24 +617,32 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     CLASS BefundSpontaneRutschung
     EXTENDS Befund =
       IWCode : MANDATORY IWCodeStandard;
+    /* Req.10 */
+    SET CONSTRAINT GeoW_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "IWCode");
     END BefundSpontaneRutschung;
     
     /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Wasser sein */
     CLASS BefundUebermurung
     EXTENDS Befund =
       IWCode : MANDATORY IWCodeUebermurung;
+    /* Req.10 */
+    SET CONSTRAINT GeoW_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "IWCode");
     END BefundUebermurung;
     
     /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Wasser sein */
     CLASS BefundUeberschwemmungDynamisch
     EXTENDS Befund =
       IWCode : MANDATORY IWCodeStandard;
+    /* Req.10 */
+    SET CONSTRAINT GeoW_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "IWCode");
     END BefundUeberschwemmungDynamisch;
     
     /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Wasser sein */
     CLASS BefundUeberschwemmungStatisch
     EXTENDS Befund =
       IWCode : MANDATORY IWCodeStandard;
+    /* Req.10 */
+    SET CONSTRAINT GeoW_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "IWCode");
     END BefundUeberschwemmungStatisch;
     
     /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Wasser sein */
@@ -638,6 +656,8 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
       Jaehrlichkeit : MANDATORY Jaehrlichkeit; 
       Intensitaet : MANDATORY Intensitaet;  
       Teilprozess : MANDATORY Teilprozess;
+    /* Req.10 */
+    SET CONSTRAINT GeoW_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "Intensitaet");
     END BefundJaehrlichkeit;
 
     /** Befunde mit Kennwert (Fliesstiefe) fuer Prozess Uberschwemmung
@@ -648,8 +668,10 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
       /** Moegliche Werte gemaess wFliesstiefe. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */
       h : wFliesstiefe;
       hDetail : wFliesstiefeDetail;
-      /* Req.18 */
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
+    /* Req.18 */
+    MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
+    /* Req.15 */
+    SET CONSTRAINT GeoW_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "h");
     END KennwertUeberschwemmungFliesstiefe;
 
     /** Befunde mit Kennwert (Fliessgeschwindigkeit) fuer Prozess Uberschwemmung
@@ -660,8 +682,10 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
       /** Moegliche Werte gemaess wUeberschwemmungFliessgeschwindigkeit. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */
       v : wUeberschwemmungFliessgeschwindigkeit;
       vDetail : wFliessgeschwindigkeitDetail;
-      /* Req.18 */
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
+    /* Req.18 */
+    MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
+    /* Req.15 */
+    SET CONSTRAINT GeoW_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "h");
     END KennwertUeberschwemmungFliessgeschwindigkeit;
     
     /** Befunde mit Kennwert (Produkt v x h) fuer Prozess Uberschwemmung
@@ -672,8 +696,10 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
       /** Moegliche Werte gemaess wProduktHxV. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */
       v_mal_h : wProduktHxV;
       v_mal_hDetail: wProduktHxVDetail;
-      /* Req.18 */
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
+    /* Req.18 */
+    MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
+    /* Req.15 */
+    SET CONSTRAINT GeoW_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "h");
     END KennwertUeberschwemmungProduktVxH;
 
     /** Befunde mit Kennwert (Fliesstiefe) fuer Prozess Uebermurung
@@ -684,8 +710,10 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
       /** Moegliche Werte gemaess wFliesstiefe. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */
       h : wFliesstiefe;
       hDetail : wFliesstiefeDetail;
-      /* Req.18 */
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
+    /* Req.18 */
+    MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
+    /* Req.15 */
+    SET CONSTRAINT GeoW_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "h");
     END KennwertUbermurungFliesstiefe;
 
     /** Befunde mit Kennwert (Fliessgeschwindigkeit) fuer Prozess Uebermurung
@@ -696,8 +724,10 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
       /** Moegliche Werte gemaess wUbermurungFliessgeschwindigkeit. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */  
       v : wUbermurungFliessgeschwindigkeit;
       vDetail : wFliessgeschwindigkeitDetail;
-      /* Req.18 */
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
+    /* Req.18 */
+    MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
+    /* Req.15 */
+    SET CONSTRAINT GeoW_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "h");
     END KennwertUbermurungFliessgeschwindigkeit;
     
     ASSOCIATION TeilauftragProzessquelle =
@@ -782,23 +812,16 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     !!@ name = "BefundJaehrlichkeit muss Hauptprozess>Wasser zugeordnet sein"       
     CONSTRAINTS OF BefundJaehrlichkeit =
       MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Sturz;
+      /* Req.8 */
+      SET CONSTRAINT INTERLIS_ext.areAreas3(ALL,>Prozessquelle,"Geometrie");  
     END;
 
     /* Req.23: Hilfsview für Constraint */
-    VIEW BefundUeberschwemmung
+    VIEW Helper_BefundUeberschwemmung
       UNION OF BUsD ~ BefundUeberschwemmungDynamisch, BUsS ~ BefundUeberschwemmungStatisch;
       =
       Geometrie: Einzelflaeche;
-    END BefundUeberschwemmung;
-
-   /* Req.10 */
-  !!VIEW Grenzpunkt_Gueltig
-  !! PROJECTION OF Grenzpunkt;
-  !! WHERE DEFINED(Grenzpunkt->Entstehung) AND Grenzpunkt->Entstehung->Status==#gueltig AND (NOT(DEFINED(Grenzpunkt->Untergang)) OR Grenzpunkt->Untergang->Status<>#gueltig);
-  !! =
-  !! ALL OF Grenzpunkt;
-  !!NIQUE Geometrie;
-  !!ND Grenzpunkt_Gueltig;
+    END Helper_BefundUeberschwemmung;
 
   END Befunde;  
 
@@ -820,8 +843,8 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
       Geometrie : MANDATORY GeometryCHLV95_V1.Coord2;
       /**Eidgenössische Gebäudeidentifikator (EGID) */
       EGID : MANDATORY 1..900000000;
-      /* Req.23 */
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.IsInside(THIS, "Geometrie", >SO_AFU_Naturgefahren_20220801.Befunde.BefundUeberschwemmung);
+    /* Req.23 */
+    MANDATORY CONSTRAINT GeoW_FunctionsExt.IsInside(THIS, "Geometrie", >SO_AFU_Naturgefahren_20220801.Befunde.Helper_BefundUeberschwemmung);
     END Untergeschosse;
 
     ASSOCIATION ProzessquelleFliessrichtungspfeil =
