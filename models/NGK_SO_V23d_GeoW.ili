@@ -33,6 +33,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
       Der Auftragnehmer muss am Ende des Auftrages im Abklaerungsperimeter deklarieren, bis zu welchem Grad die Beurteilung vorgenommen wurde.
     */
     TOPIC Auftraege =
+      OID AS INTERLIS.UUIDOID;
 
     DOMAIN
       /** Werte fuer Deklaration der Beurteilung*/
@@ -214,12 +215,14 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
   END Auftraege;
 
   /** Im TOPIC Befunde werden die Prozessquellen definiert und die Befunde der Gefahrenbeurteilungen gespeichert. 
- *   Pro Teilprozess wird je eine eigene Klasse zur Verfügung gestellt. 
- *   Fuer die Teilprozesse Ueberschwemmung und Uebermurung koennen zusaetzlich Kennwerte in eigenen Klassen gespeichert werden. 
- *   Fuer Prozesse mit einer Jaehrlichkeit koennen auch Szenarien mit freier Jaehrlichkeit gespeichert werden.
- */
- TOPIC Befunde =
+  *   Pro Teilprozess wird je eine eigene Klasse zur Verfügung gestellt. 
+  *   Fuer die Teilprozesse Ueberschwemmung und Uebermurung koennen zusaetzlich Kennwerte in eigenen Klassen gespeichert werden. 
+  *   Fuer Prozesse mit einer Jaehrlichkeit koennen auch Szenarien mit freier Jaehrlichkeit gespeichert werden.
+  */
+  TOPIC Befunde =
+    OID AS INTERLIS.UUIDOID;
     DEPENDS ON Auftraege;
+
 
     DOMAIN
        
@@ -668,6 +671,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
       /** Moegliche Werte gemaess wFliesstiefe. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */
       h : wFliesstiefe;
       hDetail : wFliesstiefeDetail;
+      Jaehrlichkeit : JaehrlichkeitListe;
     /* Req.18 */
     MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
     /* Req.15 */
@@ -682,6 +686,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
       /** Moegliche Werte gemaess wUeberschwemmungFliessgeschwindigkeit. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */
       v : wUeberschwemmungFliessgeschwindigkeit;
       vDetail : wFliessgeschwindigkeitDetail;
+      Jaehrlichkeit : JaehrlichkeitListe;
     /* Req.18 */
     MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
     /* Req.15 */
@@ -696,6 +701,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
       /** Moegliche Werte gemaess wProduktHxV. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */
       v_mal_h : wProduktHxV;
       v_mal_hDetail: wProduktHxVDetail;
+      Jaehrlichkeit : JaehrlichkeitListe;
     /* Req.18 */
     MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
     /* Req.15 */
@@ -710,6 +716,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
       /** Moegliche Werte gemaess wFliesstiefe. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */
       h : wFliesstiefe;
       hDetail : wFliesstiefeDetail;
+      Jaehrlichkeit : JaehrlichkeitListe;
     /* Req.18 */
     MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
     /* Req.15 */
@@ -724,6 +731,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
       /** Moegliche Werte gemaess wUbermurungFliessgeschwindigkeit. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */  
       v : wUbermurungFliessgeschwindigkeit;
       vDetail : wFliessgeschwindigkeitDetail;
+      Jaehrlichkeit : JaehrlichkeitListe;
     /* Req.18 */
     MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
     /* Req.15 */
@@ -813,7 +821,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     CONSTRAINTS OF BefundJaehrlichkeit =
       MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Sturz;
       /* Req.8 */
-      SET CONSTRAINT INTERLIS_ext.areAreas3(ALL,>Prozessquelle,"Geometrie");  
+      !!SET CONSTRAINT INTERLIS_ext.areAreas3(ALL,>Prozessquelle,"Geometrie");  
     END;
 
     /* Req.23: Hilfsview für Constraint */
@@ -827,6 +835,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
 
   /** Im TOPIC kartographische Produkte werden Fliessrichtungspfeile und speziell identifizierte Untergeschosse festgehalten.*/
   TOPIC Kartographische_Produkte =
+    OID AS INTERLIS.UUIDOID;
     DEPENDS ON Befunde;
 
     /** Fliessrichtungspfeile zeigen die Richtung des Wassers an */

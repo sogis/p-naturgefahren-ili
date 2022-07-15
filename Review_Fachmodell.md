@@ -30,6 +30,19 @@
 * Kartographische_Produkte.Untergeschosse.EGID Nummernbereich angepasst (gemäss DM.flex). Alter Nummernbereich führte zu Fehler in GPKG (Nummernbereich zu gross dimensioniert, Eigenschaft kann nicht erfasst werden)
 * Ansonsten enthält das Modell keine Elemente, welche per se von ili2gpkg oder Geopackage aktuell nicht unterstützt werden.
 * Abklaerungsperimeter neu 1:1 zu Teilauftrag zugewiesen (Constraint Req.30). Daher Attribute in Klasse TeilauftragRaumbezug integriert.
+* In den Klassen Kennwertxxx fehlt ein Bezug zur Jaehrlichkeit. Daher Attribut:
+
+~~~
+Jaehrlichkeit : JaehrlichkeitListe;
+~~~
+
+ergänzt.
+
+* Stabile Objekt-Identifikatoren eingefügt für Basket/Dataset-Handling:
+
+~~~
+OID AS INTERLIS.UUIDOID;
+~~~
 
 ### Fragen
 
@@ -42,7 +55,6 @@
 ## Erfassungsprozess QGIS
 
 ### Erfassungsreihenfolge
-
 
 1. Vorbereitung: Erfassung Auftrag - Bericht / Erfassung Abklerungsperimeter / Erfassung Autor
 2. Stein- / Blockschlag Prozesse: Einstieg auf ProzessquellePolygon bzw. -Punkt ()
