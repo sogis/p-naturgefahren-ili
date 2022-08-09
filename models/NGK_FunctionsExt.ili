@@ -1,0 +1,37 @@
+INTERLIS 2.3;
+CONTRACTED MODEL NGK_FunctionsExt
+  AT "mailto:info@geowerkstatt.ch" VERSION "2022-08-01" =
+    /**
+    * Geometrie-Funktionen
+    */
+    !!@ fn.description = "Ermittelt die Fläche einer (bzw. die Summe mehrer) Polygon-Geometrien. Für 'Objects' können Objekte oder Geometrien angegeben werden. Für 'AreaAttr' soll der Pfad zur Flächen-Geometrie in INTERLIS 2 Syntax angegeben werden. Falls 'Objects' bereits die Geometrien enthält, soll für 'AreaAttr' 'UNDEFINED' übergeben werden. Wird über eine Beziehung die gleiche Geometrie mehrmals gefunden, wird dessen Fläche mehrmals gezählt.";
+    !!@ fn.param = "Objects: Ausgangsobjekte oder Geometrien. AreaAttr: Pfad zum Geometrieattribut oder UNDEFINED";
+    !!@ fn.return = "Fläche der Geometrie";
+    !!@ fn.since = "2022-08-01";
+    FUNCTION GetArea (Objects: OBJECTS OF ANYCLASS; Objects: OBJECTS OF ANYCLASS): NUMERIC;
+
+    !!@ fn.description = "Ermittelt die Fläche einer (bzw. die Summe mehrer) Polygon-Geometrien. Für 'Objects' können Objekte oder Geometrien angegeben werden. Für 'AreaAttr' soll der Pfad zur Flächen-Geometrie in INTERLIS 2 Syntax angegeben werden. Falls 'Objects' bereits die Geometrien enthält, soll für 'AreaAttr' 'UNDEFINED' übergeben werden. Wird über eine Beziehung die gleiche Geometrie mehrmals gefunden, wird dessen Fläche mehrmals gezählt.";
+    !!@ fn.param = "Objects: Ausgangsobjekte oder Geometrien. AreaAttr: Pfad zum Geometrieattribut oder UNDEFINED. MasterEntity: Klassenname der umfassenden Entität. FilterCriteria: Filter gegenüber der MasterEntity";
+    !!@ fn.return = "True: liegt innerhalb / False: liegt ausserhalb";
+    !!@ fn.since = "2022-08-01";
+    FUNCTION IsInside (Objects: OBJECTS OF ANYCLASS; AreaAttr: TEXT; MasterEntity: TEXT; FilterCriteria: TEXT): BOOLEAN;
+
+    !!@ fn.description = "Zählt die Löcher innerhalb einer Fläche";
+    !!@ fn.param = "Objects: Ausgangsobjekte oder Geometrien. AreaAttr: Pfad zum Geometrieattribut oder UNDEFINED";
+    !!@ fn.return = "Anzahl Löcher";
+    !!@ fn.since = "2022-08-01";
+    FUNCTION GetHolesCount (Objects: OBJECTS OF ANYCLASS; AreaAttr: TEXT): NUMERIC;
+
+    !!@ fn.description = "Eermittelt, ob ein Geometrieobjekt innerhalb eines anderen Objektes liegt.";
+    !!@ fn.param = "Objects: Ausgangsobjekte oder Geometrien. AreaAttr: Pfad zum Geometrieattribut oder UNDEFINED";
+    !!@ fn.return = "True:  / False: liegt ausserhalb";
+    !!@ fn.since = "2022-08-01";
+    FUNCTION IsContainedBy (Objects: OBJECTS OF ANYCLASS; Objects: OBJECTS OF ANYCLASS;): BOOLEAN;
+
+    !!@ fn.description = "Zählt die Löcher innerhalb einer Fläche";
+    !!@ fn.param = "Objects: Ausgangsobjekte oder Geometrien. AreaAttr: Pfad zum Geometrieattribut oder UNDEFINED";
+    !!@ fn.return = "Anzahl Löcher";
+    !!@ fn.since = "2022-08-01";    
+    FUNCTION CheckBefundIntegrity (Objects: OBJECTS OF ANYCLASS; RefAttr: TEXT; AreaAttr: TEXT): BOOLEAN;
+
+END NGK_FunctionsExt.
