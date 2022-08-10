@@ -72,7 +72,7 @@ Vorher Dataset und Baskets erstellen! (Dataset Manager)
 java.exe -jar ili2gpkg-4.8.0.jar --update --dbfile /NGKSO2021-Auftrag1-1.gpkg --import --dataset Auftrag1 --importTid --importBid /exp-Auftrag1-vorher.xtf
 ~~~
 
-### 3. Bearbeitung Auftrag (Auftrag 1)
+### 3. Bearbeitung Auftrag
 
 Die Bearbeitung des Auftrages erfolgt dezentral und mit beliebigem System.
 
@@ -108,4 +108,4 @@ java.exe -jar ili2pg-4.8.0.jar --dbhost *** --dbport *** --dbusr *** --dbpwd ***
 
 ## offene Punkte / Unklarheiten
 
-* --replace löscht Objekte im Auftrag nicht, trotz Info im Output (https://github.com/claeis/ili2db/issues/153)
+* --replace löscht Objekte im Auftrag nicht, trotz Info im Output (<https://github.com/claeis/ili2db/issues/153>)
