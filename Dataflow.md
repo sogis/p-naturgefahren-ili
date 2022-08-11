@@ -21,7 +21,7 @@ java.exe -jar ili2pg-4.8.0.jar --dbhost *** --dbusr *** --dbpwd **** --dbport **
 
 ## Übersicht zur Strukturierung mit Baskets und Datasets
 
-Datasets und Baskets sind Organisationselemente in einer ili2db-Instanz, welche es erlauben, dass einzelne Datensätze über Klassen- und Topic-Grenzen hinweg gruppiert werden können.
+Datasets und Baskets sind Organisationselemente, welche es erlauben, dass einzelne Datensätze über Klassen- und Topic-Grenzen hinweg gruppiert werden können. Diese beiden Elemente sind Bestandteil eines Datenbank-Schema's gemäss ili2db-Metamodell. 
 Eine solche Gruppierung von Datensätzen erlaubt u.a. selektive Datenexports oder Datenaktualisierungen (Inkremente).
 
 ![Image](./images/DatasetsBaskets.png)
@@ -109,3 +109,4 @@ java.exe -jar ili2pg-4.8.0.jar --dbhost *** --dbport *** --dbusr *** --dbpwd ***
 ## offene Punkte / Unklarheiten
 
 * --replace löscht Objekte im Auftrag nicht, trotz Info im Output (<https://github.com/claeis/ili2db/issues/153>)
+* --Fehler bei PG-Import in t_ili_basket. Siehe _./models/Switch t_ili_tid fields.sql_
