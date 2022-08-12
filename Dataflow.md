@@ -1,4 +1,4 @@
-# Beschreibung Datenfluss
+# Beschreibung Datenfluss Datenimport
 Diese Dokumentation beschreibt den Datenfluss im Zusammenhang mit der dezentralen Nachführung der Naturgefahrenkarte Solothurn.
 Das Grobkonzept sieht vor, dass aus der zentralen Geodaten-Infrastruktur beim Kanton (PostGIS) bestehende Daten exportiert, in Geopackage (GPKG) - Dateien zur dezentralen, verteilten und parallelen Bearbeitung bereitgestellt und in einem kontrollierten Prozess wieder in die GDI überführt werden.
 
@@ -21,7 +21,7 @@ java.exe -jar ili2pg-4.8.0.jar --dbhost *** --dbusr *** --dbpwd **** --dbport **
 
 ## Übersicht zur Strukturierung mit Baskets und Datasets
 
-Datasets und Baskets sind Organisationselemente, welche es erlauben, dass einzelne Datensätze über Klassen- und Topic-Grenzen hinweg gruppiert werden können. Diese beiden Elemente sind Bestandteil eines Datenbank-Schema's gemäss ili2db-Metamodell. 
+Datasets und Baskets sind Organisationselemente, welche es erlauben, dass einzelne Datensätze über Klassen- und Topic-Grenzen hinweg gruppiert werden können. Diese beiden Elemente sind Bestandteil eines Datenbank-Schema's gemäss ili2db-Metamodell.
 Eine solche Gruppierung von Datensätzen erlaubt u.a. selektive Datenexports oder Datenaktualisierungen (Inkremente).
 
 ![Image](./images/DatasetsBaskets.png)
@@ -33,7 +33,7 @@ Diesem werden mindestens die entsprechenden Datensätze in den Klassen Auftrag u
 
 ```mermaid
   graph TD;
-      PostGIS-->Auftrag-->Teilauftrag-->Abklaerungsperimeter_zu_Dataset-->Dataset-Export;
+      Dataset_eröffnen-->Auftrag_zu_Dataset-->Teilauftrag_zu_Dataset-->Abklaerungsperimeter_zu_Dataset-->Dataset-Export;
 ```
 
 ## Workflow
@@ -103,10 +103,17 @@ java.exe -jar ili2pg-4.8.0.jar --dbhost *** --dbport *** --dbusr *** --dbpwd ***
 **Variante 2:** Der Datenlieferant kann keine stabile OID gewährleisten (Fall 6). Die importierten Objekte tragen im Vergleich zu allfällig bereits in der Datenbank existierenden, entsprechenden Datensätze neue Identifikatoren. Eine Erkennung ist damit nicht möglich. In diesem Fall sind die bestehenden Daten des entsprechenden Datasets vorgängig in der GDI zu löschen (--delete - Anweisung).
 
 ~~~cmd
-java.exe -jar ili2pg-4.8.0.jar --dbhost *** --dbport *** --dbusr *** --dbpwd *** --dbdatabase NGKSO --dbschema public --delete --import --dataset Auftrag1 --models SO_AFU_Naturgefahren_20220801 /exp-Auftrag1-nachher.xtf
+java.exe -jar ili2pg-4.8.0.jar --dbhost *** --dbport *** --dbusr *** --dbpwd *** --dbdatabase NGKSO --dbschema public --delete --dataset Auftrag1
 ~~~
+
+~~~cmd
+java.exe -jar ili2pg-4.8.0.jar --dbhost *** --dbport *** --dbusr *** --dbpwd *** --dbdatabase NGKSO --dbschema public --import --dataset Auftrag1 --models SO_AFU_Naturgefahren_20220801 /exp-Auftrag1-nachher.xtf
+~~~
+
+## Auflösung Dataset
+
+Nach der Übernahme der Daten in die GDI kann das Dataset aus technischen Gründen aufgelöst werden, indem die entsprechenden Objekte ins "Baseset" kopiert werden. Damit tragen sie die Markierung, dass sie nicht mehr in einem Projekt extern der GDI nachgeführt werden.
 
 ## offene Punkte / Unklarheiten
 
 * --replace löscht Objekte im Auftrag nicht, trotz Info im Output (<https://github.com/claeis/ili2db/issues/153>)
-* --Fehler bei PG-Import in t_ili_basket. Siehe _./models/Switch t_ili_tid fields.sql_
