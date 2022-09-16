@@ -32,7 +32,6 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
       Der Auftragnehmer muss am Ende des Auftrages im Abklaerungsperimeter deklarieren, bis zu welchem Grad die Beurteilung vorgenommen wurde.
     */
     TOPIC Auftraege =
-      OID AS INTERLIS.UUIDOID;
 
     DOMAIN
       /** Werte fuer Deklaration der Beurteilung*/
@@ -209,7 +208,6 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
   TOPIC Befunde =
     OID AS INTERLIS.UUIDOID;
     DEPENDS ON Auftraege;
-
 
     DOMAIN
        
@@ -691,7 +689,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
 
     ASSOCIATION ProzessquelleBefund =
       ProzessquelleBefund -- {1..*} Befund;
-      BefundProzessquelle (EXTERNAL) -- {1} Prozessquelle;
+      BefundProzessquelle -- {1} Prozessquelle;
     END ProzessquelleBefund;
 
     !!@ name = "BefundSteinBlockschlag muss Hauptprozess>Sturz zugeordnet sein"
