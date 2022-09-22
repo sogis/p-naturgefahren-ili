@@ -8,11 +8,13 @@ INTERLIS 2.3;
 * !! 2022-01-01 | geo7  | Erstellung Fachmodell
 * !! 2022-07-31 | GeoW  | Review und Optimierung für QGIS-Einsatz inkl. 
 * !!                      Constraints mit Custom Functions
+* !! 2022-09-21 | GeoW  | OID Deklaration Teilauftraege ergänzt
+* !! 2022-09-22 | GeoW  | Constraints: Methodennamen korrigiert
 * !!==============================================================================
 */
 !!@ technicalContact = mailto:agi@bd.so.ch
 MODEL SO_AFU_Naturgefahren_20220801 (de) 
-  AT "http://geo.so.ch/models/AFU" VERSION "2022-08-01" =
+  AT "http://geo.so.ch/models/AFU" VERSION "2022-09-22" =
 
   IMPORTS UNQUALIFIED Units, Time, CoordSys;
   IMPORTS GeometryCHLV95_V1;
@@ -34,7 +36,6 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
       Der Auftragnehmer muss am Ende des Auftrages im Abklaerungsperimeter deklarieren, bis zu welchem Grad die Beurteilung vorgenommen wurde.
     */
     TOPIC Auftraege =
-      OID AS INTERLIS.UUIDOID;
 
     DOMAIN
       /** Werte fuer Deklaration der Beurteilung*/
@@ -77,7 +78,10 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
         Neubeurteilung
       );
 
-    /** Auftragnehmer, Buero welches fuer Auftrag/Befund verantwortlich ist */
+      /** Deklaration lokal verwendeter OID */
+      TANROID = OID TEXT*36;
+    
+      /** Auftragnehmer, Buero welches fuer Auftrag/Befund verantwortlich ist */
     STRUCTURE Autor =
       /** Name des Bueros */
       Buero : MANDATORY TEXT*80;
@@ -133,6 +137,8 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     *     > Hinweisprozesse
     */
     CLASS TeilauftragRaumbezug (ABSTRACT) =
+      /** Objektidentifikation mittels sprechendem Schlüssel ("YYYY.<BueroABC>.x.y"), maximale Länge 36 Zeichen **/
+      OID AS TANROID;
       Bemerkung : TEXT*100;
       /** Auftragnehmer gemaess Autorenliste */
       Auftragnehmer : MANDATORY Autor;
@@ -147,7 +153,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     MANDATORY CONSTRAINT NGK_FunctionsExt.GetArea(THIS,"Geometrie") > 100;
     /* Req.3 */
     /* Datenquelle / Filterung weglassen dafür mit View */
-    MANDATORY CONSTRAINT NGK_FunctionsExt.IsInside(THIS,  "Geometrie", "HHGebiete_Kantonal", "SO");
+    MANDATORY CONSTRAINT NGK_FunctionsExt.IsInsideSO(THIS,  "Geometrie");
     /* Req.5 */
     MANDATORY CONSTRAINT NGK_FunctionsExt.GetHolesCount(THIS,  "Geometrie") == 0;
     /* Req.28 */
@@ -217,9 +223,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
   *   Fuer Prozesse mit einer Jaehrlichkeit koennen auch Szenarien mit freier Jaehrlichkeit gespeichert werden.
   */
   TOPIC Befunde =
-    OID AS INTERLIS.UUIDOID;
     DEPENDS ON Auftraege;
-
 
     DOMAIN
        
@@ -544,7 +548,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     /* Req.21 */
     MANDATORY CONSTRAINT NGK_FunctionsExt.GetHolesCount(THIS, "Geometrie") == 0;
     /* Req.9,14 */
-    !!MANDATORY CONSTRAINT NGK_FunctionsExt.IsContainedBy(THIS, "Geometrie", >Befund>BefundProzessquelle>TeilauftragRaumbezug);
+    MANDATORY CONSTRAINT NGK_FunctionsExt.IsInside(THIS, "Geometrie", ">Befund>BefundProzessquelle>TeilauftragRaumbezug", "Geometrie");
     /* Req.11 */
     MANDATORY CONSTRAINT NGK_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
     END Befund;
@@ -554,7 +558,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     EXTENDS Befund =
         IWCode : MANDATORY IWCodePermanent;
     /* Req.10 */
-    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "IWCode");
+    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle");
     END BefundAbsenkung;
 
     /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Einsturz/Absenkung sein */
@@ -562,7 +566,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     EXTENDS Befund = 
       IWCode : MANDATORY IWCodePermanent;
     /* Req.10 */
-    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "IWCode");
+    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle");
     END BefundEinsturz; 
 
     /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Sturz sein */
@@ -570,7 +574,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     EXTENDS Befund =
       IWCode : MANDATORY IWCodeStandard;
     /* Req.10 */
-    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "IWCode");
+    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle");
     END BefundSteinBlockschlag;
     
     /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Sturz sein */
@@ -578,7 +582,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     EXTENDS Befund =   
       IWCode : MANDATORY IWCodeBergFelssturz;
     /* Req.10 */
-    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "IWCode");
+    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle");
     END BefundBergFelssturz;
     
     /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Sturz sein */
@@ -586,7 +590,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     EXTENDS Befund = 
       IWCode : MANDATORY IWCodeStandard;
     /* Req.10 */
-    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "IWCode");
+    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle");
     END BefundEisschlag;
 
     /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Rutsch sein */
@@ -594,7 +598,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     EXTENDS Befund =
       IWCode : MANDATORY IWCodeStandard;
     /* Req.10 */
-    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "IWCode");
+    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle");
     END BefundHangmure;
     
     /** Konkretisiert die Klasse Befund.
@@ -616,7 +620,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     EXTENDS Befund =
       IWCode : MANDATORY IWCodeStandard;
     /* Req.10 */
-    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "IWCode");
+    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle");
     END BefundSpontaneRutschung;
     
     /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Wasser sein */
@@ -624,7 +628,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     EXTENDS Befund =
       IWCode : MANDATORY IWCodeUebermurung;
     /* Req.10 */
-    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "IWCode");
+    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle");
     END BefundUebermurung;
     
     /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Wasser sein */
@@ -632,7 +636,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     EXTENDS Befund =
       IWCode : MANDATORY IWCodeStandard;
     /* Req.10 */
-    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "IWCode");
+    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle");
     END BefundUeberschwemmungDynamisch;
     
     /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Wasser sein */
@@ -640,7 +644,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     EXTENDS Befund =
       IWCode : MANDATORY IWCodeStandard;
     /* Req.10 */
-    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "IWCode");
+    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle");
     END BefundUeberschwemmungStatisch;
     
     /** Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Wasser sein */
@@ -655,7 +659,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
       Intensitaet : MANDATORY Intensitaet;  
       Teilprozess : MANDATORY Teilprozess;
     /* Req.10 */
-    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "Intensitaet");
+    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIntensitaet(NGK_FunctionsExt.GroupBy(ALL,"Teilprozess"), "BefundProzessquelle");
     END BefundJaehrlichkeit;
 
     /** Befunde mit Kennwert (Fliesstiefe) fuer Prozess Uberschwemmung
@@ -670,7 +674,9 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     /* Req.18 */
     MANDATORY CONSTRAINT NGK_FunctionsExt.GetArea(THIS,  "Geometrie") > 5;
     /* Req.15 */
-    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "h");
+    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityH(ALL, "BefundProzessquelle");
+    /* Req.17 */
+    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityH(NGK_FunctionsExt.GroupBy(ALL,"Jaehrlichkeit"), "BefundProzessquelle"); 
     END KennwertUeberschwemmungFliesstiefe;
 
     /** Befunde mit Kennwert (Fliessgeschwindigkeit) fuer Prozess Uberschwemmung
@@ -685,7 +691,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     /* Req.18 */
     MANDATORY CONSTRAINT NGK_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
     /* Req.15 */
-    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "h");
+    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityH(ALL, "BefundProzessquelle");
     END KennwertUeberschwemmungFliessgeschwindigkeit;
     
     /** Befunde mit Kennwert (Produkt v x h) fuer Prozess Uberschwemmung
@@ -700,7 +706,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     /* Req.18 */
     MANDATORY CONSTRAINT NGK_FunctionsExt.GetArea(THIS,  "Geometrie") > 5;
     /* Req.15 */
-    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "h");
+    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityH(ALL, "BefundProzessquelle");
     END KennwertUeberschwemmungProduktVxH;
 
     /** Befunde mit Kennwert (Fliesstiefe) fuer Prozess Uebermurung
@@ -715,7 +721,9 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     /* Req.18 */
     MANDATORY CONSTRAINT NGK_FunctionsExt.GetArea(THIS,  "Geometrie") > 5;
     /* Req.15 */
-    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "h");
+    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityH(ALL, "BefundProzessquelle");
+    /* Req.17 */
+    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityH(NGK_FunctionsExt.GroupBy(ALL,"Jaehrlichkeit"), "BefundProzessquelle"); 
     END KennwertUbermurungFliesstiefe;
 
     /** Befunde mit Kennwert (Fliessgeschwindigkeit) fuer Prozess Uebermurung
@@ -730,7 +738,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     /* Req.18 */
     MANDATORY CONSTRAINT NGK_FunctionsExt.GetArea(THIS,  "Geometrie") > 5;
     /* Req.15 */
-    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrity(ALL, "BefundProzessquelle", "h");
+    SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityH(ALL, "BefundProzessquelle");
     END KennwertUbermurungFliessgeschwindigkeit;
     
     ASSOCIATION TeilauftragProzessquelle =
@@ -830,7 +838,6 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
 
   /** Im TOPIC kartographische Produkte werden Fliessrichtungspfeile und speziell identifizierte Untergeschosse festgehalten.*/
   TOPIC Kartographische_Produkte =
-    OID AS INTERLIS.UUIDOID;
     DEPENDS ON Befunde;
 
     /** Fliessrichtungspfeile zeigen die Richtung des Wassers an */
@@ -848,7 +855,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
       /**Eidgenössische Gebäudeidentifikator (EGID) */
       EGID : MANDATORY 1..900000000;
     /* Req.23 */
-    MANDATORY CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrity(THIS, "ProzessquelleBefund", "Geometrie");
+    MANDATORY CONSTRAINT NGK_FunctionsExt.IsInside(THIS, "Geometrie", "Helper_BefundUeberschwemmung", "Geometrie");
     END Untergeschosse;
 
     ASSOCIATION ProzessquelleFliessrichtungspfeil =

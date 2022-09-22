@@ -1,0 +1,43 @@
+INTERLIS 2.3;
+CONTRACTED MODEL NGK_FunctionsExt
+  AT "mailto:info@geowerkstatt.ch" VERSION "2022-08-01" =
+
+    !!@ fn.description = "Ermittelt die Fläche einer (bzw. die Summe mehrer) Polygon-Geometrien. Für 'Objects' können Objekte oder Geometrien angegeben werden. Für 'AreaAttr' soll der Pfad zur Flächen-Geometrie in INTERLIS 2 Syntax angegeben werden. Falls 'Objects' bereits die Geometrien enthält, soll für 'AreaAttr' 'UNDEFINED' übergeben werden. Wird über eine Beziehung die gleiche Geometrie mehrmals gefunden, wird dessen Fläche mehrmals gezählt.";
+    !!@ fn.param = "Objects: Ausgangsobjekte oder Geometrien. AreaAttr: Pfad zum Geometrieattribut oder UNDEFINED";
+    !!@ fn.return = "Fläche der Geometrie";
+    !!@ fn.since = "2021-11-15";
+    FUNCTION GetArea (Objects: OBJECTS OF ANYCLASS; AreaAttr: TEXT): NUMERIC;
+
+    !!@ fn.description = "Ermittelt, ob ein Geometrieobjekt innerhalb eines anderen Objektes liegt.";
+    !!@ fn.param = "Objects: Ausgangsobjekte oder Geometrien. AreaAttrOrigin: Pfad zum Geometrieattribut oder UNDEFINED. MasterEntity: Klassenname der umfassenden Entität. AreaAttrMaster: Pfad zum Geometrieattribut der umfassenden Entität oder UNDEFINED.";
+    !!@ fn.return = "True: liegt innerhalb / False: liegt ausserhalb";
+    !!@ fn.since = "2022-08-01";
+    FUNCTION IsInside (Objects: OBJECTS OF ANYCLASS; AreaAttrObj: TEXT; MasterEntity: TEXT; AreaAttrMaster: TEXT): BOOLEAN;
+
+    !!@ fn.description = "Ermittelt, ob ein Geometrieobjekt innerhalb des Kantonsperimeters Solothurn liegt.";
+    !!@ fn.param = "Objects: Ausgangsobjekte oder Geometrien. GeomAttr: Pfad zum Geometrieattribut";
+    !!@ fn.return = "True: liegt innerhalb / False: liegt ausserhalb";
+    !!@ fn.since = "2022-08-01";
+    FUNCTION IsInsideSO (Objects: OBJECTS OF ANYCLASS; GeomAttr: TEXT): BOOLEAN;
+
+    !!@ fn.description = "Zählt die Löcher innerhalb einer Fläche";
+    !!@ fn.param = "Objects: Ausgangsobjekte oder Geometrien. AreaAttr: Pfad zum Geometrieattribut oder UNDEFINED";
+    !!@ fn.return = "Anzahl Löcher";
+    !!@ fn.since = "2022-08-01";
+    FUNCTION GetHolesCount (Objects: OBJECTS OF ANYCLASS; AreaAttr: TEXT): NUMERIC;
+
+    !!@ fn.description = "Prüft, ob im gegebenen Set keine Überstände in bezug zur Objekthierarchie (zB. Jaehrlichkeit) existieren";
+    !!@ fn.param = "Objects: Ausgangsobjekte oder Geometrien. RefAttr: Pfad zum Filterattribut";
+    !!@ fn.return = "True: Integrität im Set gewährleistet / False: Integrität nicht gewährleistet";
+    !!@ fn.since = "2022-09-22";    
+    FUNCTION CheckBefundIntegrityH (Objects: OBJECTS OF ANYCLASS; FilterAttr: TEXT): BOOLEAN;
+    FUNCTION CheckBefundIntegrityIWCode (Objects: OBJECTS OF ANYCLASS; FilterAttr: TEXT): BOOLEAN;
+    FUNCTION CheckBefundIntegrityIntensitaet (Objects: OBJECTS OF ANYCLASS; FilterAttr: TEXT): BOOLEAN;
+
+    !!@ fn.description = "Gruppiert die Eingabemenge gemäss dem übergebenen Attribut-Kriterium";
+    !!@ fn.param = "Objects: Ausgangsobjekte oder Geometrien. Attr: Name des Attributes für die Gruppierung;"
+    !!@ fn.return = "Gruppierter Datensatz";
+    !!@ fn.since = "2022-09-19";    
+    FUNCTION GroupBy (Objects: OBJECTS OF ANYCLASS; Attr: TEXT): OBJECTS OF ANYCLASS;
+
+END NGK_FunctionsExt.

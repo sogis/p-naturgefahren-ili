@@ -7,11 +7,13 @@ INTERLIS 2.3;
 * !!------------------------------------------------------------------------------
 * !! 2022-01-01 | geo7  | Erstellung Fachmodell
 * !! 2022-07-31 | GeoW  | Review und Optimierung für QGIS-Einsatz 
+* !! 2022-09-21 | GeoW  | OID Deklaration Teilauftraege ergänzt
+* !! 2022-09-22 | GeoW  | Constraints: Methodennamen korrigiert
 * !!==============================================================================
 */
 !!@ technicalContact = mailto:agi@bd.so.ch
 MODEL SO_AFU_Naturgefahren_20220801 (de) 
-  AT "http://geo.so.ch/models/AFU" VERSION "2022-08-01" =
+  AT "http://geo.so.ch/models/AFU" VERSION "2022-09-22" =
 
   IMPORTS UNQUALIFIED Units, Time, CoordSys;
   IMPORTS GeometryCHLV95_V1;
@@ -74,6 +76,9 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
         Neubeurteilung
       );
 
+      /** Deklaration lokal verwendeter OID */
+      TANROID = OID TEXT*36;
+
     /** Auftragnehmer, Buero welches fuer Auftrag/Befund verantwortlich ist */
     STRUCTURE Autor =
       /** Name des Bueros */
@@ -130,10 +135,11 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     *     > Hinweisprozesse
     */
     CLASS TeilauftragRaumbezug (ABSTRACT) =
+      /** Objektidentifikation mittels sprechendem Schlüssel ("YYYY.<BueroABC>.x.y"), maximale Länge 36 Zeichen **/
+      OID AS TANROID;
       Bemerkung : TEXT*100;
       /** Auftragnehmer gemaess Autorenliste */
       Auftragnehmer : MANDATORY Autor;
-
       /** Abklaerungsperimeter = Perimeter, welcher untersucht werden soll */
       Name : MANDATORY TEXT*80;
       Geometrie : MANDATORY Einzelflaeche;
@@ -206,7 +212,6 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
   *   Fuer Prozesse mit einer Jaehrlichkeit koennen auch Szenarien mit freier Jaehrlichkeit gespeichert werden.
   */
   TOPIC Befunde =
-    OID AS INTERLIS.UUIDOID;
     DEPENDS ON Auftraege;
 
     DOMAIN
@@ -757,18 +762,10 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
       MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Sturz; 
     END;
 
-    /* Req.23: Hilfsview für Constraint */
-    VIEW Helper_BefundUeberschwemmung
-      UNION OF BUsD ~ BefundUeberschwemmungDynamisch, BUsS ~ BefundUeberschwemmungStatisch;
-      =
-      Geometrie: Einzelflaeche;
-    END Helper_BefundUeberschwemmung;
-
   END Befunde;  
 
   /** Im TOPIC kartographische Produkte werden Fliessrichtungspfeile und speziell identifizierte Untergeschosse festgehalten.*/
   TOPIC Kartographische_Produkte =
-    OID AS INTERLIS.UUIDOID;
     DEPENDS ON Befunde;
 
     /** Fliessrichtungspfeile zeigen die Richtung des Wassers an */
