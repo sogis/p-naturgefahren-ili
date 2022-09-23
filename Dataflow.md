@@ -47,7 +47,7 @@ In QGIS erfolgt die Erfassung der Aufträge, Teilaufträge mit Abklärungsperime
 1. Erfassung Dataset und Baskets über Dataset Manager (Model Baker)
 2. Auswahl Basket
 3. Erfassung Auftrag (siehe Screenshot-1)
-4. Erfassung Teilauftrag
+4. Erfassung Teilauftrag (TID erhält einen sprechenden Schlüssel mit bezug zum ausführenden Büro, dem Jahr sowie der Auftrags- und Teilauftragsnummer)
 
 Die nun erfassten Objekte sind alle einem Dataset zugewiesen, welche zwar bereitgestellt werden, aber im Rahmen des extern bearbeiteten Auftrags nicht editiert und somit auch nicht überschrieben werden.
 
