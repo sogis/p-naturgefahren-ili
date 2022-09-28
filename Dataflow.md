@@ -13,6 +13,8 @@ Ergänzung Topics mit
     OID AS INTERLIS.UUIDOID;
 ~~~
 
+> Jek: Nur bei Lieferung mit stabilen ID's notwendig, korrekt?
+
 PostGIS-Master: Es ist eine BasketCol einzurichten beim Schemaimport unter Verwendung der folgenden Parameter:
 
 ~~~cmd
@@ -52,6 +54,9 @@ In QGIS erfolgt die Erfassung der Aufträge, Teilaufträge mit Abklärungsperime
 Die nun erfassten Objekte sind alle einem Dataset zugewiesen, welche zwar bereitgestellt werden, aber im Rahmen des extern bearbeiteten Auftrags nicht editiert und somit auch nicht überschrieben werden.
 
 Wenn zusätzlich zu den Auftragsdaten weitere Daten im Topic Befunde bzw. Kartographische_Produkte initial erfasst werden, so sind diese einem dedizierten, auftragsbezogenen Dataset ("Auftrag1") zuzuweisen und dann im folgenden Schritt mit zu exportieren.
+
+> Jek: Dies hat mit der Gliederung des Modells in zwei Topics geändert, korrekt?   
+Für die Dauer des Auftrages gibt es ein auftragsbezogenes Dataset, damit Korrekturlieferungen vollautomatisch eingespielt werden können (Mittels der Optionen --delete --import)
 
 ### 2. Abgabe Auftragsdaten
 
