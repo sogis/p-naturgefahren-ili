@@ -15,6 +15,8 @@ Ergänzung Topics mit
 
 > Jek: Nur bei Lieferung mit stabilen ID's notwendig, korrekt?
 
+> Ogr: richtig. Ist hier mir exemplarisch aufgezeigt. Wir wenden einen OID nun nur noch in der abstrakten Klasse TeilauftragRaumbezug an.
+
 PostGIS-Master: Es ist eine BasketCol einzurichten beim Schemaimport unter Verwendung der folgenden Parameter:
 
 ~~~cmd
@@ -57,6 +59,8 @@ Wenn zusätzlich zu den Auftragsdaten weitere Daten im Topic Befunde bzw. Kartog
 
 > Jek: Dies hat mit der Gliederung des Modells in zwei Topics geändert, korrekt?   
 Für die Dauer des Auftrages gibt es ein auftragsbezogenes Dataset, damit Korrekturlieferungen vollautomatisch eingespielt werden können (Mittels der Optionen --delete --import)
+
+> Ogr: nein, dies hat nicht geändert. Aufgrund der Anpassung bei der Lieferung geben wir beim Datenimport neben dem --dataset-Parameter auch die --topic-Liste mit. Damit werden die Daten des jeweiligen Datasets und den entsprechenden Topics eingelesen. Daher können sie bei der Datenabgabe auch einem Auftrags-Dataset mitgegeben werden.
 
 ### 2. Abgabe Auftragsdaten
 
