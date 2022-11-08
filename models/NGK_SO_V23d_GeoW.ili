@@ -76,9 +76,6 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
         Neubeurteilung
       );
 
-      /** Deklaration lokal verwendeter OID */
-      TANROID = OID TEXT*36;
-
     /** Auftragnehmer, Buero welches fuer Auftrag/Befund verantwortlich ist */
     STRUCTURE Autor =
       /** Name des Bueros */
@@ -136,7 +133,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     */
     CLASS TeilauftragRaumbezug (ABSTRACT) =
       /** Objektidentifikation mittels sprechendem Schlüssel ("YYYY.<BueroABC>.x.y"), maximale Länge 36 Zeichen **/
-      OID AS TANROID;
+      OID AS INTERLIS.ANYOID;
       Bemerkung : TEXT*100;
       /** Auftragnehmer gemaess Autorenliste */
       Auftragnehmer : MANDATORY Autor;
