@@ -13,6 +13,10 @@ Ergänzung Topics mit
     OID AS INTERLIS.UUIDOID;
 ~~~
 
+> Jek: Nur bei Lieferung mit stabilen ID's notwendig, korrekt?
+
+> Ogr: richtig. Ist hier mir exemplarisch aufgezeigt. Wir wenden einen OID nun nur noch in der abstrakten Klasse TeilauftragRaumbezug an.
+
 PostGIS-Master: Es ist eine BasketCol einzurichten beim Schemaimport unter Verwendung der folgenden Parameter:
 
 ~~~cmd
@@ -47,11 +51,16 @@ In QGIS erfolgt die Erfassung der Aufträge, Teilaufträge mit Abklärungsperime
 1. Erfassung Dataset und Baskets über Dataset Manager (Model Baker)
 2. Auswahl Basket
 3. Erfassung Auftrag (siehe Screenshot-1)
-4. Erfassung Teilauftrag
+4. Erfassung Teilauftrag (TID erhält einen sprechenden Schlüssel mit bezug zum ausführenden Büro, dem Jahr sowie der Auftrags- und Teilauftragsnummer)
 
 Die nun erfassten Objekte sind alle einem Dataset zugewiesen, welche zwar bereitgestellt werden, aber im Rahmen des extern bearbeiteten Auftrags nicht editiert und somit auch nicht überschrieben werden.
 
 Wenn zusätzlich zu den Auftragsdaten weitere Daten im Topic Befunde bzw. Kartographische_Produkte initial erfasst werden, so sind diese einem dedizierten, auftragsbezogenen Dataset ("Auftrag1") zuzuweisen und dann im folgenden Schritt mit zu exportieren.
+
+> Jek: Dies hat mit der Gliederung des Modells in zwei Topics geändert, korrekt?   
+Für die Dauer des Auftrages gibt es ein auftragsbezogenes Dataset, damit Korrekturlieferungen vollautomatisch eingespielt werden können (Mittels der Optionen --delete --import)
+
+> Ogr: nein, dies hat nicht geändert. Aufgrund der Anpassung bei der Lieferung geben wir beim Datenimport neben dem --dataset-Parameter auch die --topic-Liste mit. Damit werden die Daten des jeweiligen Datasets und den entsprechenden Topics eingelesen. Daher können sie bei der Datenabgabe auch einem Auftrags-Dataset mitgegeben werden.
 
 ### 2. Abgabe Auftragsdaten
 
