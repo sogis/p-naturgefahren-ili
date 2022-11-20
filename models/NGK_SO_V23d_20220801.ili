@@ -715,7 +715,6 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     
     ASSOCIATION TeilauftragProzessquelle =
       /* Ein Teilauftrag hat entweder keine oder eine Prozessquelle.
-         (Ein Teilauftrag hat entweder einen Abklaerungsperimeter, eine Prozessquelle oder beides)
          Hat ein Teilauftrag KEINE Prozessquelle, ist durch den Auftragnehmer eine Prozessquelle zu definieren. */
       TeilauftragProzessquelle -- {0..1} Prozessquelle;
       ProzessquelleTeilauftrag (EXTERNAL) -- {1} SO_AFU_Naturgefahren_20220801.Auftraege.TeilauftragRaumbezug;
