@@ -169,12 +169,9 @@ Fazit: Diese Modellierung würde den vorgesehenen Datenaustausch unter Berücksi
 Idee: Deklaration einer stabilen Objektidentifikation für die Klasse Teilauftrag und Ausprägung mittels sprechendem Schlüssel
 
 ```
-      /** Deklaration lokal verwendeter OID */
-      TANROID = OID TEXT*36;
-
     CLASS TeilauftragRaumbezug (ABSTRACT) =
       /** Objektidentifikation mittels sprechendem Schlüssel ("YYYY.<BueroABC>.x.y"), maximale Länge 36 Zeichen **/
-      OID AS TANROID;
+      OID AS INTERLIS.ANYOID;
       ...
 ```
 
