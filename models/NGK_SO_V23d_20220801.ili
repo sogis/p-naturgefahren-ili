@@ -18,7 +18,7 @@ Erfassungsmodell für die Naturgefahren des Kt. Solothurn.
 !!@ technicalContact=mailto:agi@bd.so.ch
 !!@ furtherInformation=http://geo.so.ch/models/AFU/SO_AFU_Naturgefahren_20220801.uml
 MODEL SO_AFU_Naturgefahren_20220801 (de) 
-  AT "http://geo.so.ch/models/AFU" VERSION "2022-11-18" =
+  AT "http://geo.so.ch/models/AFU" VERSION "2022-11-21" =
 
   IMPORTS UNQUALIFIED Units, Time, CoordSys;
   IMPORTS GeometryCHLV95_V1;
@@ -716,7 +716,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     ASSOCIATION TeilauftragProzessquelle =
       /* Ein Teilauftrag hat entweder keine oder eine Prozessquelle.
          Hat ein Teilauftrag KEINE Prozessquelle, ist durch den Auftragnehmer eine Prozessquelle zu definieren. */
-      TeilauftragProzessquelle -- {0..1} Prozessquelle;
+      TeilauftragProzessquelle -- {0..*} Prozessquelle;
       ProzessquelleTeilauftrag (EXTERNAL) -- {1} SO_AFU_Naturgefahren_20220801.Auftraege.TeilauftragRaumbezug;
     END TeilauftragProzessquelle;
 
@@ -830,10 +830,8 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     ASSOCIATION ProzessquelleFliessrichtungspfeil =
       ProzessquelleFliessrichtung -- {0..*} Fliessrichtungspfeil;
       FliessrichtungProzessquelle (EXTERNAL) -- {1} SO_AFU_Naturgefahren_20220801.Befunde.Prozessquelle;
-      !!@ name = "R-Pfeile zwingend bei Hauptprozess Wasser (1..*)"      
+      !!@ name = "R-Pfeile dürfen nur Hauptprozess Wasser zugeordnet sein!"
       MANDATORY CONSTRAINT FliessrichtungProzessquelle->Hauptprozess == #Wasser AND DEFINED(ProzessquelleFliessrichtung);
-      !!@ name = "R-Pfeile wenn Hauptprozess <> Wasser"
-      MANDATORY CONSTRAINT FliessrichtungProzessquelle->Hauptprozess <> #Wasser AND NOT(DEFINED(ProzessquelleFliessrichtung));
     END ProzessquelleFliessrichtungspfeil;
 
   END Kartographische_Produkte;
