@@ -10,7 +10,7 @@ Erfassungsmodell für die Naturgefahren des Kt. Solothurn.
   2022-01-01 | geo7  | Erstellung Fachmodell
   2022-07-31 | GeoW  | Review und Optimierung für QGIS-Einsatz 
   2022-09-22 | GeoW  | OID Deklaration Teilauftraege ergänzt, Constraints: Methodennamen korrigiert
-  2022-11-18 | GeoW  | OID in TeilauftragRaumbezug auf ANYOID gesetzt, Kommentare bereinigt, 
+  2022-11-24 | GeoW  | OID in TeilauftragRaumbezug auf ANYOID gesetzt, Kommentare bereinigt, 
                        Constraints deklarativ eingefügt
  ==============================================================================
 */
@@ -18,7 +18,7 @@ Erfassungsmodell für die Naturgefahren des Kt. Solothurn.
 !!@ technicalContact=mailto:agi@bd.so.ch
 !!@ furtherInformation=http://geo.so.ch/models/AFU/SO_AFU_Naturgefahren_20220801.uml
 MODEL SO_AFU_Naturgefahren_20220801 (de) 
-  AT "http://geo.so.ch/models/AFU" VERSION "2022-11-21" =
+  AT "http://geo.so.ch/models/AFU" VERSION "2022-11-24" =
 
   IMPORTS UNQUALIFIED Units, Time, CoordSys;
   IMPORTS GeometryCHLV95_V1;
@@ -144,7 +144,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
       Name : MANDATORY TEXT*80;
       Geometrie : MANDATORY Einzelflaeche;
       !! Beurteilung, welcher Teilprozess zu welchem Grad untersucht wurde 
-      Beurteilungsstatus: MANDATORY Beurteilung;
+      Beurteilungsstatus: MANDATORY Beurteilungsart;
 
     !!@ name = "Der Abklärungsperimeter muss grösser 100m2 sein!"  
     !!MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS,"Geometrie") > 100; !!Constraint aus Kategorie "generisch"
@@ -152,7 +152,6 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
     !!MANDATORY CONSTRAINT GeoW_FunctionsExt.IsInside("swissBOUNDARIES3D_ili2_LV95_V1_3", "tbd" ,THIS, "Geometrie"); !!Constraint aus Kategorie "generisch"
     !!@ name = "In der Abklärungsperimeter-Geometrie sind keine Löcher erlaubt!"  
     !!MANDATORY CONSTRAINT GeoW_FunctionsExt.GetHolesCount(THIS,  "Geometrie") == 0; !!Constraint aus Kategorie "generisch"   
-    UNIQUE Geometrie;
     END TeilauftragRaumbezug;
 
     /* TEILAUFTRAG SZENARIEN (Abstrakte Klasse)
@@ -455,10 +454,10 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
         blau_schwach_100,
         gelb_schwach_100,
         gelb_schwach_300,
-        
+
+        restgefaehrdung_stark,
         restgefaehrdung_schwach,
-        restgefaehrdung_mittel,
-        restgefaehrdung_stark
+        restgefaehrdung_mittel
       );
 
       !! Wertebereich fuer Teilprozess: Uebermurung 
@@ -471,8 +470,8 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
         blau_mittel_100,
         blau_mittel_300,
 
-        restgefaehrdung_mittel,
-        restgefaehrdung_stark		
+        restgefaehrdung_stark,		
+        restgefaehrdung_mittel
       );
 
       !! Wertebereich fuer Teilprozess: Berg- und Felssturz 
@@ -488,9 +487,9 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
         rot_stark_permanent,
         blau_mittel_permanent,
         gelb_schwach_permanent,
+        restgefaehrdung_stark,
         restgefaehrdung_schwach,
-        restgefaehrdung_mittel,
-        restgefaehrdung_stark
+        restgefaehrdung_mittel
       );
 
     !! Beschreibung der Prozessquelle 
