@@ -12,13 +12,12 @@ Erfassungsmodell für die Naturgefahren des Kt. Solothurn.
   2022-09-22 | GeoW  | OID Deklaration Teilauftraege ergänzt, Constraints: Methodennamen korrigiert
   2022-11-24 | GeoW  | OID in TeilauftragRaumbezug auf ANYOID gesetzt, Kommentare bereinigt, 
                        Constraints deklarativ eingefügt
+  2022-11-30 | jek   | Modellname mit _Pilot_ ergänzt, Datum aktualisiert.
  ==============================================================================
 */
-
 !!@ technicalContact=mailto:agi@bd.so.ch
-!!@ furtherInformation=http://geo.so.ch/models/AFU/SO_AFU_Naturgefahren_20220801.uml
-MODEL SO_AFU_Naturgefahren_20220801 (de) 
-  AT "http://geo.so.ch/models/AFU" VERSION "2022-11-24" =
+MODEL SO_AFU_Naturgefahren_Pilot_20221130 (de) 
+  AT "http://geo.so.ch/models/AFU" VERSION "2022-11-30" =
 
   IMPORTS UNQUALIFIED Units, Time, CoordSys;
   IMPORTS GeometryCHLV95_V1;
@@ -716,7 +715,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
       /* Ein Teilauftrag hat entweder keine oder eine Prozessquelle.
          Hat ein Teilauftrag KEINE Prozessquelle, ist durch den Auftragnehmer eine Prozessquelle zu definieren. */
       TeilauftragProzessquelle -- {0..*} Prozessquelle;
-      ProzessquelleTeilauftrag (EXTERNAL) -- {1} SO_AFU_Naturgefahren_20220801.Auftraege.TeilauftragRaumbezug;
+      ProzessquelleTeilauftrag (EXTERNAL) -- {1} SO_AFU_Naturgefahren_Pilot_20221130.Auftraege.TeilauftragRaumbezug;
     END TeilauftragProzessquelle;
 
     ASSOCIATION ProzessquelleDetail =
@@ -828,11 +827,11 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
 
     ASSOCIATION ProzessquelleFliessrichtungspfeil =
       ProzessquelleFliessrichtung -- {0..*} Fliessrichtungspfeil;
-      FliessrichtungProzessquelle (EXTERNAL) -- {1} SO_AFU_Naturgefahren_20220801.Befunde.Prozessquelle;
+      FliessrichtungProzessquelle (EXTERNAL) -- {1} SO_AFU_Naturgefahren_Pilot_20221130.Befunde.Prozessquelle;
       !!@ name = "R-Pfeile dürfen nur Hauptprozess Wasser zugeordnet sein!"
       MANDATORY CONSTRAINT FliessrichtungProzessquelle->Hauptprozess == #Wasser AND DEFINED(ProzessquelleFliessrichtung);
     END ProzessquelleFliessrichtungspfeil;
 
   END Kartographische_Produkte;
 
-END SO_AFU_Naturgefahren_20220801.
+END SO_AFU_Naturgefahren_Pilot_20221130.
