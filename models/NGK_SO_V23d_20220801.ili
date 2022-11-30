@@ -529,7 +529,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
        Prozess Einsturz/Absenkung: Einsturz, Absenkung
        Konkretisiert werden die Befunde durch saemtliche Teilprozesse, Kennwerte fuer Wasserprozesse und freie Befunde mit Jaehrlichkeit. */
     CLASS Befund (ABSTRACT) =
-      Geometrie : MANDATORY AREA WITH (STRAIGHTS) VERTEX GeometryCHLV95_V1.Coord2 WITHOUT OVERLAPS > 0.1;
+      Geometrie : MANDATORY SURFACE WITH (STRAIGHTS) VERTEX GeometryCHLV95_V1.Coord2 WITHOUT OVERLAPS > 0.1;
       RestgefaehrdungJaehrlichkeit : JaehrlichkeitRestgefaehrdung;
       Bemerkung : TEXT*100;
     !!@ name = "In der Befund-Geometrie sind keine KLöcher erlaubt!"  
