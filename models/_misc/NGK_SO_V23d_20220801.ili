@@ -365,7 +365,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
         von_190_bis_195_cm,
         von_195_bis_200_cm,
         mehr_als_200_cm
-      );
+      ) ORDERED;
 
       !! Standardwertebereich fuer Teilprozess Uebermurung: Fliessgeschwindigkeit [m/s] 
       wUbermurungFliessgeschwindigkeit = (
@@ -403,7 +403,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
         von_1_8_bis_1_9_m_s,
         von_1_9_bis_2_0_m_s,
         mehr_als_2_0_m_s
-      );
+      ) ORDERED;
 
       !! Standardwertebereich Produkt h x v in [m2/s]. 
       wProduktHxV = (
@@ -435,7 +435,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
         von_1_8_bis_1_9_m2_s,
         von_1_9_bis_2_0_m2_s,
         mehr_als_2_0_m2_s
-      );
+      ) ORDERED;
  
       /* Wertebereich fuer Teilprozesse Ueberschwemmung statisch & dynamisch, Steinschlag, Blockschlag, Spontane Rutschung;
          Restgefaehrdung mit Intensitaeten;*/
@@ -458,7 +458,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
         restgefaehrdung_stark,
         restgefaehrdung_schwach,
         restgefaehrdung_mittel
-      );
+      ) ORDERED;
 
       !! Wertebereich fuer Teilprozess: Uebermurung 
         IWCodeUebermurung = (
@@ -472,7 +472,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
 
         restgefaehrdung_stark,		
         restgefaehrdung_mittel
-      );
+      ) ORDERED;
 
       !! Wertebereich fuer Teilprozess: Berg- und Felssturz 
       IWCodeBergFelssturz = (
@@ -480,7 +480,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
         rot_stark_100,
         rot_stark_300,
         restgefaehrdung_stark
-      );
+      ) ORDERED;
 
       !! Wertebereich fuer permanente Teilprozesse: Permanente Rutschung, Absenkung, Einsturz 
       IWCodePermanent = (
@@ -490,7 +490,7 @@ MODEL SO_AFU_Naturgefahren_20220801 (de)
         restgefaehrdung_stark,
         restgefaehrdung_schwach,
         restgefaehrdung_mittel
-      );
+      ) ORDERED;
 
     !! Beschreibung der Prozessquelle 
     CLASS Prozessquelle =
