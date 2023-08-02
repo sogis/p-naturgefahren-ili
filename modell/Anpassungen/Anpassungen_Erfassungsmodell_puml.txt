@@ -1,0 +1,130 @@
+@startuml
+
+skin rose
+
+title Strukturelle Vereinfachungen und Constraints Erfassungsmodell
+
+class "Prozessquelle\nSteinBlockschlag (1)" as pqs {
+  Punkt
+  Polygon
+}
+
+class "Prozessquelle" as pq {
+  Hauptprozess - löschen (5)? Ja
+}
+
+class "Befund" as bef {}
+
+class "Fliessrichtungspfeile" as pfeil {
+  Skalierung - löschen? Ja
+}
+
+class "Teilauftrag (6)" as ta {
+  Hauptprozess
+  WasserKennwerte (12) (keine, normal, detailliert)
+  AufloesungDetailliert - löschen? (9)
+  Freie_Jaehrlichkeit
+}
+
+class "Perimeter (11)" as peri {
+  Bezeichnung
+  w_Ueberschwemmung_statisch : Beurteilungsart
+  w_Ueberschwemmung_dynamisch : Beurteilungsart
+  w_Uebermurung : Beurteilungsart
+  w_Ufererosion : Beurteilungsart
+  ea_Einsturz : Beurteilungsart
+  ea_Absenkung : Beurteilungsart
+  s_Stein_Blockschlag : Beurteilungsart
+  s_Berg_Felssturz : Beurteilungsart
+  s_Eisschlag : Beurteilungsart
+  r_Hangmure : Beurteilungsart
+  r_Spontane_Rutschung : Beurteilungsart
+  r_Permanente_Rutschung : Beurteilungsart
+  Polygon
+}
+
+class "Autor (8)" as aut {}
+
+class "Beurteilung\nlöschen? Ja" as b {}
+
+class "TeilauftragSzenarien - löschen? (7)" as tas {}
+
+class "Auftrag (10)" as a {
+  Kennung
+  Abschluss_Jahr
+}
+
+pq "1" -right- "1..*" bef : (3)
+pq "0..1" -- "1" pqs : (2)
+pq "1" -- "0..*" pfeil : (4)
+
+a "1" -- "1..*" ta
+ta "1" -right- "1..*" pq
+ta "1..*" -- "1" aut
+
+ta "1..*" -left- "1..*" peri : "      "
+
+
+
+legend
+In Klassen sind nur neue oder geänderte Attribute enthalten
+F: Frage
+C: Constraint
+
+(1)  ProzessquelskalleSteinBlockschlagPunkt -Polygon werden gelöscht
+- F: Flaeche als Multipolygon? __Nein - Einzelpolygon__
+- C: Entweder Punkt oder Polygon muss erfasst sein.
+
+(2) C: Prozessquellen mit Hauptprozess Stein / Blockschlag müssen
+mit den Zusatzinformationen in ProzessquelleSteinBlockschlag verknüpft sein.
+
+(3) C: Die Teilprozesse der Befunde müssen mit dem Hauptprozess
+der Prozessquelle übereinstimmen.
+
+(4) C: Prozessquellen mit Hauptprozess X müssen mit 
+Fliessrichtungspfeilen verknüpft sein.
+
+(5) F: Teilauftrag ist pro Teilprozess definiert. Damit macht die 
+Hauptprozess-Angabe auf der Prozessquelle keinen Sinn, oder? 
+__Korrekt Teilauftrag neu pro Hauptprozess__.
+
+(6)
+__Es werden immer alle Teilprozesse im Hauptprozess abgeklärt.__
+- F: Abklährungsperimeter ist pro Teilprozess. 
+Wie bringen wir das mit den Altdaten (pro Hauptprozess) zusammen?
+__Doris?__
+- F: Häufig muss das gleiche Polygon mehrfach erfasst werden. 
+Abklärungsperimeter als separate Klasse definieren und verknüpfen?
+__Ja, separate Klasse__.
+- C: Es dürfen nur Befunde mit dem entsprechenden Teilprozess zugeordnet sein.
+
+(7): F: Hintergrund sind freie wählbare Jährlichkeiten...?
+Diese kann man aber in den Befunden nicht setzen. Darum Weglassen?
+__Jährlichkeit ist als frei wählbare Zahl definiert.__
+__Darum Freie_Jaehrlichkeit als optionales Attribut in Teilauftrag zügeln.__
+
+(8): F: Umwandeln von heute Struktur in "normale" Klasse? Damit kann
+im Teilauftrag der entsprechende Autor in Dropdown augewählt werden.
+__Ja, umwandeln__
+
+(9): 
+- __F: Detaillierte Kennwerte in je eigene Klasse? Nein, belassen__
+
+(10):
+- __F: Jahr für Auftragsabschluss OK oder genauer notwendig mit Datum? Nur Jahr OK__
+- __C: Kennung ist eindeutig__
+- __C: Name der Prozessquelle ist innerhalb (Teil-)Auftrag eindeutig__
+
+(11):
+- C: Teilprozess-Beurteilungen des entsprechenden Hauptprozesses (Teilauftrag)
+dürfen nicht NULL sein.
+
+(12):
+- C: Bei Hauptprozess Wasser darf Attribut "WasserKennwerte" nicht NULL sein.
+- C: In den Kennwert-Klassen müssen die Kennwerte gemäss Attribut "WasserKennwerte" ausgefüllt sein.
+Alternativ: In den Kennwert-Klassen müssen entweder die normalen oder detaillierten
+Kennwerte ausgefüllt sein.
+und 
+end legend
+
+@enduml
