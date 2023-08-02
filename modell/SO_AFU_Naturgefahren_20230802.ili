@@ -1,7 +1,4 @@
 INTERLIS 2.3;
-/** Naturgefahren SO.
-Erfassungsmodell für die Naturgefahren des Kt. Solothurn.
-*/
 
 /* 
  ------------------------------------------------------------------------------
@@ -13,11 +10,12 @@ Erfassungsmodell für die Naturgefahren des Kt. Solothurn.
   2022-11-24 | GeoW  | OID in TeilauftragRaumbezug auf ANYOID gesetzt, Kommentare bereinigt, 
                        Constraints deklarativ eingefügt
   2022-11-30 | jek   | Modellname mit _Pilot_ ergänzt, Datum aktualisiert.
+  2022-08-02 | jek   | Anpassungen Klassen in Topic Auftraege und Kl. Prozessquelle gemäss Pilot.
  ==============================================================================
 */
 !!@ technicalContact=mailto:agi@bd.so.ch
-MODEL SO_AFU_Naturgefahren_Pilot_20221130 (de) 
-  AT "http://geo.so.ch/models/AFU" VERSION "2022-11-30" =
+MODEL SO_AFU_Naturgefahren_20220802 (de) 
+  AT "http://geo.so.ch/models/AFU" VERSION "2022-08-02" =
 
   IMPORTS UNQUALIFIED Units, Time, CoordSys;
   IMPORTS GeometryCHLV95_V1;
@@ -834,4 +832,4 @@ MODEL SO_AFU_Naturgefahren_Pilot_20221130 (de)
 
   END Kartographische_Produkte;
 
-END SO_AFU_Naturgefahren_Pilot_20221130.
+END SO_AFU_Naturgefahren_20220802.
