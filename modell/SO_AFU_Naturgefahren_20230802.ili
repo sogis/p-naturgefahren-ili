@@ -47,11 +47,18 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
         beurteilt_und_in_abklaerung
       );
 
-      !! Wertebereich fuer permanente Teilprozesse
-      TeilprozessPermanent = (
-        permanente_Rutschung,
-        Einsturz,
-        Absenkung
+      !! Wertebereiche fuer Prozessquellenbeschreibung Hauptprozesse
+      Hauptprozess = (
+        Wasser,
+        Rutschung,
+        Sturz,
+        Absenkung_Einsturz
+      );
+
+      WasserkennwerteArt = (
+        keine,
+        normal,
+        detailliert
       );
 
       !! Wertebereich fuer Teilprozesse der Hauptprozesse Rutsch und Sturz
@@ -61,13 +68,6 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
         Stein_Blockschlag,
         Fels_Bergsturz,
         Eisschlag
-      );
-
-      !! Wertebereich fuer Teilprozesse des Hauptprozess Wasser
-      TeilprozessWasser = (
-        Ueberschwemmung_statisch,
-        Ueberschwemmung_dynamisch,
-        Ubermurung
       );
 
       !! Art der Nachfuehrung der Gefahrenkarte
@@ -120,20 +120,17 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
       Dateiname: MANDATORY TEXT*100;
     END Bericht;
 
-    /* TEILAUFTRAG RAUMBEZUG (Abstrakte Klasse)
-       pro Teilauftrag ist jeweils entweder ein Abklaerungsperimeter, eine Prozessquelle oder beides zu eroeffnen.
-       Teilauftrag mit Abklaerungsperimeter: Es sind saemtliche Prozesse im Abklaerungsperimeter zu untersuchen. Prozessquellen sind nicht bekannt und muessen neu definiert werden.
-       Teilauftrag mit Prozessquelle: Prozessquelle wurde bereits in einem alten Projekt erfasst und ist bekannt. Es erfolgt eine Nachfuehrung fuer eine bestimmte Prozessquelle (z.B. Veraenderungen durch Bautaetigkeiten und dadurch ist eine neue Gefaehrdungssituation entstanden)
-       Teilauftrag mit Abklaerungsperimeter und Prozessquelle: Fuer eine "lange" Prozessquelle (z.B. Aare) soll nur in einem bestimmten Perimeter (z.B. in Olten) die Gefahrenkarte erneuert werden.
-       Folgende Teilabklaerungsarten gibt es:
-       Szenariobezogen: Prozesse mit Jaehrlichkeiten
-         > Rutsch/Sturz/Wasser/Murgang
-       Ohne Szenarien:
-         > Permanente Prozesse
-         > Hinweisprozesse */
-    CLASS TeilauftragRaumbezug (ABSTRACT) =
+    /* TEILAUFTRAG
+      Mit dem Teilauftrag wrid der entsprechende Hauptprozess einwirkungs- oder prozessquellenorientiert beurteilt.
+      Ein einwirkungsorientierter Teilauftrag beurteilt alle für den Einwirkungsraum relevanten Prozessquellen.
+      Die prozessquellenorientierte Berteilung benennt explizit die zu beurteilenden Prozessquellen. Diese "alten"  
+      Prozessquellen werden beim Datenabgleich automatissch durch die neu beurteilten ersetzt.
+    */
+    CLASS Teilauftrag =
       !! Objektidentifikation mittels sprechendem Schlüssel ("YYYY.<BueroABC>.x.y"), maximale Länge 36 Zeichen 
       OID AS INTERLIS.ANYOID;
+      !! Im Teilauftrag abgeklärter Hauptprozess. Abgeklärte Teilprozesse siehe Abklärungsperimeter.
+      Hauptprozess : MANDATORY Hauptprozess;
       Bemerkung : TEXT*100;
       !! Auftragnehmer gemaess Autorenliste 
       Auftragnehmer : MANDATORY Autor;
@@ -142,7 +139,11 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
       Geometrie : MANDATORY Einzelflaeche;
       !! Beurteilung, welcher Teilprozess zu welchem Grad untersucht wurde 
       Beurteilungsstatus: MANDATORY Beurteilungsart;
-      !!       Hauptprozess : MANDATORY Hauptprozess;
+      !! Für Wasser-Teilauftrag: Angabe, ob und wie detailliert die Kennwerte abgeklaert werden.
+      Wasserkennwerte: WasserkennwerteArt;
+      !! Für Ausnahmefall der Abklährung einer freien Jährlichkeit mittels Klasse BefundeJaehrlichkeit ist hier
+      !! die abzuklärende Jährlichkeit gesetzt. Im Normallfall NULL.
+      Jaehrlichkeit : Jaehrlichkeit;
 
     !!@ name = "Der Abklärungsperimeter muss grösser 100m2 sein!"  
     !!MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS,"Geometrie") > 100; !!Constraint aus Kategorie "generisch"
@@ -150,53 +151,10 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
     !!MANDATORY CONSTRAINT GeoW_FunctionsExt.IsInside("swissBOUNDARIES3D_ili2_LV95_V1_3", "tbd" ,THIS, "Geometrie"); !!Constraint aus Kategorie "generisch"
     !!@ name = "In der Abklärungsperimeter-Geometrie sind keine Löcher erlaubt!"  
     !!MANDATORY CONSTRAINT GeoW_FunctionsExt.GetHolesCount(THIS,  "Geometrie") == 0; !!Constraint aus Kategorie "generisch"   
-    END TeilauftragRaumbezug;
-
-    /* TEILAUFTRAG SZENARIEN (Abstrakte Klasse)
-       Fuer Prozesse mit Jaehrlichkeiten. Unterscheidung von Prozessen wo 
-       - Kennwerte fakultativ bestellt werden koennen (Wasserprozesse)
-       - Keine Kennwerte bestellt werden
-       Angabe, ob nur Grundszenarien (Szenarien 30/100/300/Extrem) bestellt werden und/oder weitere Szenarien mit frei waehlbarer Jaehrlichkeit (Wert zwischen 0 und 9999999)*/
-    CLASS TeilauftragSzenarien (ABSTRACT)
-    EXTENDS TeilauftragRaumbezug =
-      /* True = Nur Grundszenarien werden bestellt (Szenarien 30/100/300/Extrem)
-         False = Es wird ein frei waehlbares Szenario bestellt (z.B. Jaehrlichkeit 10) */
-      Grundszenarien : MANDATORY BOOLEAN;
-      !! Bestellung eines Szenario mit frei waehlbarer Jaehrlichkeit. Wert zwischen 0 und 9999999
-      Jaehrlichkeit : Jaehrlichkeit;
-    END TeilauftragSzenarien;
-
-    CLASS TeilauftragRutschSturz
-    EXTENDS TeilauftragSzenarien =
-      !! Angabe, welcher Teilprozess untersucht werden soll. Moegliche Werte siehe Wertebereich TeilprozessRutschSturz 
-      Teilprozess : MANDATORY TeilprozessRutschSturz;
-    END TeilauftragRutschSturz;
-
-    CLASS TeilauftragUeberschwemmungMurgang
-    EXTENDS TeilauftragSzenarien =
-      !! Angabe, welcher Teilprozess untersucht werden soll. Moegliche Werte siehe Wertebereich TeilprozessRutschSturz  
-      Teilprozess : MANDATORY TeilprozessWasser;
-      /* True = es werden Kennwerte (v, h, v x h), je nach Teilprozess, bestellt
-         False = es werden keine Kennwerte verlangt */
-      Kennwerte : MANDATORY BOOLEAN;
-      /* Aufloesung Detailliert: 
-         True = Die Abgabe der Werte muss gemäss den detaillierten Werten erfolgen.
-         False = Die Abgabe der Werte muss gemäss den Standardwerten erfolgen */
-      AufloesungDetailliert: MANDATORY BOOLEAN;
-    END TeilauftragUeberschwemmungMurgang;
-
-    CLASS TeilauftragPermanenteProzesse
-    EXTENDS TeilauftragRaumbezug =
-      !! Angabe, welcher Teilprozess untersucht werden soll. Moegliche Werte siehe Wertebereich TeilprozessePermanent   
-      Teilprozess : MANDATORY TeilprozessPermanent;
-    END TeilauftragPermanenteProzesse;
-
-    CLASS TeilauftragUfererosion
-    EXTENDS TeilauftragRaumbezug =
-    END TeilauftragUfererosion;
+    END Teilauftrag;
 
     ASSOCIATION AuftragTeilauftrag =
-      AuftragTeilauftrag -- {1..*} TeilauftragRaumbezug;
+      AuftragTeilauftrag -- {1..*} Teilauftrag;
       TeilauftragAuftrag -<> {1} Auftrag;
     END AuftragTeilauftrag;
 
@@ -215,14 +173,6 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
     DEPENDS ON Auftraege;
 
     DOMAIN
-       
-      !! Wertebereiche fuer Prozessquellenbeschreibung Hauptprozesse
-      Hauptprozess = (
-        Wasser,
-        Rutschung,
-        Sturz,
-        Absenkung_Einsturz
-      );
 
       !! Wertebereiche fuer Prozessquellenbeschreibung Teilprozesse
       Teilprozess = (
@@ -701,7 +651,7 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
       /* Ein Teilauftrag hat entweder keine oder eine Prozessquelle.
          Hat ein Teilauftrag KEINE Prozessquelle, ist durch den Auftragnehmer eine Prozessquelle zu definieren. */
       TeilauftragProzessquelle -- {0..*} Prozessquelle;
-      ProzessquelleTeilauftrag (EXTERNAL) -- {1} SO_AFU_Naturgefahren_20220802.Auftraege.TeilauftragRaumbezug;
+      ProzessquelleTeilauftrag (EXTERNAL) -- {1} SO_AFU_Naturgefahren_20220802.Auftraege.Teilauftrag;
     END TeilauftragProzessquelle;
 
     ASSOCIATION ProzessquelleSteinBlock =
