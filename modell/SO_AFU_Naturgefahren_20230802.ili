@@ -142,6 +142,7 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
       Geometrie : MANDATORY Einzelflaeche;
       !! Beurteilung, welcher Teilprozess zu welchem Grad untersucht wurde 
       Beurteilungsstatus: MANDATORY Beurteilungsart;
+      !!       Hauptprozess : MANDATORY Hauptprozess;
 
     !!@ name = "Der Abklärungsperimeter muss grösser 100m2 sein!"  
     !!MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS,"Geometrie") > 100; !!Constraint aus Kategorie "generisch"
@@ -491,33 +492,20 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
 
     !! Beschreibung der Prozessquelle 
     CLASS Prozessquelle =
-      !! Name der Prozessquelle (Dorfbach) 
-      ProzessquellenName : MANDATORY TEXT*80;
-      Hauptprozess : MANDATORY Hauptprozess;
+      !! Innerhalb Teilauftrag eindeutiger Name der Prozessquelle. Bsp.: Dorfbach
+      Kennung : MANDATORY TEXT*80;
     END Prozessquelle;
 
     !! Abstrakte Klasse fuer Detailbeschreibung der Prozessquelle bei Stein- und Blockschlag 
-    CLASS ProzessquelleSteinBlockschlag (ABSTRACT) =
+    CLASS ProzessquelleSteinBlockschlag =
       !! Beschreibung der Geologie 
       Geologie : MANDATORY TEXT*200;  
       Volumen : MANDATORY 1 .. 999999999 [Units.m3];
       Form : MANDATORY AspektForm;
       Jaehrlichkeit : MANDATORY Jaehrlichkeit;
+      Polygon : Einzelflaeche;
+      Punkt : GeometryCHLV95_V1.Coord3;
     END ProzessquelleSteinBlockschlag;
-
-    /* Konkretisiert die Klasse ProzessquelleSteinBlockschlag. Beschreibt die Prozessquelle mit einem Polygon
-    Prozessquelle -> Hauptprozess muss Sturz sein */
-    CLASS ProzessquelleSteinBlockschlagPolygon
-    EXTENDS ProzessquelleSteinBlockschlag =
-      Geometrie : MANDATORY Einzelflaeche;
-    END ProzessquelleSteinBlockschlagPolygon;
-   
-    /* Konkretisiert die Klasse ProzessquelleSteinBlockschlag. Beschreibt die Prozessquelle mit einem Punkt
-    Prozessquelle -> Hauptprozess muss Sturz sein */
-    CLASS ProzessquelleSteinBlockschlagPunkt
-    EXTENDS ProzessquelleSteinBlockschlag =
-      Geometrie : MANDATORY GeometryCHLV95_V1.Coord3;
-    END ProzessquelleSteinBlockschlagPunkt;
 
     /* Abstrakte Klasse fuer Befunde.
        Prozess Wasser: Ueberschwemmung statisch/dynamisch, Ubermurung, Ufererosion
@@ -713,13 +701,13 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
       /* Ein Teilauftrag hat entweder keine oder eine Prozessquelle.
          Hat ein Teilauftrag KEINE Prozessquelle, ist durch den Auftragnehmer eine Prozessquelle zu definieren. */
       TeilauftragProzessquelle -- {0..*} Prozessquelle;
-      ProzessquelleTeilauftrag (EXTERNAL) -- {1} SO_AFU_Naturgefahren_Pilot_20221130.Auftraege.TeilauftragRaumbezug;
+      ProzessquelleTeilauftrag (EXTERNAL) -- {1} SO_AFU_Naturgefahren_20220802.Auftraege.TeilauftragRaumbezug;
     END TeilauftragProzessquelle;
 
-    ASSOCIATION ProzessquelleDetail =
-      Prozessquelle -- {0..1} ProzessquelleSteinBlockschlag;
-      ProzessquelleDetail -<> {1} Prozessquelle;
-    END ProzessquelleDetail;
+    ASSOCIATION ProzessquelleSteinBlock =
+      ProzessquelleSteinBlock -- {0..1} ProzessquelleSteinBlockschlag;
+      Prozessquelle -<> {1} Prozessquelle;
+    END ProzessquelleSteinBlock;
 
     ASSOCIATION ProzessquelleBefund =
       ProzessquelleBefund -- {1..*} Befund;
@@ -728,67 +716,67 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
 
     CONSTRAINTS OF BefundSteinBlockschlag =
       !!@ name = "BefundSteinBlockschlag muss Hauptprozess>Sturz zugeordnet sein"
-      MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Sturz;
+      !!MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Sturz;
     END;
 
     CONSTRAINTS OF BefundBergFelssturz =
       !!@ name = "BefundBergFelssturz muss Hauptprozess>Sturz zugeordnet sein"
-      MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Sturz;
+      !!MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Sturz;
     END;
 
     CONSTRAINTS OF BefundEisschlag =
       !!@ name = "BefundEisschlag muss Hauptprozess>Sturz zugeordnet sein"
-      MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Sturz;
+      !!MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Sturz;
     END;
 
     CONSTRAINTS OF BefundHangmure =
       !!@ name = "BefundHangmure muss Hauptprozess>Rutschung zugeordnet sein"
-      MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Rutschung;
+      !!MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Rutschung;
     END;
    
     CONSTRAINTS OF BefundUfererosion =
       !!@ name = "BefundUfererosion muss Hauptprozess>Wasser zugeordnet sein"
-      MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Wasser;
+      !!MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Wasser;
     END;
   
     CONSTRAINTS OF BefundAbsenkung =
       !!@ name = "BefundAbsenkung muss Hauptprozess>Absenkung_Einsturz zugeordnet sein" 
-      MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Absenkung_Einsturz;
+      !!MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Absenkung_Einsturz;
     END;
    
     CONSTRAINTS OF BefundEinsturz =
       !!@ name = "BefundEinsturz muss Hauptprozess>Absenkung_Einsturz zugeordnet sein"
-      MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Absenkung_Einsturz;
+      !!MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Absenkung_Einsturz;
     END;
 
     CONSTRAINTS OF BefundPermanenteRutschung =
       !!@ name = "BefundPermanenteRutschung muss Hauptprozess>Rutschung zugeordnet sein" 
-      MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Rutschung;
+      !!MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Rutschung;
     END;   
 
     CONSTRAINTS OF BefundSpontaneRutschung =
       !!@ name = "BefundSpontaneRutschung muss Hauptprozess>Rutschung zugeordnet sein"
-      MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Rutschung;
+      !!MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Rutschung;
     END;      
 
     CONSTRAINTS OF BefundUebermurung =
       !!@ name = "BefundUebermurung muss Hauptprozess>Wasser zugeordnet sein" 
-      MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Wasser;
+      !!MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Wasser;
     END;
     
     CONSTRAINTS OF BefundUeberschwemmungDynamisch =
       !!@ name = "BefundUeberschwemmungDynamisch muss Hauptprozess>Wasser zugeordnet sein"
-      MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Wasser;
+      !!MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Wasser;
     END;
        
     CONSTRAINTS OF BefundUeberschwemmungStatisch =
       !!@ name = "BefundUeberschwemmungStatisch muss Hauptprozess>Wasser zugeordnet sein"
-      MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Wasser;
+      !!MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Wasser;
     END;
      
     CONSTRAINTS OF BefundJaehrlichkeit =
       !!@ name = "BefundJaehrlichkeit muss Hauptprozess>Wasser zugeordnet sein"  
-      MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Sturz; 
+      !!MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Sturz; 
       !!@ name = "BefundJaehrlichkeit ist nichtz flächendeckend!"  
       !!SET CONSTRAINT INTERLIS_ext.areAreas3(ALL,>Prozessquelle,"Geometrie");     
     END;
@@ -809,25 +797,14 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
     CLASS Fliessrichtungspfeil =
       Geometrie : MANDATORY GeometryCHLV95_V1.Coord2;
       Azimuth : MANDATORY GeometryCHLV95_V1.Orientation;
-      !! Skalierung des Fliessrichtungspfeils (z.B. fuer kleine/grosse Geschwindigkeiten) 
-      Skalierung : MANDATORY 1 .. 10;
       Jaehrlichkeit : MANDATORY JaehrlichkeitListe;
     END Fliessrichtungspfeil;
 
-    !! Standort von Gebaeuden mit Untergeschossen 
-    CLASS Untergeschosse =
-      Geometrie : MANDATORY GeometryCHLV95_V1.Coord2;
-      !!Eidgenössische Gebäudeidentifikator (EGID) 
-      EGID : MANDATORY 1..900000000;
-    !!@ name = "Untergeschoss muss innerhalb BefundUeberschwemmung liegen!"  
-    !!MANDATORY CONSTRAINT GeoW_FunctionsExt.IsInside(THIS, "Geometrie", "Helper_BefundUeberschwemmung", "Geometrie"); !!Constraint aus Kategorie "generisch"  
-    END Untergeschosse;
-
     ASSOCIATION ProzessquelleFliessrichtungspfeil =
       ProzessquelleFliessrichtung -- {0..*} Fliessrichtungspfeil;
-      FliessrichtungProzessquelle (EXTERNAL) -- {1} SO_AFU_Naturgefahren_Pilot_20221130.Befunde.Prozessquelle;
+      FliessrichtungProzessquelle (EXTERNAL) -- {1} SO_AFU_Naturgefahren_20220802.Befunde.Prozessquelle;
       !!@ name = "R-Pfeile dürfen nur Hauptprozess Wasser zugeordnet sein!"
-      MANDATORY CONSTRAINT FliessrichtungProzessquelle->Hauptprozess == #Wasser AND DEFINED(ProzessquelleFliessrichtung);
+      !!MANDATORY CONSTRAINT FliessrichtungProzessquelle->Hauptprozess == #Wasser AND DEFINED(ProzessquelleFliessrichtung);
     END ProzessquelleFliessrichtungspfeil;
 
   END Kartographische_Produkte;
