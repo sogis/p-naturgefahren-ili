@@ -78,7 +78,7 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
       );
 
     !! Auftragnehmer, Buero welches fuer Auftrag/Befund verantwortlich ist
-    STRUCTURE Autor =
+    CLASS Autor =
       !! Name des Bueros
       Buero : MANDATORY TEXT*80;
       !! Standort des Bueros/Filiale, welche den Auftrag abwickelt 
@@ -102,10 +102,12 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
     END Beurteilung;
 
     CLASS Auftrag =
-      !! Beschreibung des Auftrags 
-      Name : MANDATORY TEXT*80;
+      !! Eindeutige Bezeichnung des Auftrags 
+      Kennung : MANDATORY TEXT*80;
       !! Auftraggeber 
       Fachstelle : MANDATORY TEXT*80;
+      !! Jahr, in welchem der Auftrag abgeschlossen wurde.
+      Abschlussjahr : MANDATORY 2020 .. 2040;
       !! Art der Gefahrenbeurteilung -> siehe Wertebereich Deklarationen
       Deklaration : MANDATORY Deklaration;
       Bemerkung : TEXT*100;
@@ -132,8 +134,6 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
       !! Im Teilauftrag abgeklärter Hauptprozess. Abgeklärte Teilprozesse siehe Abklärungsperimeter.
       Hauptprozess : MANDATORY Hauptprozess;
       Bemerkung : TEXT*100;
-      !! Auftragnehmer gemaess Autorenliste 
-      Auftragnehmer : MANDATORY Autor;
       !! Abklaerungsperimeter = Perimeter, welcher untersucht werden soll 
       Name : MANDATORY TEXT*80;
       Geometrie : MANDATORY Einzelflaeche;
@@ -162,6 +162,11 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
       AuftragBericht -- {1..*} Bericht;
       BerichtAuftrag -<> {1} Auftrag;
     END AuftragBericht;
+
+    ASSOCIATION TeilauftragAutor =
+      TeilauftragRole -- {1..*} Teilauftrag;
+      AutorRole -- {1} Autor;
+    END TeilauftragAutor;
 
   END Auftraege;
 
