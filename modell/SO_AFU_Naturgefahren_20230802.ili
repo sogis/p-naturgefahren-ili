@@ -163,7 +163,6 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
       r_Permanente_Rutschung : Beurteilungsart;
     END Abklaerungsperimeter;
 
-
     ASSOCIATION AuftragTeilauftrag =
       AuftragTeilauftrag -- {1..*} Teilauftrag;
       TeilauftragAuftrag -<> {1} Auftrag;
@@ -178,6 +177,11 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
       TeilauftragRole -- {1..*} Teilauftrag;
       AutorRole -- {1} Autor;
     END TeilauftragAutor;
+
+    ASSOCIATION AbklaerungsperimeterTeilauftrag =
+      AbklaerungsperimeterRole -- {1..*} Abklaerungsperimeter;
+      TeilauftragRole -- {1..*} Teilauftrag;
+    END AbklaerungsperimeterTeilauftrag;
 
   END Auftraege;
 
@@ -462,7 +466,7 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
       Kennung : MANDATORY TEXT*80;
     END Prozessquelle;
 
-    !! Abstrakte Klasse fuer Detailbeschreibung der Prozessquelle bei Stein- und Blockschlag 
+    !! Klasse fuer Detailbeschreibung der Prozessquelle bei Stein- und Blockschlag 
     CLASS ProzessquelleSteinBlockschlag =
       !! Beschreibung der Geologie 
       Geologie : MANDATORY TEXT*200;  
@@ -670,15 +674,29 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
       ProzessquelleTeilauftrag (EXTERNAL) -- {1} SO_AFU_Naturgefahren_20220802.Auftraege.Teilauftrag;
     END TeilauftragProzessquelle;
 
-    ASSOCIATION ProzessquelleSteinBlock =
-      ProzessquelleSteinBlock -- {0..1} ProzessquelleSteinBlockschlag;
-      Prozessquelle -<> {1} Prozessquelle;
-    END ProzessquelleSteinBlock;
+    ASSOCIATION ProzessquelleSteinBlock_Prozessquelle =
+      ProzessquelleSteinBlockRole -- {0..1} ProzessquelleSteinBlockschlag;
+      ProzessquelleRole -<> {1} Prozessquelle;
+    END ProzessquelleSteinBlock_Prozessquelle;
 
     ASSOCIATION ProzessquelleBefund =
       ProzessquelleBefund -- {1..*} Befund;
       BefundProzessquelle -- {1} Prozessquelle;
     END ProzessquelleBefund;
+
+    !! Fliessrichtungspfeile zeigen die Richtung des Wassers an 
+    CLASS Fliessrichtungspfeil =
+      Geometrie : MANDATORY GeometryCHLV95_V1.Coord2;
+      Azimuth : MANDATORY GeometryCHLV95_V1.Orientation;
+      Jaehrlichkeit : MANDATORY JaehrlichkeitListe;
+    END Fliessrichtungspfeil;
+
+    ASSOCIATION ProzessquelleFliessrichtungspfeil =
+      ProzessquelleFliessrichtung -- {0..*} Fliessrichtungspfeil;
+      FliessrichtungProzessquelle -- {1} Prozessquelle;
+      !!@ name = "R-Pfeile dürfen nur Hauptprozess Wasser zugeordnet sein!"
+      !!MANDATORY CONSTRAINT FliessrichtungProzessquelle->Hauptprozess == #Wasser AND DEFINED(ProzessquelleFliessrichtung);
+    END ProzessquelleFliessrichtungspfeil;
 
     CONSTRAINTS OF BefundSteinBlockschlag =
       !!@ name = "BefundSteinBlockschlag muss Hauptprozess>Sturz zugeordnet sein"
@@ -754,25 +772,5 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
       Geometrie: Einzelflaeche;
     END Helper_BefundUeberschwemmung;
   END Befunde;  
-
-  !! Im TOPIC kartographische Produkte werden Fliessrichtungspfeile und speziell identifizierte Untergeschosse festgehalten.
-  TOPIC Kartographische_Produkte =
-    DEPENDS ON Befunde;
-
-    !! Fliessrichtungspfeile zeigen die Richtung des Wassers an 
-    CLASS Fliessrichtungspfeil =
-      Geometrie : MANDATORY GeometryCHLV95_V1.Coord2;
-      Azimuth : MANDATORY GeometryCHLV95_V1.Orientation;
-      Jaehrlichkeit : MANDATORY JaehrlichkeitListe;
-    END Fliessrichtungspfeil;
-
-    ASSOCIATION ProzessquelleFliessrichtungspfeil =
-      ProzessquelleFliessrichtung -- {0..*} Fliessrichtungspfeil;
-      FliessrichtungProzessquelle (EXTERNAL) -- {1} SO_AFU_Naturgefahren_20220802.Befunde.Prozessquelle;
-      !!@ name = "R-Pfeile dürfen nur Hauptprozess Wasser zugeordnet sein!"
-      !!MANDATORY CONSTRAINT FliessrichtungProzessquelle->Hauptprozess == #Wasser AND DEFINED(ProzessquelleFliessrichtung);
-    END ProzessquelleFliessrichtungspfeil;
-
-  END Kartographische_Produkte;
 
 END SO_AFU_Naturgefahren_20220802.
