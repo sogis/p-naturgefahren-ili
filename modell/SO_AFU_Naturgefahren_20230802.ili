@@ -85,22 +85,6 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
       Filiale : MANDATORY TEXT*80;
     END Autor;
 
-    !! Beurteilung: gibt an, welcher Teilprozesse im Abklaerungsperimeter zu welchem Grad untersucht wurde. Zulaessige Werte siehe Wertebereich Beurteilungen 
-    STRUCTURE Beurteilung =
-      w_Ueberschwemmung_statisch : MANDATORY Beurteilungsart;
-      w_Ueberschwemmung_dynamisch : MANDATORY Beurteilungsart;
-      w_Uebermurung : MANDATORY Beurteilungsart;
-      w_Ufererosion : MANDATORY Beurteilungsart;
-      ea_Einsturz : MANDATORY Beurteilungsart;
-      ea_Absenkung : MANDATORY Beurteilungsart;
-      s_Stein_Blockschlag : MANDATORY Beurteilungsart;
-      s_Berg_Felssturz : MANDATORY Beurteilungsart;
-      s_Eisschlag : MANDATORY Beurteilungsart;
-      r_Hangmure : MANDATORY Beurteilungsart;
-      r_Spontane_Rutschung : MANDATORY Beurteilungsart;
-      r_Permanente_Rutschung : MANDATORY Beurteilungsart;
-    END Beurteilung;
-
     CLASS Auftrag =
       !! Eindeutige Bezeichnung des Auftrags 
       Kennung : MANDATORY TEXT*80;
@@ -122,7 +106,7 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
       Dateiname: MANDATORY TEXT*100;
     END Bericht;
 
-    /* TEILAUFTRAG
+    /* 
       Mit dem Teilauftrag wrid der entsprechende Hauptprozess einwirkungs- oder prozessquellenorientiert beurteilt.
       Ein einwirkungsorientierter Teilauftrag beurteilt alle für den Einwirkungsraum relevanten Prozessquellen.
       Die prozessquellenorientierte Berteilung benennt explizit die zu beurteilenden Prozessquellen. Diese "alten"  
@@ -136,9 +120,6 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
       Bemerkung : TEXT*100;
       !! Abklaerungsperimeter = Perimeter, welcher untersucht werden soll 
       Name : MANDATORY TEXT*80;
-      Geometrie : MANDATORY Einzelflaeche;
-      !! Beurteilung, welcher Teilprozess zu welchem Grad untersucht wurde 
-      Beurteilungsstatus: MANDATORY Beurteilungsart;
       !! Für Wasser-Teilauftrag: Angabe, ob und wie detailliert die Kennwerte abgeklaert werden.
       Wasserkennwerte: WasserkennwerteArt;
       !! Für Ausnahmefall der Abklährung einer freien Jährlichkeit mittels Klasse BefundeJaehrlichkeit ist hier
@@ -152,6 +133,36 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
     !!@ name = "In der Abklärungsperimeter-Geometrie sind keine Löcher erlaubt!"  
     !!MANDATORY CONSTRAINT GeoW_FunctionsExt.GetHolesCount(THIS,  "Geometrie") == 0; !!Constraint aus Kategorie "generisch"   
     END Teilauftrag;
+
+    /* 
+    1-n Perimeter, für welche die Einwirkungen der Teilprozesse gemäss Beurteilungsart
+    abgeklärt wurde. Im einfachsten Fall wird nur ein einziger Perimeter erfasst, welcher 
+    den Teilaufträgen (Hauptprozesse) zugewiesen ist. Die Beurteilungsart ist für alle
+    Teilprozesse angegeben.
+    Bsp. komplexer Fall: Für ein Aussenquartier müssen lediglich die Wassergefahren geklärt 
+    werden. Folglich mehrere Perimeter im Auftrag. Der "Aussenquartier-Perimeter" ist lediglich
+    dem Teilauftrag mit Hauptprozess=Wasser zugeordnet. Er hat nur die Beurteilungen der 
+    Wasser-Teilprozesse ausgefüllt. Für alle Gefahren der anderen Hauptprozesse folgt 
+    im "Aussenquartier-Perimeter" implizit die Beurteilungsart "nicht beurteilt".
+    */
+    CLASS Abklaerungsperimeter =
+      Geometrie : MANDATORY Einzelflaeche;
+      !! Dient "nur" der Perimeter-Anzeige als Text zwecks editieren der Beziehung zum Teilauftrag. 
+      Bezeichnung: MANDATORY TEXT*80;
+      w_Ueberschwemmung_statisch : Beurteilungsart;
+      w_Ueberschwemmung_dynamisch : Beurteilungsart;
+      w_Uebermurung : Beurteilungsart;
+      w_Ufererosion : Beurteilungsart;
+      ea_Einsturz : Beurteilungsart;
+      ea_Absenkung : Beurteilungsart;
+      s_Stein_Blockschlag : Beurteilungsart;
+      s_Berg_Felssturz : Beurteilungsart;
+      s_Eisschlag : Beurteilungsart;
+      r_Hangmure : Beurteilungsart;
+      r_Spontane_Rutschung : Beurteilungsart;
+      r_Permanente_Rutschung : Beurteilungsart;
+    END Abklaerungsperimeter;
+
 
     ASSOCIATION AuftragTeilauftrag =
       AuftragTeilauftrag -- {1..*} Teilauftrag;

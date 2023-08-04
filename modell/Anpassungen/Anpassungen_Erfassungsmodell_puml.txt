@@ -20,13 +20,13 @@ class "Fliessrichtungspfeile" as pfeil {
 }
 
 class "Teilauftrag (6)" as ta {
-  Hauptprozess
+  Hauptprozess (13)
   WasserKennwerte (12) (keine, normal, detailliert)
   AufloesungDetailliert - löschen? (9)
   Freie_Jaehrlichkeit
 }
 
-class "Perimeter (11)" as peri {
+class "Abklaerungsperimeter (11)" as peri {
   Bezeichnung
   w_Ueberschwemmung_statisch : Beurteilungsart
   w_Ueberschwemmung_dynamisch : Beurteilungsart
@@ -71,7 +71,7 @@ In Klassen sind nur neue oder geänderte Attribute enthalten
 F: Frage
 C: Constraint
 
-(1)  ProzessquelskalleSteinBlockschlagPunkt -Polygon werden gelöscht
+(1)  ProzessquelleSteinBlockschlagPunkt -Polygon: Werden gelöscht
 - F: Flaeche als Multipolygon? __Nein - Einzelpolygon__
 - C: Entweder Punkt oder Polygon muss erfasst sein.
 
@@ -124,7 +124,10 @@ dürfen nicht NULL sein.
 - C: In den Kennwert-Klassen müssen die Kennwerte gemäss Attribut "WasserKennwerte" ausgefüllt sein.
 Alternativ: In den Kennwert-Klassen müssen entweder die normalen oder detaillierten
 Kennwerte ausgefüllt sein.
-und 
+
+(13):
+- C: Innerhalb eines Auftrags dürfen keine Teilaufträge mit gleichem Hauptprozess vorkommen.
+(Kombination von Teilauftrag.Hauptprozess und Teilauftrag->Auftrag ist unique)
 end legend
 
 @enduml
