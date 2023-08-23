@@ -45,7 +45,7 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
         beurteilt_und_nicht_vollstaendig,
         beurteilt_und_nicht_bestimmbar,
         beurteilt_und_in_abklaerung
-      );
+      ) ORDERED;
 
       !! Wertebereiche fuer Prozessquellenbeschreibung Hauptprozesse
       Hauptprozess = (
@@ -73,9 +73,9 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
       !! Art der Nachfuehrung der Gefahrenkarte
       Deklaration = (
         Nachfuehrung,
-        BeurteilungNachMassnahmen,
+        Beurteilung_nach_Massnahmen,
         Neubeurteilung
-      );
+      ) ORDERED;
 
     !! Auftragnehmer, Buero welches fuer Auftrag/Befund verantwortlich ist
     CLASS Autor =
@@ -199,16 +199,16 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
         Ueberschwemmung_statisch,
         Ueberschwemmung_dynamisch,
         Ubermurung,
+        Ufererosion,
         spontane_Rutschung,
         Hangmure,
+        permanente_Rutschung,
         Stein_Blockschlag,
         Fels_Bergsturz,
-        Eisschlag,
-        permanente_Rutschung,
+        Eisschlag,        
         Einsturz,
-        Absenkung,
-        Ufererosion
-      );
+        Absenkung        
+      ) ORDERED;
      
       !! Wertebereich fuer Prozessquellenbeschreibung fuer Prozess Stein/Blockschlag
       AspektForm = (
@@ -223,7 +223,7 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
         schwach,
         mittel,
         stark
-      );
+        ) ORDERED;
 
       !! Wertebereiche fuer Prozess Rutsch: Beschleunigung 
         rBeschleunigung = (
@@ -234,7 +234,7 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
         mittel,
         !!> 5fach Mittelwert von v 
         stark
-      );
+        ) ORDERED;
 
       !! Wertebereich fuer Prozess Rutsch: Differentialbewegung 
       rDifferentialbewegung = (
@@ -243,29 +243,30 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
         gering,
         !! groesser 2 cm/Jahr/10m 
         hoch
-      );
+      ) ORDERED;
 
       !! Wertebereich fuer Prozess Rutsch: Korrektur 
       rKorrektur = (
-        Entschaerfung1,
         keine,
+        Entschaerfung1,
         Verschaerfung1,
         Verschaerfung2
-      );
+      ) ORDERED;
 
       !! Wertebereich Rutschgeschwindigkeit 
       rRutschgeschwindigkeit = (
+        keine,
         !! 0-2 cm/Jahr 
         substabil,
         !! 2-10 cm/Jahr 
         wenig_aktiv,
         !! > 10 cm/Jahr 
-        aktiv,
-        keine
-      );
+        aktiv
+      ) ORDERED;
 
       !! Wertebereich fuer Prozess Rutsch: Tiefe Gleitflaeche 
       rTiefeGleitflaeche = (
+        keine,
         !! oberflaechlich: Tiefe 0 < t <= 2 m 
         oberflaechlich,
         !! mitteltief: Tiefe 2 < t <= 10 m 
@@ -275,20 +276,29 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
         !! sehr tief: Tiefe t > 40m 
         sehr_tief,
         !! unbestimmt: Tiefe t <= 40 m 
-        unbestimmt,
-        keine
-      );
+        unbestimmt
+      ) ORDERED;
      
-      !! Standardwertebereich fuer Teilprozess Ueberschwemmung: Fliesstiefe [m]
-      wFliesstiefe = (
+      !! Wertebereich fuer Teilprozess Ueberschwemmung: Fliesstiefe [cm]
+      wFliesstiefeUeberschwemmung = (
         von_0_bis_25_cm,
         von_25_bis_50_cm,
         von_50_bis_75_cm,
         von_75_bis_100_cm,
-        von_100_bis_150_cm,
-        von_150_bis_200_cm,
-        mehr_als_200_cm
-      );
+        von_100_bis_125_cm,
+        von_125_bis_150_cm,
+        von_150_bis_175_cm,
+        von_175_bis_200_cm,
+        von_200_bis_300_cm,
+        von_300_bis_400_cm,
+        mehr_als_400_cm
+      ) ORDERED;
+
+      !! Wertebereich fuer Teilprozess Uebermurung: Fliesstiefe [cm]
+      wFliesstiefeUebermurung = (
+        bis_100_cm,
+        mehr_als_100_cm
+      ) ORDERED;
  
       !! Detaillierter Wertebereich fuer Teilprozess Ueberschwemmung: Fliesstiefe [m]
       wFliesstiefeDetail = (
@@ -339,14 +349,18 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
       wUbermurungFliessgeschwindigkeit = (
         bis_1_m_s,
         mehr_als_1_m_s
-      );
+      ) ORDERED;
 
       !! Standard Wertebereich fuer Prozess Ueberschwemmung: Fliessgeschwindigkeit [m/s]
       wUeberschwemmungFliessgeschwindigkeit = (
-        bis_0_5_m_s,
-        von_0_5_bis_2_m_s,
-        mehr_als_2_m_s
-      );
+        von_0_bis_0_5_m_s,
+        von_0_5_bis_1_m_s,
+        von_1_bis_2_m_s,
+        von_2_bis_3_m_s,
+        von_3_bis_4_m_s,
+        von_4_bis_5_m_s,
+        mehr_als_5_m_s
+      ) ORDERED;
 
       !! Detaillierter Wertebereich fuer Teilprozess Ueberschwemmung und Uebermurung: Fliessgeschwindigkeit [m/s] 
         wFliessgeschwindigkeitDetail = (
@@ -424,9 +438,9 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
         gelb_schwach_300,
 
         restgefaehrdung_stark,
-        restgefaehrdung_schwach,
-        restgefaehrdung_mittel
-      );
+        restgefaehrdung_mittel,
+        restgefaehrdung_schwach
+      ) ORDERED;
 
       !! Wertebereich fuer Teilprozess: Uebermurung 
         IWCodeUebermurung = (
@@ -440,7 +454,7 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
 
         restgefaehrdung_stark,		
         restgefaehrdung_mittel
-      );
+        ) ORDERED;
 
       !! Wertebereich fuer Teilprozess: Berg- und Felssturz 
       IWCodeBergFelssturz = (
@@ -448,7 +462,7 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
         rot_stark_100,
         rot_stark_300,
         restgefaehrdung_stark
-      );
+      ) ORDERED;
 
       !! Wertebereich fuer permanente Teilprozesse: Permanente Rutschung, Absenkung, Einsturz 
       IWCodePermanent = (
@@ -456,9 +470,9 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
         blau_mittel_permanent,
         gelb_schwach_permanent,
         restgefaehrdung_stark,
-        restgefaehrdung_schwach,
-        restgefaehrdung_mittel
-      );
+        restgefaehrdung_mittel,
+        restgefaehrdung_schwach
+      ) ORDERED;
 
     !! Beschreibung der Prozessquelle 
     CLASS Prozessquelle =
@@ -608,7 +622,7 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
     CLASS KennwertUeberschwemmungFliesstiefe
     EXTENDS Befund =
       !! Moegliche Werte gemaess wFliesstiefe. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. 
-      h : wFliesstiefe;
+      h : wFliesstiefeUeberschwemmung;
       hDetail : wFliesstiefeDetail;
       Jaehrlichkeit : JaehrlichkeitListe;
     !!@ name = "ungültige Überragung bei Befund!"  
@@ -646,7 +660,7 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
     CLASS KennwertUbermurungFliesstiefe
     EXTENDS Befund =
       !! Moegliche Werte gemaess wFliesstiefe. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen.
-      h : wFliesstiefe;
+      h : wFliesstiefeUebermurung;
       hDetail : wFliesstiefeDetail;
       Jaehrlichkeit : JaehrlichkeitListe;
     !!@ name = "ungültige Überragung bei Befund!"  
