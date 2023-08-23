@@ -120,8 +120,8 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
       Bemerkung : TEXT*100;
       !! Abklaerungsperimeter = Perimeter, welcher untersucht werden soll 
       Name : MANDATORY TEXT*80;
-      !! Für Wasser-Teilauftrag: Angabe, ob und wie detailliert die Kennwerte abgeklaert werden.
-      Wasserkennwerte: WasserkennwerteArt;
+      !! True, falls für Wasser-Teilauftrag die Kennwerte gemäss Modell geliefert werden.
+      Wasserkennwerte: MANDATORY BOOLEAN;
       !! Für Ausnahmefall der Abklährung einer freien Jährlichkeit mittels Klasse BefundeJaehrlichkeit ist hier
       !! die abzuklärende Jährlichkeit gesetzt. Im Normallfall NULL.
       Jaehrlichkeit : Jaehrlichkeit;
@@ -316,38 +316,6 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
         von_4_bis_5_m_s,
         mehr_als_5_m_s
       ) ORDERED;
-
-      !! Standardwertebereich Produkt h x v in [m2/s]. 
-      wProduktHxV = (
-        bis_0_5_m2_s,
-        von_0_5_bis_2_0_m2_s,
-        mehr_als_2_0_m2_s
-      );
-       
-      !! Detaillierter Wertebereich Produkt h x v in [m2/s]. 
-      wProduktHxVDetail = (
-        von_0_0_bis_0_1_m2_s,
-        von_0_1_bis_0_2_m2_s,
-        von_0_2_bis_0_3_m2_s,
-        von_0_3_bis_0_4_m2_s,
-        von_0_4_bis_0_5_m2_s,
-        von_0_5_bis_0_6_m2_s,
-        von_0_6_bis_0_7_m2_s,
-        von_0_7_bis_0_8_m2_s,
-        von_0_8_bis_0_9_m2_s,
-        von_0_9_bis_1_0_m2_s,
-        von_1_0_bis_1_1_m2_s,
-        von_1_1_bis_1_2_m2_s,
-        von_1_2_bis_1_3_m2_s,
-        von_1_3_bis_1_4_m2_s,
-        von_1_4_bis_1_5_m2_s,
-        von_1_5_bis_1_6_m2_s,
-        von_1_6_bis_1_7_m2_s,
-        von_1_7_bis_1_8_m2_s,
-        von_1_8_bis_1_9_m2_s,
-        von_1_9_bis_2_0_m2_s,
-        mehr_als_2_0_m2_s
-      );
  
       /* Wertebereich fuer Teilprozesse Ueberschwemmung statisch & dynamisch, Steinschlag, Blockschlag, Spontane Rutschung;
          Restgefaehrdung mit Intensitaeten;*/
@@ -568,18 +536,6 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
     !!@ name = "ungültige Überragung bei Befund!"  
       !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityH(ALL, "BefundProzessquelle"); !!Constraint aus Kategorie "spezifisch"
     END KennwertUeberschwemmungFliessgeschwindigkeit;
-    
-    /* Befunde mit Kennwert (Produkt v x h) fuer Prozess Uberschwemmung
-       Prozessquelle -> Hauptprozess muss Wasser sein */
-    CLASS KennwertUeberschwemmungProduktVxH
-    EXTENDS Befund =
-      !! Moegliche Werte gemaess wProduktHxV. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. 
-      v_mal_h : wProduktHxV;
-      v_mal_hDetail: wProduktHxVDetail;
-      Jaehrlichkeit : JaehrlichkeitListe;
-    !!@ name = "ungültige Überragung bei Befund!"  
-    !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityH(ALL, "BefundProzessquelle"); !!Constraint aus Kategorie "spezifisch"  
-    END KennwertUeberschwemmungProduktVxH;
 
     /* Befunde mit Kennwert (Fliesstiefe) fuer Prozess Uebermurung
        Prozessquelle -> Hauptprozess muss Wasser sein */
