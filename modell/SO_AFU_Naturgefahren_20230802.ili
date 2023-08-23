@@ -10,12 +10,12 @@ INTERLIS 2.3;
   2022-11-24 | GeoW  | OID in TeilauftragRaumbezug auf ANYOID gesetzt, Kommentare bereinigt, 
                        Constraints deklarativ eingefügt
   2022-11-30 | jek   | Modellname mit _Pilot_ ergänzt, Datum aktualisiert.
-  2022-08-02 | jek   | Anpassungen Klassen in Topic Auftraege und Kl. Prozessquelle gemäss Pilot.
+  2023-08-02 | jek   | Anpassungen gemäss Erkenntnissen aus Pilot Himmelried.
  ==============================================================================
 */
 !!@ technicalContact=mailto:agi@bd.so.ch
-MODEL SO_AFU_Naturgefahren_20220802 (de) 
-  AT "http://geo.so.ch/models/AFU" VERSION "2022-08-02" =
+MODEL SO_AFU_Naturgefahren_20230802 (de) 
+  AT "http://geo.so.ch/models/AFU" VERSION "2023-08-02" =
 
   IMPORTS UNQUALIFIED Units, Time, CoordSys;
   IMPORTS GeometryCHLV95_V1;
@@ -53,12 +53,6 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
         Rutschung,
         Sturz,
         Absenkung_Einsturz
-      );
-
-      WasserkennwerteArt = (
-        keine,
-        normal,
-        detailliert
       );
 
       !! Wertebereich fuer Teilprozesse der Hauptprozesse Rutsch und Sturz
@@ -337,7 +331,7 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
         restgefaehrdung_stark,
         restgefaehrdung_mittel,
         restgefaehrdung_schwach
-      ) ORDERED;
+      );
 
       !! Wertebereich fuer Teilprozess: Uebermurung 
         IWCodeUebermurung = (
@@ -565,7 +559,7 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
       /* Ein Teilauftrag hat entweder keine oder eine Prozessquelle.
          Hat ein Teilauftrag KEINE Prozessquelle, ist durch den Auftragnehmer eine Prozessquelle zu definieren. */
       TeilauftragProzessquelle -- {0..*} Prozessquelle;
-      ProzessquelleTeilauftrag (EXTERNAL) -- {1} SO_AFU_Naturgefahren_20220802.Auftraege.Teilauftrag;
+      ProzessquelleTeilauftrag (EXTERNAL) -- {1} SO_AFU_Naturgefahren_20230802.Auftraege.Teilauftrag;
     END TeilauftragProzessquelle;
 
     ASSOCIATION ProzessquelleSteinBlock_Prozessquelle =
@@ -667,4 +661,4 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
     END Helper_BefundUeberschwemmung;
   END Befunde;  
 
-END SO_AFU_Naturgefahren_20220802.
+END SO_AFU_Naturgefahren_20230802.
