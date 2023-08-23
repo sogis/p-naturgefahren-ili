@@ -299,51 +299,6 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
         bis_100_cm,
         mehr_als_100_cm
       ) ORDERED;
- 
-      !! Detaillierter Wertebereich fuer Teilprozess Ueberschwemmung: Fliesstiefe [m]
-      wFliesstiefeDetail = (
-        von_0_bis_5_cm,
-        von_5_bis_10_cm,
-        von_10_bis_15_cm,
-        von_15_bis_20_cm,
-        von_20_bis_25_cm,
-        von_25_bis_30_cm,
-        von_30_bis_35_cm,
-        von_35_bis_40_cm,
-        von_40_bis_45_cm,
-        von_45_bis_50_cm,
-        von_50_bis_55_cm,
-        von_55_bis_60_cm,
-        von_60_bis_65_cm,
-        von_65_bis_70_cm,
-        von_70_bis_75_cm,
-        von_75_bis_80_cm,
-        von_80_bis_85_cm,
-        von_85_bis_90_cm,
-        von_90_bis_95_cm,
-        von_95_bis_100_cm,
-        von_100_bis_105_cm,
-        von_105_bis_110_cm,
-        von_110_bis_115_cm,
-        von_115_bis_120_cm,
-        von_120_bis_125_cm,
-        von_125_bis_130_cm,
-        von_130_bis_135_cm,
-        von_135_bis_140_cm,
-        von_140_bis_145_cm,
-        von_145_bis_150_cm,
-        von_150_bis_155_cm,
-        von_155_bis_160_cm,
-        von_160_bis_165_cm,
-        von_165_bis_170_cm,
-        von_170_bis_175_cm,
-        von_175_bis_180_cm,
-        von_180_bis_185_cm,
-        von_185_bis_190_cm,
-        von_190_bis_195_cm,
-        von_195_bis_200_cm,
-        mehr_als_200_cm
-      );
 
       !! Standardwertebereich fuer Teilprozess Uebermurung: Fliessgeschwindigkeit [m/s] 
       wUbermurungFliessgeschwindigkeit = (
@@ -597,8 +552,7 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
     CLASS KennwertUeberschwemmungFliesstiefe
     EXTENDS Befund =
       !! Moegliche Werte gemaess wFliesstiefe. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. 
-      h : wFliesstiefeUeberschwemmung;
-      hDetail : wFliesstiefeDetail;
+      h : MANDATORY wFliesstiefeUeberschwemmung;
       Jaehrlichkeit : JaehrlichkeitListe;
     !!@ name = "ungültige Überragung bei Befund!"  
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityH(ALL, "BefundProzessquelle"); !!Constraint aus Kategorie "spezifisch"
@@ -634,8 +588,7 @@ MODEL SO_AFU_Naturgefahren_20220802 (de)
     CLASS KennwertUbermurungFliesstiefe
     EXTENDS Befund =
       !! Moegliche Werte gemaess wFliesstiefe. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen.
-      h : wFliesstiefeUebermurung;
-      hDetail : wFliesstiefeDetail;
+      h : MANDATORY wFliesstiefeUebermurung;
       Jaehrlichkeit : JaehrlichkeitListe;
     !!@ name = "ungültige Überragung bei Befund!"  
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityH(ALL, "BefundProzessquelle"); !!Constraint aus Kategorie "spezifisch"   
