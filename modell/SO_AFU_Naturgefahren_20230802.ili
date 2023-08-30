@@ -101,10 +101,10 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     END Bericht;
 
     /* 
-      Mit dem Teilauftrag wrid der entsprechende Hauptprozess einwirkungs- oder prozessquellenorientiert beurteilt.
+      Mit dem Teilauftrag wird der entsprechende Hauptprozess einwirkungs- oder prozessquellenorientiert beurteilt.
       Ein einwirkungsorientierter Teilauftrag beurteilt alle für den Einwirkungsraum relevanten Prozessquellen.
-      Die prozessquellenorientierte Berteilung benennt explizit die zu beurteilenden Prozessquellen. Diese "alten"  
-      Prozessquellen werden beim Datenabgleich automatissch durch die neu beurteilten ersetzt.
+      Die prozessquellenorientierte Beurteilung benennt explizit die zu beurteilenden Prozessquellen. Diese "alten"  
+      Prozessquellen werden beim Datenabgleich automatisch durch die neu beurteilten ersetzt.
     */
     CLASS Teilauftrag =
       !! Objektidentifikation mittels sprechendem Schlüssel ("YYYY.<BueroABC>.x.y"), maximale Länge 36 Zeichen 
@@ -116,7 +116,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Name : MANDATORY TEXT*80;
       !! True, falls für Wasser-Teilauftrag die Kennwerte gemäss Modell geliefert werden.
       Wasserkennwerte: MANDATORY BOOLEAN;
-      !! Für Ausnahmefall der Abklährung einer freien Jährlichkeit mittels Klasse BefundeJaehrlichkeit ist hier
+      !! Für Ausnahmefall der Abklärung einer freien Jährlichkeit mittels Klasse BefundeJaehrlichkeit ist hier
       !! die abzuklärende Jährlichkeit gesetzt. Im Normallfall NULL.
       Jaehrlichkeit : Jaehrlichkeit;
 
@@ -192,7 +192,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Teilprozess = (
         Ueberschwemmung_statisch,
         Ueberschwemmung_dynamisch,
-        Ubermurung,
+        Uebermurung,
         Ufererosion,
         spontane_Rutschung,
         Hangmure,
@@ -295,7 +295,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       ) ORDERED;
 
       !! Standardwertebereich fuer Teilprozess Uebermurung: Fliessgeschwindigkeit [m/s] 
-      wUbermurungFliessgeschwindigkeit = (
+      wUebermurungFliessgeschwindigkeit = (
         bis_1_m_s,
         mehr_als_1_m_s
       ) ORDERED;
@@ -430,7 +430,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     END PQ_Jaehrlichkeit_Hangmure;
 
     /* Abstrakte Klasse fuer Befunde.
-       Prozess Wasser: Ueberschwemmung statisch/dynamisch, Ubermurung, Ufererosion
+       Prozess Wasser: Ueberschwemmung statisch/dynamisch, Uebermurung, Ufererosion
        Prozess Rutsch: Hangmure, Spontane/Permanente Rutschung
        Prozess Sturz: Stein-/Blockschlag, Berg-/Felssturz, Eisschlag
        Prozess Einsturz/Absenkung: Einsturz, Absenkung
@@ -501,7 +501,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     END BefundHangmure;
     
     !! Konkretisiert die Klasse Befund.
-    /* Fuer den Teilprozess permanente Rutschuung sind die Kennwerte zu Rutschgeschwindigkeit, Tiefe der Gleitfaleche, Differentailbewerung, Beschleunigung und Korrekturterme anzugeben.
+    /* Fuer den Teilprozess permanente Rutschung sind die Kennwerte zu Rutschgeschwindigkeit, Tiefe der Gleitflaeche, Differentialbewegung, Beschleunigung und Korrekturwerte anzugeben.
     Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Rutsch sein */
     CLASS BefundPermanenteRutschung
     EXTENDS Befund_TextPQ =
@@ -560,7 +560,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle");  !!Constraint aus Kategorie "spezifisch"
     END BefundJaehrlichkeit;
 
-    /* Befunde mit Kennwert (Fliesstiefe) fuer Prozess Uberschwemmung
+    /* Befunde mit Kennwert (Fliesstiefe) fuer Prozess Ueberschwemmung
        Prozessquelle -> Hauptprozess muss Wasser sein */
     CLASS KennwertUeberschwemmungFliesstiefe
     EXTENDS Befund_TextPQ =
@@ -573,7 +573,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityH(NGK_FunctionsExt.GroupBy(ALL,"Jaehrlichkeit"), "BefundProzessquelle"); !!Constraint aus Kategorie "spezifisch"
     END KennwertUeberschwemmungFliesstiefe;
 
-    /* Befunde mit Kennwert (Fliessgeschwindigkeit) fuer Prozess Uberschwemmung
+    /* Befunde mit Kennwert (Fliessgeschwindigkeit) fuer Prozess Ueberschwemmung
        Prozessquelle -> Hauptprozess muss Wasser sein */
     CLASS KennwertUeberschwemmungFliessgeschwindigkeit
     EXTENDS Befund_TextPQ =
@@ -586,7 +586,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
 
     /* Befunde mit Kennwert (Fliesstiefe) fuer Prozess Uebermurung
        Prozessquelle -> Hauptprozess muss Wasser sein */
-    CLASS KennwertUbermurungFliesstiefe
+    CLASS KennwertUebermurungFliesstiefe
     EXTENDS Befund_TextPQ =
       !! Moegliche Werte gemaess wFliesstiefe. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen.
       h : MANDATORY wFliesstiefeUebermurung;
@@ -595,18 +595,18 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityH(ALL, "BefundProzessquelle"); !!Constraint aus Kategorie "spezifisch"   
     !!@ name = "ungültige Überragung bei Befund!"  
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityH(NGK_FunctionsExt.GroupBy(ALL,"Jaehrlichkeit"), "BefundProzessquelle"); !!Constraint aus Kategorie "spezifisch"  
-    END KennwertUbermurungFliesstiefe;
+    END KennwertUebermurungFliesstiefe;
 
     /* Befunde mit Kennwert (Fliessgeschwindigkeit) fuer Prozess Uebermurung
        Prozessquelle -> Hauptprozess muss Wasser sein */
-    CLASS KennwertUbermurungFliessgeschwindigkeit
+    CLASS KennwertUebermurungFliessgeschwindigkeit
     EXTENDS Befund_TextPQ =
-      !! Moegliche Werte gemaess wUbermurungFliessgeschwindigkeit. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen.   
-      v : MANDATORY wUbermurungFliessgeschwindigkeit;
+      !! Moegliche Werte gemaess wUebermurungFliessgeschwindigkeit. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen.   
+      v : MANDATORY wUebermurungFliessgeschwindigkeit;
       Jaehrlichkeit : JaehrlichkeitListe;
     !!@ name = "ungültige Überragung bei Befund!"  
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityH(ALL, "BefundProzessquelle"); !!Constraint aus Kategorie "spezifisch"  
-    END KennwertUbermurungFliessgeschwindigkeit;
+    END KennwertUebermurungFliessgeschwindigkeit;
     
     ASSOCIATION TeilauftragProzessquelle =
       /* Ein Teilauftrag hat entweder keine oder eine Prozessquelle.
@@ -727,7 +727,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     CONSTRAINTS OF BefundJaehrlichkeit =
       !!@ name = "BefundJaehrlichkeit muss Hauptprozess>Wasser zugeordnet sein"  
       !!MANDATORY CONSTRAINT BefundProzessquelle->Hauptprozess == #Sturz; 
-      !!@ name = "BefundJaehrlichkeit ist nichtz flächendeckend!"  
+      !!@ name = "BefundJaehrlichkeit ist nicht flächendeckend!"  
       !!SET CONSTRAINT INTERLIS_ext.areAreas3(ALL,>Prozessquelle,"Geometrie");     
     END;
 
