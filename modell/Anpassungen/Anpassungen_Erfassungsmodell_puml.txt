@@ -72,7 +72,7 @@ F: Frage
 C: Constraint
 
 (1)  ProzessquelleSteinBlockschlagPunkt -Polygon: Werden gelöscht
-- F: Flaeche als Multipolygon? __Nein - Einzelpolygon__
+- F: Flaeche als Multipolygon? Res: Nein - Einzelpolygon
 - C: Entweder Punkt oder Polygon muss erfasst sein.
 
 (2) C: Prozessquellen mit Hauptprozess Stein / Blockschlag müssen
@@ -86,34 +86,33 @@ Fliessrichtungspfeilen verknüpft sein.
 
 (5) F: Teilauftrag ist pro Teilprozess definiert. Damit macht die 
 Hauptprozess-Angabe auf der Prozessquelle keinen Sinn, oder? 
-__Korrekt Teilauftrag neu pro Hauptprozess__.
+Res: Korrekt Teilauftrag neu pro Hauptprozess.
 
 (6)
-__Es werden immer alle Teilprozesse im Hauptprozess abgeklärt.__
 - F: Abklährungsperimeter ist pro Teilprozess. 
 Wie bringen wir das mit den Altdaten (pro Hauptprozess) zusammen?
-__Doris?__
+Res: Teilauftrag pro Hauptprozess. Perimeter mit n:m Beziehung zu Teilauftrag
 - F: Häufig muss das gleiche Polygon mehrfach erfasst werden. 
 Abklärungsperimeter als separate Klasse definieren und verknüpfen?
-__Ja, separate Klasse__.
+Res: Ja, separate Klasse.
 - C: Es dürfen nur Befunde mit dem entsprechenden Teilprozess zugeordnet sein.
 
 (7): F: Hintergrund sind freie wählbare Jährlichkeiten...?
 Diese kann man aber in den Befunden nicht setzen. Darum Weglassen?
-__Jährlichkeit ist als frei wählbare Zahl definiert.__
-__Darum Freie_Jaehrlichkeit als optionales Attribut in Teilauftrag zügeln.__
+Res: Freie_Jaehrlichkeit als optionales Attribut in Teilauftrag zügeln.
 
 (8): F: Umwandeln von heute Struktur in "normale" Klasse? Damit kann
 im Teilauftrag der entsprechende Autor in Dropdown augewählt werden.
-__Ja, umwandeln__
+Res: Ja, umwandeln
 
 (9): 
-- __F: Detaillierte Kennwerte in je eigene Klasse? Nein, belassen__
+- F: Detaillierte Kennwerte (KW) in je eigene Klasse? 
+Res: Nein, belassen. Detaillierte KW streichen.
 
 (10):
-- __F: Jahr für Auftragsabschluss OK oder genauer notwendig mit Datum? Nur Jahr OK__
-- __C: Kennung ist eindeutig__
-- __C: Name der Prozessquelle ist innerhalb (Teil-)Auftrag eindeutig__
+- F: Jahr für Auftragsabschluss OK oder genauer notwendig mit Datum? Res: Nur Jahr OK
+- C: Kennung ist eindeutig
+- C: Name der Prozessquelle ist innerhalb (Teil-)Auftrag eindeutig
 
 (11):
 - C: Teilprozess-Beurteilungen des entsprechenden Hauptprozesses (Teilauftrag)
