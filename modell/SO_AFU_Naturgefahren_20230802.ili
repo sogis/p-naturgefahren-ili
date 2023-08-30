@@ -317,6 +317,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         rot_stark_30,
         rot_stark_100,
         rot_stark_300,
+        rot_mittel_30,
 
         blau_mittel_30,
         blau_mittel_100,
@@ -339,6 +340,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         rot_stark_100,
         rot_stark_300,
 
+        rot_mittel_30,
         blau_mittel_100,
         blau_mittel_300,
 
