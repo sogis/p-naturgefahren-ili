@@ -88,7 +88,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Abschlussjahr : MANDATORY 2020 .. 2040;
       !! Art der Gefahrenbeurteilung -> siehe Wertebereich Deklarationen
       Deklaration : MANDATORY Deklaration;
-      Bemerkung : MText*100;
+      Bemerkung : MText*255;
     !!@ name = "Die Klasse Auftrag bedingt mindestens 1 Eintrag!"  
     MANDATORY CONSTRAINT INTERLIS.objectCount(THIS)==1;
     END Auftrag;
@@ -111,7 +111,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       OID AS INTERLIS.ANYOID;
       !! Im Teilauftrag abgeklärter Hauptprozess. Abgeklärte Teilprozesse siehe Abklärungsperimeter.
       Hauptprozess : MANDATORY Hauptprozess;
-      Bemerkung : MText*100;
+      Bemerkung : MText*255;
       !! Abklaerungsperimeter = Perimeter, welcher untersucht werden soll 
       Name : MANDATORY Text*80;
       !! True, falls für Wasser-Teilauftrag die Kennwerte gemäss Modell geliefert werden.
@@ -141,8 +141,6 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     */
     CLASS Abklaerungsperimeter =
       Geometrie : MANDATORY Einzelflaeche;
-      !! Dient "nur" der Perimeter-Anzeige als Text zwecks editieren der Beziehung zum Teilauftrag. 
-      Bezeichnung: Text*80;
       w_Ueberschwemmung_statisch : Beurteilungsart;
       w_Ueberschwemmung_dynamisch : Beurteilungsart;
       w_Uebermurung : Beurteilungsart;
@@ -155,6 +153,9 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       r_Hangmure : Beurteilungsart;
       r_Spontane_Rutschung : Beurteilungsart;
       r_Permanente_Rutschung : Beurteilungsart;
+      !! Dient "nur" der Perimeter-Anzeige als Text zwecks editieren der Beziehung zum Teilauftrag. 
+      Bezeichnung: Text*80;
+      Bemerkung : MText*255;
     END Abklaerungsperimeter;
 
     ASSOCIATION AuftragTeilauftrag =
@@ -396,7 +397,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     CLASS Prozessquelle =
       !! Innerhalb Teilauftrag eindeutiger Name der Prozessquelle. Bsp.: Dorfbach
       Kennung : MANDATORY Text*80;
-      Bemerkung : MText*100;
+      Bemerkung : MText*255;
     END Prozessquelle;
 
     /* Informationen zu Form uns Ausdehnung der Prozessquelle SteinBlockschlag für die entsprechende Jährlichkeit
@@ -405,7 +406,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Jaehrlichkeit : MANDATORY Jaehrlichkeit;
       Polygon : MANDATORY Einzelflaeche;
       !! Beschreibung der Geologie 
-      Beschr_Geologie : MANDATORY MText*200;  
+      Beschr_Geologie : MANDATORY MText*255;  
       Volumen : MANDATORY 1 .. 999999999 [Units.m3];
       Form : MANDATORY AspektForm;
     END PQ_Jaehrlichkeit_SteinBlockschlag;
@@ -413,7 +414,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     CLASS PQ_Jaehrlichkeit_Rutsch_Mure_Base (ABSTRACT) = 
       Jaehrlichkeit : MANDATORY Jaehrlichkeit;
       Polygon : MANDATORY Einzelflaeche;
-      Beschr_Lockermaterial : MANDATORY MText*200;
+      Beschr_Lockermaterial : MANDATORY MText*255;
       Mob_Schicht_Machtigkeit : MANDATORY 0.0 .. 999.0;
       Krit_Hangneigung : MANDATORY 0..90;
     END PQ_Jaehrlichkeit_Rutsch_Mure_Base;
@@ -439,7 +440,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     CLASS Befund_Basis (ABSTRACT) =
       Geometrie : MANDATORY SURFACE WITH (STRAIGHTS) VERTEX GeometryCHLV95_V1.Coord2 WITHOUT OVERLAPS > 0.1;
       RestgefaehrdungJaehrlichkeit : JaehrlichkeitRestgefaehrdung;
-      Bemerkung : MText*100;
+      Bemerkung : MText*255;
     !!@ name = "In der Befund-Geometrie sind keine KLöcher erlaubt!"  
     !!MANDATORY CONSTRAINT GeoW_FunctionsExt.GetHolesCount(THIS, "Geometrie") == 0; !!Constraint aus Kategorie "generisch"
     !!@ name = "Befund liegt nicht innerhalb des Abklärungsperimeters!"  
