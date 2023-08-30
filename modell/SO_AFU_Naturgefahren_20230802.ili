@@ -311,7 +311,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         mehr_als_5_m_s
       ) ORDERED;
  
-      /* Wertebereich fuer Teilprozesse Ueberschwemmung statisch & dynamisch, Steinschlag, Blockschlag, Spontane Rutschung;
+      /* Wertebereich fuer Teilprozesse Ueberschwemmung statisch & dynamisch, Spontane Rutschung;
          Restgefaehrdung mit Intensitaeten;*/
       IWCodeStandard = (
         rot_stark_30,
@@ -332,7 +332,27 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         restgefaehrdung_stark,
         restgefaehrdung_mittel,
         restgefaehrdung_schwach
-      );
+      ) ORDERED;
+
+      /* Wertebereich fuer Steinschlag und Blockschlag;
+      Restgefaehrdung mit Intensitaeten;*/
+      IWCodeSteinBlockschlag = (
+          rot_stark_30,
+          rot_stark_100,
+          rot_stark_300,
+          rot_mittel_30,
+  
+          blau_mittel_100,
+          blau_mittel_300,
+                    
+          blau_schwach_30,
+          blau_schwach_100,
+          gelb_schwach_300,
+  
+          restgefaehrdung_stark,
+          restgefaehrdung_mittel,
+          restgefaehrdung_schwach
+        ) ORDERED;
 
       !! Wertebereich fuer Teilprozess: Uebermurung 
         IWCodeUebermurung = (
@@ -356,7 +376,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         restgefaehrdung_stark
       ) ORDERED;
 
-      !! Wertebereich fuer permanente Teilprozesse: Permanente Rutschung, Absenkung, Einsturz 
+      !! Wertebereich für Permanente Rutschung, Absenkung, Einsturz 
       IWCodePermanent = (
         rot_stark_permanent,
         blau_mittel_permanent,
@@ -364,6 +384,12 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         restgefaehrdung_stark,
         restgefaehrdung_mittel,
         restgefaehrdung_schwach
+      ) ORDERED;
+
+      !! Wertebereich für Absenkung und Einsturz 
+      IWCodeAbsenkungEinsturz = (
+        blau_mittel_permanent,
+        gelb_schwach_permanent
       ) ORDERED;
 
     !! Beschreibung der Prozessquelle 
@@ -429,7 +455,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     !! Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Einsturz/Absenkung sein 
     CLASS BefundAbsenkung
     EXTENDS Befund_TextPQ =
-        IWCode : MANDATORY IWCodePermanent;
+        IWCode : MANDATORY IWCodeAbsenkungEinsturz;
     !!@ name = "ungültige Überragung bei Befund!"  
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle"); !!Constraint aus Kategorie "spezifisch"
     END BefundAbsenkung;
@@ -437,7 +463,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     !! Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Einsturz/Absenkung sein 
     CLASS BefundEinsturz
     EXTENDS Befund_TextPQ = 
-      IWCode : MANDATORY IWCodePermanent;
+      IWCode : MANDATORY IWCodeAbsenkungEinsturz;
     !!@ name = "ungültige Überragung bei Befund!"  
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle");  !!Constraint aus Kategorie "spezifisch"
     END BefundEinsturz; 
@@ -445,7 +471,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     !! Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Sturz sein 
     CLASS BefundSteinBlockschlag
     EXTENDS Befund_Basis =
-      IWCode : MANDATORY IWCodeStandard;
+      IWCode : MANDATORY IWCodeSteinBlockschlag;
     !!@ name = "ungültige Überragung bei Befund!"  
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle");  !!Constraint aus Kategorie "spezifisch" 
     END BefundSteinBlockschlag;
