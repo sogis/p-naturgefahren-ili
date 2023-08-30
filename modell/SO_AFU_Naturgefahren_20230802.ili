@@ -372,16 +372,36 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Kennung : MANDATORY TEXT*80;
     END Prozessquelle;
 
-    !! Klasse fuer Detailbeschreibung der Prozessquelle bei Stein- und Blockschlag 
-    CLASS ProzessquelleSteinBlockschlag =
+    /* Informationen zu Form uns Ausdehnung der Prozessquelle SteinBlockschlag für die entsprechende Jährlichkeit
+     */
+    CLASS PQ_Jaehrlichkeit_SteinBlockschlag =
+      Jaehrlichkeit : MANDATORY Jaehrlichkeit;
+      Polygon : MANDATORY Einzelflaeche;
       !! Beschreibung der Geologie 
-      Geologie : MANDATORY TEXT*200;  
+      Beschr_Geologie : MANDATORY TEXT*200;  
       Volumen : MANDATORY 1 .. 999999999 [Units.m3];
       Form : MANDATORY AspektForm;
+    END PQ_Jaehrlichkeit_SteinBlockschlag;
+
+    CLASS PQ_Jaehrlichkeit_Rutsch_Mure_Base (ABSTRACT) = 
       Jaehrlichkeit : MANDATORY Jaehrlichkeit;
-      Polygon : Einzelflaeche;
-      Punkt : GeometryCHLV95_V1.Coord3;
-    END ProzessquelleSteinBlockschlag;
+      Polygon : MANDATORY Einzelflaeche;
+      Beschr_Lockermaterial : MANDATORY TEXT*200;
+      Mob_Schicht_Machtigkeit : MANDATORY 0.0 .. 999.0;
+      Krit_Hangneigung : MANDATORY 0..90;
+    END PQ_Jaehrlichkeit_Rutsch_Mure_Base;
+
+    /* Informationen zu Ausdehnung, ... der Prozessquelle SpontaneRutschung für die entsprechende Jährlichkeit
+     */
+    CLASS PQ_Jaehrlichkeit_SpontaneRutschung
+      EXTENDS PQ_Jaehrlichkeit_Rutsch_Mure_Base = 
+    END PQ_Jaehrlichkeit_SpontaneRutschung;
+
+    /* Informationen zu Ausdehnung, ... der Prozessquelle Hangmure für die entsprechende Jährlichkeit
+     */
+    CLASS PQ_Jaehrlichkeit_Hangmure
+      EXTENDS PQ_Jaehrlichkeit_Rutsch_Mure_Base = 
+    END PQ_Jaehrlichkeit_Hangmure;
 
     /* Abstrakte Klasse fuer Befunde.
        Prozess Wasser: Ueberschwemmung statisch/dynamisch, Ubermurung, Ufererosion
@@ -389,7 +409,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
        Prozess Sturz: Stein-/Blockschlag, Berg-/Felssturz, Eisschlag
        Prozess Einsturz/Absenkung: Einsturz, Absenkung
        Konkretisiert werden die Befunde durch saemtliche Teilprozesse, Kennwerte fuer Wasserprozesse und freie Befunde mit Jaehrlichkeit. */
-    CLASS Befund (ABSTRACT) =
+    CLASS Befund_Basis (ABSTRACT) =
       Geometrie : MANDATORY SURFACE WITH (STRAIGHTS) VERTEX GeometryCHLV95_V1.Coord2 WITHOUT OVERLAPS > 0.1;
       RestgefaehrdungJaehrlichkeit : JaehrlichkeitRestgefaehrdung;
       Bemerkung : TEXT*100;
@@ -399,11 +419,16 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     !!MANDATORY CONSTRAINT GeoW_FunctionsExt.IsInside(THIS, "Geometrie", ">Befund>BefundProzessquelle>TeilauftragRaumbezug", "Geometrie"); !!Constraint aus Kategorie "generisch"
     !!@ name = "Der Befund muss grösser 100m2 sein!"  
     !!MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5; !!Constraint aus Kategorie "generisch"
-    END Befund;
+    END Befund_Basis;
+
+    /* Basisklasse für alle direkt der geometrielosen Prozessquelle zugewiesenen Befunde */
+    CLASS Befund_TextPQ (ABSTRACT) 
+      EXTENDS Befund_Basis = 
+    END Befund_TextPQ;
 
     !! Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Einsturz/Absenkung sein 
     CLASS BefundAbsenkung
-    EXTENDS Befund =
+    EXTENDS Befund_TextPQ =
         IWCode : MANDATORY IWCodePermanent;
     !!@ name = "ungültige Überragung bei Befund!"  
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle"); !!Constraint aus Kategorie "spezifisch"
@@ -411,7 +436,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
 
     !! Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Einsturz/Absenkung sein 
     CLASS BefundEinsturz
-    EXTENDS Befund = 
+    EXTENDS Befund_TextPQ = 
       IWCode : MANDATORY IWCodePermanent;
     !!@ name = "ungültige Überragung bei Befund!"  
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle");  !!Constraint aus Kategorie "spezifisch"
@@ -419,7 +444,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
 
     !! Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Sturz sein 
     CLASS BefundSteinBlockschlag
-    EXTENDS Befund =
+    EXTENDS Befund_Basis =
       IWCode : MANDATORY IWCodeStandard;
     !!@ name = "ungültige Überragung bei Befund!"  
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle");  !!Constraint aus Kategorie "spezifisch" 
@@ -427,7 +452,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     
     !! Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Sturz sein 
     CLASS BefundBergFelssturz
-    EXTENDS Befund =   
+    EXTENDS Befund_TextPQ =   
       IWCode : MANDATORY IWCodeBergFelssturz;
     !!@ name = "ungültige Überragung bei Befund!"  
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle");  !!Constraint aus Kategorie "spezifisch"   
@@ -435,7 +460,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     
     !! Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Sturz sein 
     CLASS BefundEisschlag
-    EXTENDS Befund = 
+    EXTENDS Befund_TextPQ = 
       IWCode : MANDATORY IWCodeStandard;
     !!@ name = "ungültige Überragung bei Befund!"  
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle");  !!Constraint aus Kategorie "spezifisch"  
@@ -443,7 +468,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
 
     !! Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Rutsch sein 
     CLASS BefundHangmure
-    EXTENDS Befund =
+    EXTENDS Befund_Basis =
       IWCode : MANDATORY IWCodeStandard;
     !!@ name = "ungültige Überragung bei Befund!"  
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle"); !!Constraint aus Kategorie "spezifisch"
@@ -453,7 +478,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     /* Fuer den Teilprozess permanente Rutschuung sind die Kennwerte zu Rutschgeschwindigkeit, Tiefe der Gleitfaleche, Differentailbewerung, Beschleunigung und Korrekturterme anzugeben.
     Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Rutsch sein */
     CLASS BefundPermanenteRutschung
-    EXTENDS Befund =
+    EXTENDS Befund_TextPQ =
       Rutschgeschwindigkeit : MANDATORY rRutschgeschwindigkeit;
       Tiefe_Gleitflaeche : MANDATORY rTiefeGleitflaeche;
       Differentialbewegung : MANDATORY rDifferentialbewegung;
@@ -464,7 +489,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
 
     !! Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Rutsch sein 
     CLASS BefundSpontaneRutschung
-    EXTENDS Befund =
+    EXTENDS Befund_Basis =
       IWCode : MANDATORY IWCodeStandard;
     !!@ name = "ungültige Überragung bei Befund!"  
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle"); !!Constraint aus Kategorie "spezifisch"
@@ -472,7 +497,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     
     !! Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Wasser sein 
     CLASS BefundUebermurung
-    EXTENDS Befund =
+    EXTENDS Befund_TextPQ =
       IWCode : MANDATORY IWCodeUebermurung;
     !!@ name = "ungültige Überragung bei Befund!"  
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle");   !!Constraint aus Kategorie "spezifisch"
@@ -480,7 +505,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     
     !! Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Wasser sein 
     CLASS BefundUeberschwemmungDynamisch
-    EXTENDS Befund =
+    EXTENDS Befund_TextPQ =
       IWCode : MANDATORY IWCodeStandard;
     !!@ name = "ungültige Überragung bei Befund!"  
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle");   !!Constraint aus Kategorie "spezifisch"
@@ -488,7 +513,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     
     !! Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Wasser sein 
     CLASS BefundUeberschwemmungStatisch
-    EXTENDS Befund =
+    EXTENDS Befund_TextPQ =
       IWCode : MANDATORY IWCodeStandard;
     !!@ name = "ungültige Überragung bei Befund!"  
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle");  !!Constraint aus Kategorie "spezifisch" 
@@ -496,12 +521,12 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     
     !! Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Wasser sein 
     CLASS BefundUfererosion
-    EXTENDS Befund =
+    EXTENDS Befund_TextPQ =
     END BefundUfererosion;
 
     !! Befunde fuer freie Jaehrlichkeit. Hier sind Jaehrlichkeit, Intensitaet Teilprozess anzugeben. 
     CLASS BefundJaehrlichkeit
-    EXTENDS Befund =
+    EXTENDS Befund_TextPQ =
       Jaehrlichkeit : MANDATORY Jaehrlichkeit; 
       Intensitaet : MANDATORY Intensitaet;  
       Teilprozess : MANDATORY Teilprozess;
@@ -512,7 +537,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     /* Befunde mit Kennwert (Fliesstiefe) fuer Prozess Uberschwemmung
        Prozessquelle -> Hauptprozess muss Wasser sein */
     CLASS KennwertUeberschwemmungFliesstiefe
-    EXTENDS Befund =
+    EXTENDS Befund_TextPQ =
       !! Moegliche Werte gemaess wFliesstiefe. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. 
       h : MANDATORY wFliesstiefeUeberschwemmung;
       Jaehrlichkeit : JaehrlichkeitListe;
@@ -525,7 +550,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     /* Befunde mit Kennwert (Fliessgeschwindigkeit) fuer Prozess Uberschwemmung
        Prozessquelle -> Hauptprozess muss Wasser sein */
     CLASS KennwertUeberschwemmungFliessgeschwindigkeit
-    EXTENDS Befund =
+    EXTENDS Befund_TextPQ =
       !! Moegliche Werte gemaess wUeberschwemmungFliessgeschwindigkeit. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */
       v : MANDATORY wUeberschwemmungFliessgeschwindigkeit;
       Jaehrlichkeit : JaehrlichkeitListe;
@@ -536,7 +561,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     /* Befunde mit Kennwert (Fliesstiefe) fuer Prozess Uebermurung
        Prozessquelle -> Hauptprozess muss Wasser sein */
     CLASS KennwertUbermurungFliesstiefe
-    EXTENDS Befund =
+    EXTENDS Befund_TextPQ =
       !! Moegliche Werte gemaess wFliesstiefe. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen.
       h : MANDATORY wFliesstiefeUebermurung;
       Jaehrlichkeit : JaehrlichkeitListe;
@@ -549,7 +574,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     /* Befunde mit Kennwert (Fliessgeschwindigkeit) fuer Prozess Uebermurung
        Prozessquelle -> Hauptprozess muss Wasser sein */
     CLASS KennwertUbermurungFliessgeschwindigkeit
-    EXTENDS Befund =
+    EXTENDS Befund_TextPQ =
       !! Moegliche Werte gemaess wUbermurungFliessgeschwindigkeit. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen.   
       v : MANDATORY wUbermurungFliessgeschwindigkeit;
       Jaehrlichkeit : JaehrlichkeitListe;
@@ -564,15 +589,40 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       ProzessquelleTeilauftrag (EXTERNAL) -- {1} SO_AFU_Naturgefahren_20230802.Auftraege.Teilauftrag;
     END TeilauftragProzessquelle;
 
-    ASSOCIATION ProzessquelleSteinBlock_Prozessquelle =
-      ProzessquelleSteinBlockRole -- {0..1} ProzessquelleSteinBlockschlag;
-      ProzessquelleRole -<> {1} Prozessquelle;
-    END ProzessquelleSteinBlock_Prozessquelle;
+    ASSOCIATION PQ_Jaehrlichkeit_SteinBlockschlag__Prozessquelle =
+      PQ_Jaehrlichkeit_SteinBlockschlagR -- {0..*} PQ_Jaehrlichkeit_SteinBlockschlag;
+      ProzessquelleR -<> {1} Prozessquelle;
+    END PQ_Jaehrlichkeit_SteinBlockschlag__Prozessquelle;
 
-    ASSOCIATION ProzessquelleBefund =
-      ProzessquelleBefund -- {1..*} Befund;
-      BefundProzessquelle -- {1} Prozessquelle;
-    END ProzessquelleBefund;
+    ASSOCIATION PQ_Jaehrlichkeit_SpontaneRutschung__Prozessquelle =
+      PQ_Jaehrlichkeit_SpontaneRutschungR -- {0..*} PQ_Jaehrlichkeit_SpontaneRutschung;
+      ProzessquelleR -<> {1} Prozessquelle;
+    END PQ_Jaehrlichkeit_SpontaneRutschung__Prozessquelle;
+
+    ASSOCIATION PQ_Jaehrlichkeit_Hangmure__Prozessquelle =
+      PQ_Jaehrlichkeit_HangmureR -- {0..*} PQ_Jaehrlichkeit_Hangmure;
+      ProzessquelleR -<> {1} Prozessquelle;
+    END PQ_Jaehrlichkeit_Hangmure__Prozessquelle;
+
+    ASSOCIATION PQ_Jaehrlichkeit_SteinBlockschlag__BefundSteinBlockschlag =
+      BefundSteinBlockschlagR -- {1..*} BefundSteinBlockschlag;
+      PQ_Jaehrlichkeit_SteinBlockschlagR -- {1} PQ_Jaehrlichkeit_SteinBlockschlag;
+    END PQ_Jaehrlichkeit_SteinBlockschlag__BefundSteinBlockschlag;
+
+    ASSOCIATION PQ_Jaehrlichkeit_SpontaneRutschung__BefundSpontaneRutschung =
+      BefundSpontaneRutschungR -- {1..*} BefundSpontaneRutschung;
+      PQ_Jaehrlichkeit_SpontaneRutschungR -- {1} PQ_Jaehrlichkeit_SpontaneRutschung;
+    END PQ_Jaehrlichkeit_SpontaneRutschung__BefundSpontaneRutschung;
+
+    ASSOCIATION PQ_Jaehrlichkeit_Hangmure__BefundHangmure =
+      BefundHangmureR -- {1..*} BefundHangmure;
+      PQ_Jaehrlichkeit_HangmureR -- {1} PQ_Jaehrlichkeit_Hangmure;
+    END PQ_Jaehrlichkeit_Hangmure__BefundHangmure;
+
+    ASSOCIATION Prozessquelle__Befund_TextPQ =
+      Befund_TextPQR -- {1..*} Befund_TextPQ;
+      ProzessquelleR -- {1} Prozessquelle;
+    END Prozessquelle__Befund_TextPQ;
 
     !! Fliessrichtungspfeile zeigen die Richtung des Wassers an 
     CLASS Fliessrichtungspfeil =

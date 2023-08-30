@@ -4,8 +4,24 @@ skin rose
 
 title Strukturelle Vereinfachungen und Constraints Erfassungsmodell
 
-class "Prozessquelle\nSteinBlockschlag (1)" as pqs {
-  Punkt
+class "PQ_Jaehrlichkeit_SteinBlockschlag" as pqsb {
+  Punkt - löschen
+  Polygon
+}
+
+class "PQ_Jaehrlichkeit_SpontaneRutschung" as pqsr {
+  Jaehrlichkeit
+  Beschr_Lockermaterial Text
+  Mob_Schicht_Machtigkeit: 0,0 .. 999,0
+  Krit_Hangneigung: 0..90
+  Polygon
+}
+
+class "PQ_Jaehrlichkeit_Hangmure" as pqhm {
+  Jaehrlichkeit
+  Beschr_Lockermaterial Text
+  Mob_Schicht_Machtigkeit: 0,0 .. 999,0
+  Krit_Hangneigung: 0..90
   Polygon
 }
 
@@ -14,6 +30,12 @@ class "Prozessquelle" as pq {
 }
 
 class "Befund" as bef {}
+
+class "BefundHangmure" as befhm {}
+
+class "BefundSpontane\nRutschung" as befsr {}
+
+class "BefundSteinBlockschlag" as befsb {}
 
 class "Fliessrichtungspfeile" as pfeil {
   Skalierung - löschen? Ja
@@ -55,16 +77,20 @@ class "Auftrag (10)" as a {
 }
 
 pq "1" -right- "1..*" bef : (3)
-pq "0..1" -- "1" pqs : (2)
 pq "1" -- "0..*" pfeil : (4)
+pq "1" -- "0..*" pqsr
+pq "1" -- "0..*" pqsb
+pq "1" -- "0..*" pqhm
+
+pqsb "1"-- "1..*" befsb : (14)
+pqsr "1"-- "1..*" befsr : (14)
+pqhm "1"-- "1..*" befhm : (14)
 
 a "1" -- "1..*" ta
-ta "1" -right- "1..*" pq
+ta "1" -right- "0..*" pq
 ta "1..*" -- "1" aut
 
 ta "1..*" -left- "1..*" peri : "      "
-
-
 
 legend
 In Klassen sind nur neue oder geänderte Attribute enthalten
@@ -75,11 +101,9 @@ C: Constraint
 - F: Flaeche als Multipolygon? Res: Nein - Einzelpolygon
 - C: Entweder Punkt oder Polygon muss erfasst sein.
 
-(2) C: Prozessquellen mit Hauptprozess Stein / Blockschlag müssen
-mit den Zusatzinformationen in ProzessquelleSteinBlockschlag verknüpft sein.
-
-(3) C: Die Teilprozesse der Befunde müssen mit dem Hauptprozess
-der Prozessquelle übereinstimmen.
+(3) 
+- C: Die Teilprozesse der Befunde müssen mit dem Hauptprozess
+des Teilauftrags übereinstimmen (Gilt auch für BefundSteinBlockschlag via PQ_Jaehrlichkeit_SteinBlockschlagschlag).
 
 (4) C: Prozessquellen mit Hauptprozess X müssen mit 
 Fliessrichtungspfeilen verknüpft sein.
@@ -96,6 +120,7 @@ Res: Teilauftrag pro Hauptprozess. Perimeter mit n:m Beziehung zu Teilauftrag
 Abklärungsperimeter als separate Klasse definieren und verknüpfen?
 Res: Ja, separate Klasse.
 - C: Es dürfen nur Befunde mit dem entsprechenden Teilprozess zugeordnet sein.
+- C: Bei Hauptprozess 
 
 (7): F: Hintergrund sind freie wählbare Jährlichkeiten...?
 Diese kann man aber in den Befunden nicht setzen. Darum Weglassen?
@@ -127,6 +152,11 @@ Kennwerte ausgefüllt sein.
 (13):
 - C: Innerhalb eines Auftrags dürfen keine Teilaufträge mit gleichem Hauptprozess vorkommen.
 (Kombination von Teilauftrag.Hauptprozess und Teilauftrag->Auftrag ist unique)
+
+(14):
+- C: Die Jährlichkeiten der Befunde müssen mit den Jährlichkeiten des jeweils zugeordneten 
+PQ_Jaehrlichkeit_* Objektes übereinstimmen
+
 end legend
 
 @enduml
