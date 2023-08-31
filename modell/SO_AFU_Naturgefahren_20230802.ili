@@ -74,30 +74,30 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     !! Auftragnehmer, Buero welches fuer Auftrag/Befund verantwortlich ist
     CLASS Autor =
       !! Name des Bueros
-      Buero : MANDATORY Text*80;
+      Buero : MANDATORY TEXT*80;
       !! Standort des Bueros/Filiale, welche den Auftrag abwickelt 
-      Filiale : MANDATORY Text*80;
+      Filiale : MANDATORY TEXT*80;
     END Autor;
 
     CLASS Auftrag =
       !! Eindeutige Bezeichnung des Auftrags 
-      Kennung : MANDATORY Text*80;
+      Kennung : MANDATORY TEXT*80;
       !! Auftraggeber 
-      Fachstelle : MANDATORY Text*80;
+      Fachstelle : MANDATORY TEXT*80;
       !! Jahr, in welchem der Auftrag abgeschlossen wurde.
       Abschlussjahr : MANDATORY 2020 .. 2040;
       !! Art der Gefahrenbeurteilung -> siehe Wertebereich Deklarationen
       Deklaration : MANDATORY Deklaration;
-      Bemerkung : MText*255;
+      Bemerkung : MTEXT*255;
     !!@ name = "Die Klasse Auftrag bedingt mindestens 1 Eintrag!"  
     MANDATORY CONSTRAINT INTERLIS.objectCount(THIS)==1;
     END Auftrag;
 
     CLASS Bericht = 
       !! Bezeichnung des Berichts (z.B. Technischer Bericht, Anhang, etc.) 
-      Bericht : MANDATORY Text*80;
+      Bericht : MANDATORY TEXT*80;
       !! Dateiname des Berichts inkl. Datum im Format YYYYMMDD 
-      Dateiname: MANDATORY Text*100;
+      Dateiname: MANDATORY TEXT*100;
     END Bericht;
 
     /* 
@@ -111,9 +111,9 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       OID AS INTERLIS.ANYOID;
       !! Im Teilauftrag abgeklärter Hauptprozess. Abgeklärte Teilprozesse siehe Abklärungsperimeter.
       Hauptprozess : MANDATORY Hauptprozess;
-      Bemerkung : MText*255;
+      Bemerkung : MTEXT*255;
       !! Abklaerungsperimeter = Perimeter, welcher untersucht werden soll 
-      Name : MANDATORY Text*80;
+      Name : MANDATORY TEXT*80;
       !! True, falls für Wasser-Teilauftrag die Kennwerte gemäss Modell geliefert werden.
       Wasserkennwerte: MANDATORY BOOLEAN;
       !! Für Ausnahmefall der Abklärung einer freien Jährlichkeit mittels Klasse BefundeJaehrlichkeit ist hier
@@ -154,29 +154,29 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       r_Spontane_Rutschung : Beurteilungsart;
       r_Permanente_Rutschung : Beurteilungsart;
       !! Dient "nur" der Perimeter-Anzeige als Text zwecks editieren der Beziehung zum Teilauftrag. 
-      Bezeichnung: Text*80;
-      Bemerkung : MText*255;
+      Bezeichnung: TEXT*80;
+      Bemerkung : MTEXT*255;
     END Abklaerungsperimeter;
 
-    ASSOCIATION AuftragTeilauftrag =
-      AuftragTeilauftrag -- {1..*} Teilauftrag;
-      TeilauftragAuftrag -<> {1} Auftrag;
-    END AuftragTeilauftrag;
+    ASSOCIATION Auftrag__Teilauftrag =
+      Teilauftrag_R -- {1..*} Teilauftrag;
+      Auftrag_R -<> {1} Auftrag;
+    END Auftrag__Teilauftrag;
 
-    ASSOCIATION AuftragBericht =
-      AuftragBericht -- {1..*} Bericht;
-      BerichtAuftrag -<> {1} Auftrag;
-    END AuftragBericht;
+    ASSOCIATION Auftrag__Bericht =
+      Bericht_R -- {1..*} Bericht;
+      Auftrag_R -<> {1} Auftrag;
+    END Auftrag__Bericht;
 
-    ASSOCIATION TeilauftragAutor =
-      TeilauftragRole -- {1..*} Teilauftrag;
-      AutorRole -- {1} Autor;
-    END TeilauftragAutor;
+    ASSOCIATION Teilauftrag__Autor =
+      Teilauftrag_R -- {1..*} Teilauftrag;
+      Autor_R -- {1} Autor;
+    END Teilauftrag__Autor;
 
-    ASSOCIATION AbklaerungsperimeterTeilauftrag =
-      AbklaerungsperimeterRole -- {1..*} Abklaerungsperimeter;
-      TeilauftragRole -- {1..*} Teilauftrag;
-    END AbklaerungsperimeterTeilauftrag;
+    ASSOCIATION Abklaerungsperimeter__Teilauftrag =
+      Abklaerungsperimeter_R -- {1..*} Abklaerungsperimeter;
+      Teilauftrag_R -- {1..*} Teilauftrag;
+    END Abklaerungsperimeter__Teilauftrag;
 
   END Auftraege;
 
@@ -396,8 +396,8 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     !! Beschreibung der Prozessquelle 
     CLASS Prozessquelle =
       !! Innerhalb Teilauftrag eindeutiger Name der Prozessquelle. Bsp.: Dorfbach
-      Kennung : MANDATORY Text*80;
-      Bemerkung : MText*255;
+      Kennung : MANDATORY TEXT*80;
+      Bemerkung : MTEXT*255;
     END Prozessquelle;
 
     /* Informationen zu Form uns Ausdehnung der Prozessquelle SteinBlockschlag für die entsprechende Jährlichkeit
@@ -406,7 +406,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Jaehrlichkeit : MANDATORY Jaehrlichkeit;
       Polygon : MANDATORY Einzelflaeche;
       !! Beschreibung der Geologie 
-      Beschr_Geologie : MANDATORY MText*255;  
+      Beschr_Geologie : MANDATORY MTEXT*255;  
       Volumen : MANDATORY 1 .. 999999999 [Units.m3];
       Form : MANDATORY AspektForm;
     END PQ_Jaehrlichkeit_SteinBlockschlag;
@@ -414,7 +414,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     CLASS PQ_Jaehrlichkeit_Rutsch_Mure_Base (ABSTRACT) = 
       Jaehrlichkeit : MANDATORY Jaehrlichkeit;
       Polygon : MANDATORY Einzelflaeche;
-      Beschr_Lockermaterial : MANDATORY MText*255;
+      Beschr_Lockermaterial : MANDATORY MTEXT*255;
       Mob_Schicht_Machtigkeit : MANDATORY 0.0 .. 999.0;
       Krit_Hangneigung : MANDATORY 0..90;
     END PQ_Jaehrlichkeit_Rutsch_Mure_Base;
@@ -440,7 +440,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     CLASS Befund_Basis (ABSTRACT) =
       Geometrie : MANDATORY SURFACE WITH (STRAIGHTS) VERTEX GeometryCHLV95_V1.Coord2 WITHOUT OVERLAPS > 0.1;
       RestgefaehrdungJaehrlichkeit : JaehrlichkeitRestgefaehrdung;
-      Bemerkung : MText*255;
+      Bemerkung : MTEXT*255;
     !!@ name = "In der Befund-Geometrie sind keine KLöcher erlaubt!"  
     !!MANDATORY CONSTRAINT GeoW_FunctionsExt.GetHolesCount(THIS, "Geometrie") == 0; !!Constraint aus Kategorie "generisch"
     !!@ name = "Befund liegt nicht innerhalb des Abklärungsperimeters!"  
@@ -610,46 +610,46 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityH(ALL, "BefundProzessquelle"); !!Constraint aus Kategorie "spezifisch"  
     END KennwertUebermurungFliessgeschwindigkeit;
     
-    ASSOCIATION TeilauftragProzessquelle =
+    ASSOCIATION Teilauftrag__Prozessquelle =
       /* Ein Teilauftrag hat entweder keine oder eine Prozessquelle.
          Hat ein Teilauftrag KEINE Prozessquelle, ist durch den Auftragnehmer eine Prozessquelle zu definieren. */
-      TeilauftragProzessquelle -- {0..*} Prozessquelle;
-      ProzessquelleTeilauftrag (EXTERNAL) -- {1} SO_AFU_Naturgefahren_20230802.Auftraege.Teilauftrag;
-    END TeilauftragProzessquelle;
+         Prozessquelle_R -- {0..*} Prozessquelle;
+         Teilauftrag_R (EXTERNAL) -- {1} SO_AFU_Naturgefahren_20230802.Auftraege.Teilauftrag;
+    END Teilauftrag__Prozessquelle;
 
     ASSOCIATION PQ_Jaehrlichkeit_SteinBlockschlag__Prozessquelle =
-      PQ_Jaehrlichkeit_SteinBlockschlagR -- {0..*} PQ_Jaehrlichkeit_SteinBlockschlag;
-      ProzessquelleR -<> {1} Prozessquelle;
+      PQ_Jaehrlichkeit_SteinBlockschlag_R -- {0..*} PQ_Jaehrlichkeit_SteinBlockschlag;
+      Prozessquelle_R -<> {1} Prozessquelle;
     END PQ_Jaehrlichkeit_SteinBlockschlag__Prozessquelle;
 
     ASSOCIATION PQ_Jaehrlichkeit_SpontaneRutschung__Prozessquelle =
-      PQ_Jaehrlichkeit_SpontaneRutschungR -- {0..*} PQ_Jaehrlichkeit_SpontaneRutschung;
-      ProzessquelleR -<> {1} Prozessquelle;
+      PQ_Jaehrlichkeit_SpontaneRutschung_R -- {0..*} PQ_Jaehrlichkeit_SpontaneRutschung;
+      Prozessquelle_R -<> {1} Prozessquelle;
     END PQ_Jaehrlichkeit_SpontaneRutschung__Prozessquelle;
 
     ASSOCIATION PQ_Jaehrlichkeit_Hangmure__Prozessquelle =
-      PQ_Jaehrlichkeit_HangmureR -- {0..*} PQ_Jaehrlichkeit_Hangmure;
-      ProzessquelleR -<> {1} Prozessquelle;
+      PQ_Jaehrlichkeit_Hangmure_R -- {0..*} PQ_Jaehrlichkeit_Hangmure;
+      Prozessquelle_R -<> {1} Prozessquelle;
     END PQ_Jaehrlichkeit_Hangmure__Prozessquelle;
 
     ASSOCIATION PQ_Jaehrlichkeit_SteinBlockschlag__BefundSteinBlockschlag =
-      BefundSteinBlockschlagR -- {1..*} BefundSteinBlockschlag;
-      PQ_Jaehrlichkeit_SteinBlockschlagR -- {1} PQ_Jaehrlichkeit_SteinBlockschlag;
+      BefundSteinBlockschlag_R -- {1..*} BefundSteinBlockschlag;
+      PQ_Jaehrlichkeit_SteinBlockschlag_R -- {1} PQ_Jaehrlichkeit_SteinBlockschlag;
     END PQ_Jaehrlichkeit_SteinBlockschlag__BefundSteinBlockschlag;
 
     ASSOCIATION PQ_Jaehrlichkeit_SpontaneRutschung__BefundSpontaneRutschung =
-      BefundSpontaneRutschungR -- {1..*} BefundSpontaneRutschung;
-      PQ_Jaehrlichkeit_SpontaneRutschungR -- {1} PQ_Jaehrlichkeit_SpontaneRutschung;
+      BefundSpontaneRutschung_R -- {1..*} BefundSpontaneRutschung;
+      PQ_Jaehrlichkeit_SpontaneRutschung_R -- {1} PQ_Jaehrlichkeit_SpontaneRutschung;
     END PQ_Jaehrlichkeit_SpontaneRutschung__BefundSpontaneRutschung;
 
     ASSOCIATION PQ_Jaehrlichkeit_Hangmure__BefundHangmure =
-      BefundHangmureR -- {1..*} BefundHangmure;
-      PQ_Jaehrlichkeit_HangmureR -- {1} PQ_Jaehrlichkeit_Hangmure;
+      BefundHangmure_R -- {1..*} BefundHangmure;
+      PQ_Jaehrlichkeit_Hangmure_R -- {1} PQ_Jaehrlichkeit_Hangmure;
     END PQ_Jaehrlichkeit_Hangmure__BefundHangmure;
 
     ASSOCIATION Prozessquelle__Befund_TextPQ =
-      Befund_TextPQR -- {1..*} Befund_TextPQ;
-      ProzessquelleR -- {1} Prozessquelle;
+      Befund_TextPQ_R -- {1..*} Befund_TextPQ;
+      Prozessquelle_R -- {1} Prozessquelle;
     END Prozessquelle__Befund_TextPQ;
 
     !! Fliessrichtungspfeile zeigen die Richtung des Wassers an 
@@ -659,12 +659,12 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Jaehrlichkeit : MANDATORY JaehrlichkeitListe;
     END Fliessrichtungspfeil;
 
-    ASSOCIATION ProzessquelleFliessrichtungspfeil =
-      ProzessquelleFliessrichtung -- {0..*} Fliessrichtungspfeil;
-      FliessrichtungProzessquelle -- {1} Prozessquelle;
+    ASSOCIATION Prozessquelle__Fliessrichtungspfeil =
+      Fliessrichtungspfeil_R -- {0..*} Fliessrichtungspfeil;
+      Prozessquelle_R -- {1} Prozessquelle;
       !!@ name = "R-Pfeile dürfen nur Hauptprozess Wasser zugeordnet sein!"
       !!MANDATORY CONSTRAINT FliessrichtungProzessquelle->Hauptprozess == #Wasser AND DEFINED(ProzessquelleFliessrichtung);
-    END ProzessquelleFliessrichtungspfeil;
+    END Prozessquelle__Fliessrichtungspfeil;
 
     CONSTRAINTS OF BefundSteinBlockschlag =
       !!@ name = "BefundSteinBlockschlag muss Hauptprozess>Sturz zugeordnet sein"
