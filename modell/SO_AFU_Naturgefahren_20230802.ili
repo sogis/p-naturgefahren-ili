@@ -568,7 +568,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     EXTENDS Befund_TextPQ =
       !! Moegliche Werte gemaess wFliesstiefe. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. 
       h : MANDATORY wFliesstiefeUeberschwemmung;
-      Jaehrlichkeit : JaehrlichkeitListe;
+      Jaehrlichkeit : MANDATORY JaehrlichkeitListe;
     !!@ name = "ungültige Überragung bei Befund!"  
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityH(ALL, "BefundProzessquelle"); !!Constraint aus Kategorie "spezifisch"
     !!@ name = "ungültige Überragung bei Befund!"  
@@ -581,7 +581,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     EXTENDS Befund_TextPQ =
       !! Moegliche Werte gemaess wUeberschwemmungFliessgeschwindigkeit. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */
       v : MANDATORY wUeberschwemmungFliessgeschwindigkeit;
-      Jaehrlichkeit : JaehrlichkeitListe;
+      Jaehrlichkeit : MANDATORY JaehrlichkeitListe;
     !!@ name = "ungültige Überragung bei Befund!"  
       !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityH(ALL, "BefundProzessquelle"); !!Constraint aus Kategorie "spezifisch"
     END KennwertUeberschwemmungFliessgeschwindigkeit;
@@ -592,7 +592,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     EXTENDS Befund_TextPQ =
       !! Moegliche Werte gemaess wFliesstiefe. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen.
       h : MANDATORY wFliesstiefeUebermurung;
-      Jaehrlichkeit : JaehrlichkeitListe;
+      Jaehrlichkeit : MANDATORY JaehrlichkeitListe;
     !!@ name = "ungültige Überragung bei Befund!"  
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityH(ALL, "BefundProzessquelle"); !!Constraint aus Kategorie "spezifisch"   
     !!@ name = "ungültige Überragung bei Befund!"  
@@ -605,7 +605,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     EXTENDS Befund_TextPQ =
       !! Moegliche Werte gemaess wUebermurungFliessgeschwindigkeit. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen.   
       v : MANDATORY wUebermurungFliessgeschwindigkeit;
-      Jaehrlichkeit : JaehrlichkeitListe;
+      Jaehrlichkeit : MANDATORY JaehrlichkeitListe;
     !!@ name = "ungültige Überragung bei Befund!"  
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityH(ALL, "BefundProzessquelle"); !!Constraint aus Kategorie "spezifisch"  
     END KennwertUebermurungFliessgeschwindigkeit;
