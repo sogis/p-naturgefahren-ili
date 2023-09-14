@@ -407,7 +407,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Polygon : MANDATORY Einzelflaeche;
       !! Beschreibung der Geologie 
       Beschr_Geologie : MANDATORY MTEXT*255;  
-      Volumen : MANDATORY 1 .. 999999999 [Units.m3];
+      Volumen : MANDATORY 0.000 .. 999999999.999 [Units.m3];
       Form : MANDATORY AspektForm;
     END PQ_Jaehrlichkeit_SteinBlockschlag;
 
