@@ -648,7 +648,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     END PQ_Jaehrlichkeit_Hangmure__BefundHangmure;
 
     ASSOCIATION Prozessquelle__Befund_TextPQ =
-      Befund_TextPQ_R -- {1..*} Befund_TextPQ;
+      Befund_TextPQ_R -- {0..*} Befund_TextPQ;
       Prozessquelle_R -- {1} Prozessquelle;
     END Prozessquelle__Befund_TextPQ;
 

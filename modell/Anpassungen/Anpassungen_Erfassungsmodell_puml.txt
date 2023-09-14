@@ -25,11 +25,11 @@ class "PQ_Jaehrlichkeit_Hangmure" as pqhm {
   Polygon
 }
 
-class "Prozessquelle" as pq {
+class "Prozessquelle (3)" as pq {
   Hauptprozess - löschen (5)? Ja
 }
 
-class "Befund" as bef {}
+class "Befund_TextPQ" as bef {}
 
 class "BefundHangmure" as befhm {}
 
@@ -76,7 +76,7 @@ class "Auftrag (10)" as a {
   Abschluss_Jahr
 }
 
-pq "1" -right- "1..*" bef : (3)
+pq "1" -right- "0..*" bef : "     "
 pq "1" -- "0..*" pfeil : (4)
 pq "1" -- "0..*" pqsr
 pq "1" -- "0..*" pqsb
@@ -102,8 +102,10 @@ C: Constraint
 - C: Entweder Punkt oder Polygon muss erfasst sein.
 
 (3) 
-- C: Die Teilprozesse der Befunde müssen mit dem Hauptprozess
-des Teilauftrags übereinstimmen (Gilt auch für BefundSteinBlockschlag via PQ_Jaehrlichkeit_SteinBlockschlagschlag).
+- C: Die Teilprozesse der Objekte aller Subklassen von Befund_Basis müssen mit 
+dem Hauptprozess des Teilauftrags übereinstimmen.
+- C: Eine Prozessquelle muss mit mindestens einem Objekt der Subklassen von Befund_TextPQ
+oder einem Objekt der PQ_Jaehrlichkeit_*-Klassen verknüpft sein.
 
 (4) C: Prozessquellen mit Hauptprozess X müssen mit 
 Fliessrichtungspfeilen verknüpft sein.
