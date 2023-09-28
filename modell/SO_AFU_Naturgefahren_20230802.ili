@@ -407,7 +407,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Polygon : MANDATORY Einzelflaeche;
       !! Beschreibung der Geologie 
       Beschr_Geologie : MANDATORY MTEXT*255;  
-      Volumen : MANDATORY 1 .. 999999999 [Units.m3];
+      Volumen : MANDATORY 0.000 .. 999999999.999 [Units.m3];
       Form : MANDATORY AspektForm;
     END PQ_Jaehrlichkeit_SteinBlockschlag;
 
@@ -648,7 +648,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     END PQ_Jaehrlichkeit_Hangmure__BefundHangmure;
 
     ASSOCIATION Prozessquelle__Befund_TextPQ =
-      Befund_TextPQ_R -- {1..*} Befund_TextPQ;
+      Befund_TextPQ_R -- {0..*} Befund_TextPQ;
       Prozessquelle_R -- {1} Prozessquelle;
     END Prozessquelle__Befund_TextPQ;
 
