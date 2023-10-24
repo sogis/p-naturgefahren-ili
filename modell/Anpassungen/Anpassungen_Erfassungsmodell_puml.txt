@@ -99,11 +99,11 @@ C: Constraint
 
 (1)  ProzessquelleSteinBlockschlagPunkt -Polygon: Werden gelöscht
 - F: Flaeche als Multipolygon? Res: Nein - Einzelpolygon
-- C: Entweder Punkt oder Polygon muss erfasst sein.
 
 (3) 
 - C: Die Teilprozesse der Objekte aller Subklassen von Befund_Basis müssen mit 
-dem Hauptprozess des Teilauftrags übereinstimmen.
+dem Hauptprozess des Teilauftrags übereinstimmen. Teilprozess folgt in allen Subklassen aus dem Klassenname. 
+Ausnahme: BefundJaehrlichkeit - hier in der Eigenschaft "Teilprozess".
 - C: Eine Prozessquelle muss mit mindestens einem Objekt der Subklassen von Befund_TextPQ
 oder einem Objekt der PQ_Jaehrlichkeit_*-Klassen verknüpft sein.
 
@@ -115,14 +115,14 @@ Hauptprozess-Angabe auf der Prozessquelle keinen Sinn, oder?
 Res: Korrekt Teilauftrag neu pro Hauptprozess.
 
 (6)
-- F: Abklährungsperimeter ist pro Teilprozess. 
+- F: Abklärungsperimeter ist pro Teilprozess. 
 Wie bringen wir das mit den Altdaten (pro Hauptprozess) zusammen?
 Res: Teilauftrag pro Hauptprozess. Perimeter mit n:m Beziehung zu Teilauftrag
 - F: Häufig muss das gleiche Polygon mehrfach erfasst werden. 
 Abklärungsperimeter als separate Klasse definieren und verknüpfen?
 Res: Ja, separate Klasse.
 - C: Es dürfen nur Befunde mit dem entsprechenden Teilprozess zugeordnet sein.
-- C: Bei Hauptprozess 
+- C: Falls "Wasserkennwerte" = TRUE muss pro Kennwert-Klasse mindestens ein Objekt verknüpft sein.
 
 (7): F: Hintergrund sind freie wählbare Jährlichkeiten...?
 Diese kann man aber in den Befunden nicht setzen. Darum Weglassen?
