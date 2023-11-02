@@ -80,7 +80,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     END Autor;
 
     CLASS Auftrag =
-      !! Eindeutige Bezeichnung des Auftrags 
+      !! Eindeutige Bezeichnung des Auftrags. Beispiel: 128_Himmelried_Wasser_Sturz_2008 
       Kennung : MANDATORY TEXT*80;
       !! Auftraggeber 
       Fachstelle : MANDATORY TEXT*80;
@@ -107,8 +107,6 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Prozessquellen werden beim Datenabgleich automatisch durch die neu beurteilten ersetzt.
     */
     CLASS Teilauftrag =
-      !! Objektidentifikation mittels sprechendem Schlüssel ("YYYY.<BueroABC>.x.y"), maximale Länge 36 Zeichen 
-      OID AS INTERLIS.ANYOID;
       !! Im Teilauftrag abgeklärter Hauptprozess. Abgeklärte Teilprozesse siehe Abklärungsperimeter.
       Hauptprozess : MANDATORY Hauptprozess;
       Bemerkung : MTEXT*255;
