@@ -25,6 +25,11 @@ class "PQ_Jaehrlichkeit_Hangmure" as pqhm {
   Polygon
 }
 
+class "PQ_Jaehrlichkeit_BergFelssturz" as pqbf {
+}
+
+class "BefundBergFelssturz" as befbf {}
+
 class "Prozessquelle (3)" as pq {
   Hauptprozess - löschen (5)? Ja
 }
@@ -81,10 +86,12 @@ pq "1" -- "0..*" pfeil : (4)
 pq "1" -- "0..*" pqsr
 pq "1" -- "0..*" pqsb
 pq "1" -- "0..*" pqhm
+pq "1" -- "0..*" pqbf
 
 pqsb "1"-- "1..*" befsb : (14)
 pqsr "1"-- "1..*" befsr : (14)
 pqhm "1"-- "1..*" befhm : (14)
+pqbf "1"-- "1..*" befbf
 
 a "1" -- "1..*" ta
 ta "1" -right- "0..*" pq

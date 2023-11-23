@@ -200,7 +200,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         Absenkung        
       ) ORDERED;
      
-      !! Wertebereich fuer Prozessquellenbeschreibung fuer Prozess Stein/Blockschlag
+      !! Wertebereich fuer Prozessquellenbeschreibung fuer Prozess Stein/Blockschlag und Berg/Felssturz
       AspektForm = (
         zylindrisch,
         kubisch,
@@ -395,16 +395,27 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Bemerkung : MTEXT*255;
     END Prozessquelle;
 
-    /* Informationen zu Form uns Ausdehnung der Prozessquelle SteinBlockschlag für die entsprechende Jährlichkeit
-     */
-    CLASS PQ_Jaehrlichkeit_SteinBlockschlag =
+    CLASS PQ_Jaehrlichkeit_Schlag_Sturz_Base =
       Jaehrlichkeit : MANDATORY Jaehrlichkeit;
       Polygon : MANDATORY Einzelflaeche;
       !! Beschreibung der Geologie 
       Beschr_Geologie : MANDATORY MTEXT*255;  
-      Volumen : MANDATORY 0.000 .. 999999999.999 [Units.m3];
       Form : MANDATORY AspektForm;
+    END PQ_Jaehrlichkeit_Schlag_Sturz_Base;
+
+    /* Informationen zu Form und Ausdehnung der Prozessquelle SteinBlockschlag für die entsprechende Jährlichkeit
+     */
+    CLASS PQ_Jaehrlichkeit_SteinBlockschlag
+      EXTENDS PQ_Jaehrlichkeit_Schlag_Sturz_Base = 
+      Volumen : MANDATORY 0.000 .. 999999999.999 [Units.m3];
     END PQ_Jaehrlichkeit_SteinBlockschlag;
+
+    /* Informationen zu Form und Ausdehnung der Prozessquelle BergFelssturz für die entsprechende Jährlichkeit
+     */
+    CLASS PQ_Jaehrlichkeit_BergFelssturz
+      EXTENDS PQ_Jaehrlichkeit_Schlag_Sturz_Base = 
+      Volumen : MANDATORY 0 .. 999999999 [Units.m3];
+    END PQ_Jaehrlichkeit_BergFelssturz;
 
     CLASS PQ_Jaehrlichkeit_Rutsch_Mure_Base (ABSTRACT) = 
       Jaehrlichkeit : MANDATORY Jaehrlichkeit;
@@ -466,7 +477,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     END BefundEinsturz; 
 
     !! Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Sturz sein 
-    CLASS BefundSteinBlockschlag
+    CLASS bsb
     EXTENDS Befund_Basis =
       IWCode : MANDATORY IWCodeSteinBlockschlag;
     !!@ name = "ungültige Überragung bei Befund!"  
@@ -475,7 +486,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     
     !! Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Sturz sein 
     CLASS BefundBergFelssturz
-    EXTENDS Befund_TextPQ =   
+    EXTENDS Befund_Basis =   
       IWCode : MANDATORY IWCodeBergFelssturz;
     !!@ name = "ungültige Überragung bei Befund!"  
     !!SET CONSTRAINT NGK_FunctionsExt.CheckBefundIntegrityIWCode(ALL, "BefundProzessquelle");  !!Constraint aus Kategorie "spezifisch"   
@@ -619,6 +630,11 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Prozessquelle_R -<> {1} Prozessquelle;
     END PQ_Jaehrlichkeit_Hangmure__Prozessquelle;
 
+    ASSOCIATION PQ_Jaehrlichkeit_BergFelssturz__Prozessquelle =
+      PQ_Jaehrlichkeit_BergFelssturz_R -- {0..*} PQ_Jaehrlichkeit_BergFelssturz;
+      Prozessquelle_R -<> {1} Prozessquelle;
+    END PQ_Jaehrlichkeit_BergFelssturz__Prozessquelle;
+
     ASSOCIATION PQ_Jaehrlichkeit_SteinBlockschlag__BefundSteinBlockschlag =
       BefundSteinBlockschlag_R -- {1..*} BefundSteinBlockschlag;
       PQ_Jaehrlichkeit_SteinBlockschlag_R -- {1} PQ_Jaehrlichkeit_SteinBlockschlag;
@@ -633,6 +649,11 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       BefundHangmure_R -- {1..*} BefundHangmure;
       PQ_Jaehrlichkeit_Hangmure_R -- {1} PQ_Jaehrlichkeit_Hangmure;
     END PQ_Jaehrlichkeit_Hangmure__BefundHangmure;
+
+    ASSOCIATION PQ_Jaehrlichkeit_BergFelssturz__BefundBergFelssturz =
+      BefundBergFelssturz_R -- {1..*} BefundBergFelssturz;
+      PQ_Jaehrlichkeit_BergFelssturz_R -- {1} PQ_Jaehrlichkeit_BergFelssturz;
+    END PQ_Jaehrlichkeit_BergFelssturz__BefundBergFelssturz;
 
     ASSOCIATION Prozessquelle__Befund_TextPQ =
       Befund_TextPQ_R -- {0..*} Befund_TextPQ;
