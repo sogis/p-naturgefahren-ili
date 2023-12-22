@@ -47,4 +47,11 @@ CONTRACTED MODEL GeoW_FunctionsExt
     !!@ fn.return = "TRUE, wenn sich zwei Linien überlappen oder zwischen zwei Linien eine gemeinsame Teilstrecke vorhanden ist";
     !!@ fn.since = "2023-12-18";
     FUNCTION PolylinesOverlap (Objects: OBJECTS OF ANYCLASS; LineAttr: TEXT): BOOLEAN;
+
+    !!@ fn.description = "Prüft, ob ein Objekt innerhalb der Geometrie eines anderen Objektes liegt.";
+    !!@ fn.param = "ReferenceGeometry: Referenzgeometrie, innerhalb welcher das TestObject liegen muss. TestObject: Objekt, welches zu prüfen ist. TestObjectgeometry: Geometriefeld, bezogen auf das unter Testobject übergebene Objekt";
+    !!@ fn.return = "Boolean";
+    !!@ fn.since = "2023-12-21";
+    FUNCTION IsInside (ReferenceGeometry: MULTIAREA; TestObject: OBJECT OF ANYCLASS; TestObjectgeometry: TEXT): BOOLEAN;
+
 END GeoW_FunctionsExt.
