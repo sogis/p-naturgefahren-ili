@@ -92,6 +92,8 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Bemerkung : MTEXT*255;
     !!@ ilivalid.msg_de = "Die Klasse Auftrag bedingt mindestens 1 Eintrag!"  
     MANDATORY CONSTRAINT INTERLIS.objectCount(THIS)==1;
+    !!@ ilivalid.msg_de = "Es gibt mehrere identische Kennungen!"  
+    UNIQUE Kennung;
     END Auftrag;
 
     CLASS Bericht = 
@@ -114,10 +116,13 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       !! Abklaerungsperimeter = Perimeter, welcher untersucht werden soll 
       Name : MANDATORY TEXT*80;
       !! True, falls für Wasser-Teilauftrag die Kennwerte gemäss Modell geliefert werden.
-      Wasserkennwerte: MANDATORY BOOLEAN;
+      Wasserkennwerte: BOOLEAN;
       !! Für Ausnahmefall der Abklärung einer freien Jährlichkeit mittels Klasse BefundeJaehrlichkeit ist hier
       !! die abzuklärende Jährlichkeit gesetzt. Im Normallfall NULL.
       Jaehrlichkeit : Jaehrlichkeit;
+      !!@ name = "CheckTeilauftragWasserKennwert"
+      !!@ ilivalid.msg_de = "Bei einem Teilauftrag mit Hauptprozess 'Wasser' müssen Kennwerte geliefert werden!" 
+      MANDATORY CONSTRAINT (Hauptprozess != #Wasser) OR DEFINED(Wasserkennwerte);
     END Teilauftrag;
 
     /* 
@@ -177,6 +182,38 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Abklaerungsperimeter_R -- {1..*} Abklaerungsperimeter;
       Teilauftrag_R -- {1..*} Teilauftrag;
     END Abklaerungsperimeter__Teilauftrag;
+
+    CONSTRAINTS OF Teilauftrag =
+      !!@ ilivalid.msg_de = "Zu diesem Auftrag gibt es bereits einen Teilauftrag mit demselben Hauptprozess!" 
+      UNIQUE Auftrag_R, Hauptprozess;
+    END;
+
+    CONSTRAINTS OF Abklaerungsperimeter =
+      !!@ ilivalid.msg_de = "Teilprozess Beurteilung 'w_Ueberschwemmung_statisch' muss bei diesem Hauptprozess zwingend ausgefüllt werden!" 
+      MANDATORY CONSTRAINT NOT(Teilauftrag_R->Hauptprozess == #Wasser) OR DEFINED(w_Ueberschwemmung_statisch);
+      !!@ ilivalid.msg_de = "Teilprozess Beurteilung 'w_Ueberschwemmung_dynamisch' muss bei diesem Hauptprozess zwingend ausgefüllt werden!" 
+      MANDATORY CONSTRAINT NOT(Teilauftrag_R->Hauptprozess == #Wasser) OR DEFINED(w_Ueberschwemmung_dynamisch);
+      !!@ ilivalid.msg_de = "Teilprozess Beurteilung 'w_Uebermurung' muss bei diesem Hauptprozess zwingend ausgefüllt werden!" 
+      MANDATORY CONSTRAINT NOT(Teilauftrag_R->Hauptprozess == #Wasser) OR DEFINED(w_Uebermurung);
+      !!@ ilivalid.msg_de = "Teilprozess Beurteilung 'w_Ufererosion' muss bei diesem Hauptprozess zwingend ausgefüllt werden!" 
+      MANDATORY CONSTRAINT NOT(Teilauftrag_R->Hauptprozess == #Wasser) OR DEFINED(w_Ufererosion);
+      !!@ ilivalid.msg_de = "Teilprozess Beurteilung 'ea_Einsturz' muss bei diesem Hauptprozess zwingend ausgefüllt werden!" 
+      MANDATORY CONSTRAINT NOT(Teilauftrag_R->Hauptprozess == #Absenkung_Einsturz) OR DEFINED(ea_Einsturz);
+      !!@ ilivalid.msg_de = "Teilprozess Beurteilung 'ea_Absenkung' muss bei diesem Hauptprozess zwingend ausgefüllt werden!" 
+      MANDATORY CONSTRAINT NOT(Teilauftrag_R->Hauptprozess == #Absenkung_Einsturz) OR DEFINED(ea_Absenkung);
+      !!@ ilivalid.msg_de = "Teilprozess Beurteilung 's_Stein_Blockschlag' muss bei diesem Hauptprozess zwingend ausgefüllt werden!" 
+      MANDATORY CONSTRAINT NOT(Teilauftrag_R->Hauptprozess == #Sturz) OR DEFINED(s_Stein_Blockschlag);
+      !!@ ilivalid.msg_de = "Teilprozess Beurteilung 's_Berg_Felssturz' muss bei diesem Hauptprozess zwingend ausgefüllt werden!" 
+      MANDATORY CONSTRAINT NOT(Teilauftrag_R->Hauptprozess == #Sturz) OR DEFINED(s_Berg_Felssturz);
+      !!@ ilivalid.msg_de = "Teilprozess Beurteilung 's_Eisschlag' muss bei diesem Hauptprozess zwingend ausgefüllt werden!" 
+      MANDATORY CONSTRAINT NOT(Teilauftrag_R->Hauptprozess == #Sturz) OR DEFINED(s_Eisschlag);
+      !!@ ilivalid.msg_de = "Teilprozess Beurteilung 'r_Hangmure' muss bei diesem Hauptprozess zwingend ausgefüllt werden!" 
+      MANDATORY CONSTRAINT NOT(Teilauftrag_R->Hauptprozess == #Rutschung) OR DEFINED(r_Hangmure);
+      !!@ ilivalid.msg_de = "Teilprozess Beurteilung 'r_Spontane_Rutschung' muss bei diesem Hauptprozess zwingend ausgefüllt werden!" 
+      MANDATORY CONSTRAINT NOT(Teilauftrag_R->Hauptprozess == #Rutschung) OR DEFINED(r_Spontane_Rutschung);
+      !!@ ilivalid.msg_de = "Teilprozess Beurteilung 'r_Permanente_Rutschung' muss bei diesem Hauptprozess zwingend ausgefüllt werden!" 
+      MANDATORY CONSTRAINT NOT(Teilauftrag_R->Hauptprozess == #Rutschung) OR DEFINED(r_Permanente_Rutschung);
+    END;
 
   END Auftraege;
 
@@ -581,8 +618,8 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     ASSOCIATION Teilauftrag__Prozessquelle =
       /* Ein Teilauftrag hat entweder keine oder eine Prozessquelle.
          Hat ein Teilauftrag KEINE Prozessquelle, ist durch den Auftragnehmer eine Prozessquelle zu definieren. */
-         Prozessquelle_R -- {0..*} Prozessquelle;
-         Teilauftrag_R (EXTERNAL) -- {1} SO_AFU_Naturgefahren_20230802.Auftraege.Teilauftrag;
+      Prozessquelle_R -- {0..*} Prozessquelle;
+      Teilauftrag_R (EXTERNAL) -- {1} SO_AFU_Naturgefahren_20230802.Auftraege.Teilauftrag;
     END Teilauftrag__Prozessquelle;
 
     ASSOCIATION PQ_Jaehrlichkeit_SteinBlockschlag__Prozessquelle =
@@ -642,6 +679,11 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       !!@ name = "CheckBefundSteinBlockschlagKeineUeberragung"
       !!@ ilivalid.msg_de = "ungültige Überragung bei Befund mit gleichem IWCode und Prozessquelle!"
       SET CONSTRAINT INTERLIS.areAreas(GeoW_FunctionsExt.GetInGroups(GeoW_FunctionsExt.GetInGroups(ALL, PQ_Jaehrlichkeit_SteinBlockschlag_R->Prozessquelle_R), IWCode),UNDEFINED, >> Geometrie);
+      !!@ name = "CheckBefundSteinBlockschlagJaehrlichkeit"
+      !!@ ilivalid.msg_de = "Die Jaehrlichkeit stimmt nicht mit der Jaehrlichkeit der Prozessquelle überein!"
+      MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_30) OR (IWCode == #rot_mittel_30) OR (IWCode == #blau_schwach_30)) OR (PQ_Jaehrlichkeit_SteinBlockschlag_R->Jaehrlichkeit == 30);
+      MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_100) OR (IWCode == #blau_mittel_100)) OR (PQ_Jaehrlichkeit_SteinBlockschlag_R->Jaehrlichkeit == 100);
+      MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_300) OR (IWCode == #blau_mittel_300)) OR (PQ_Jaehrlichkeit_SteinBlockschlag_R->Jaehrlichkeit == 300);    
     END;
 
     CONSTRAINTS OF BefundBergFelssturz =
@@ -660,6 +702,8 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       !!@ name = "BefundEisschlagKeineUeberragung"
       !!@ ilivalid.msg_de = "ungültige Überragung bei Befund mit gleichem IWCode und Prozessquelle!"
       SET CONSTRAINT INTERLIS.areAreas(GeoW_FunctionsExt.GetInGroups(GeoW_FunctionsExt.GetInGroups(ALL, Prozessquelle_R), IWCode),UNDEFINED, >> Geometrie);
+      !!@ name = "CheckBefundEisschlagJaehrlichkeit"
+      !!@ ilivalid.msg_de = "Die Jaehrlichkeit stimmt nicht mit der Jaehrlichkeit der Prozessquelle überein!"
     END;
 
     CONSTRAINTS OF BefundHangmure =
@@ -669,6 +713,11 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       !!@ name = "BefundHangmureKeineUeberragung"
       !!@ ilivalid.msg_de = "ungültige Überragung bei Befund mit gleichem IWCode und Prozessquelle!" 
       SET CONSTRAINT INTERLIS.areAreas(GeoW_FunctionsExt.GetInGroups(GeoW_FunctionsExt.GetInGroups(ALL, PQ_Jaehrlichkeit_Hangmure_R->Prozessquelle_R), IWCode),UNDEFINED, >> Geometrie);
+      !!@ name = "CheckBefundHangmureJaehrlichkeit"
+      !!@ ilivalid.msg_de = "Die Jaehrlichkeit stimmt nicht mit der Jaehrlichkeit der Prozessquelle überein!"
+      MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_30) OR (IWCode == #rot_mittel_30) OR (IWCode == #blau_schwach_30)) OR (PQ_Jaehrlichkeit_Hangmure_R->Jaehrlichkeit == 30);
+      MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_100) OR (IWCode == #blau_mittel_100)) OR (PQ_Jaehrlichkeit_Hangmure_R->Jaehrlichkeit == 100);
+      MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_300) OR (IWCode == #blau_mittel_300)) OR (PQ_Jaehrlichkeit_Hangmure_R->Jaehrlichkeit == 300); 
     END;
    
     CONSTRAINTS OF BefundUfererosion =
@@ -708,6 +757,11 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       !!@ name = "CheckBefundSpontaneRutschungKeineUeberragung"
       !!@ ilivalid.msg_de = "ungültige Überragung bei Befund mit gleichem IWCode und Prozessquelle!"  
       SET CONSTRAINT INTERLIS.areAreas(GeoW_FunctionsExt.GetInGroups(GeoW_FunctionsExt.GetInGroups(ALL, PQ_Jaehrlichkeit_SpontaneRutschung_R->Prozessquelle_R), IWCode),UNDEFINED, >> Geometrie);
+      !!@ name = "CheckBefundSpontaneRutschungJaehrlichkeit"
+      !!@ ilivalid.msg_de = "Die Jaehrlichkeit stimmt nicht mit der Jaehrlichkeit der Prozessquelle überein!"
+      MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_30) OR (IWCode == #rot_mittel_30) OR (IWCode == #blau_schwach_30)) OR (PQ_Jaehrlichkeit_SpontaneRutschung_R->Jaehrlichkeit == 30);
+      MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_100) OR (IWCode == #blau_mittel_100)) OR (PQ_Jaehrlichkeit_SpontaneRutschung_R->Jaehrlichkeit == 100);
+      MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_300) OR (IWCode == #blau_mittel_300)) OR (PQ_Jaehrlichkeit_SpontaneRutschung_R->Jaehrlichkeit == 300); 
     END;      
 
     CONSTRAINTS OF BefundUebermurung =
@@ -740,7 +794,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     CONSTRAINTS OF BefundJaehrlichkeit =
       !!@ name = "CheckBefundBefundJaehrlichkeitHauptprozess"
       !!@ ilivalid.msg_de = "BefundJaehrlichkeit muss Hauptprozess>Wasser zugeordnet sein"  
-      MANDATORY CONSTRAINT Prozessquelle_R->Teilauftrag_R->Hauptprozess == #Sturz; 
+      !!MANDATORY CONSTRAINT Prozessquelle_R->Teilauftrag_R->Hauptprozess == #Sturz; !!offene Frage
       !!@ name = "CheckBefundBefundJaehrlichkeitFlaechendeckung"
       !!@ ilivalid.msg_de = "BefundJaehrlichkeit ist nicht flächendeckend!"  
       SET CONSTRAINT INTERLIS_ext.areAreas3(ALL,>Prozessquelle,"Geometrie");
@@ -782,7 +836,10 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     CONSTRAINTS OF Prozessquelle =
       !!@ name = "CheckProzessquelleBefundJaehrlichkeit" 
       !!@ ilivalid.msg_de = "Eine Prozessquelle muss mit mindestens einem Objekt der Subklassen von Befund_TextPQ oder einem Objekt der PQ_Jaehrlichkeit_*-Klassen verknüpft sein!"  
-      MANDATORY CONSTRAINT DEFINED(Befund_TextPQ_R) OR (DEFINED(PQ_Jaehrlichkeit_SteinBlockschlag_R) OR DEFINED(PQ_Jaehrlichkeit_SpontaneRutschung_R) OR DEFINED(PQ_Jaehrlichkeit_Hangmure_R) OR DEFINED(PQ_Jaehrlichkeit_SteinBlockschlag_R) OR DEFINED(PQ_Jaehrlichkeit_SpontaneRutschung_R) OR DEFINED(PQ_Jaehrlichkeit_Hangmure_R));
+      MANDATORY CONSTRAINT DEFINED(Befund_TextPQ_R) OR (DEFINED(PQ_Jaehrlichkeit_SteinBlockschlag_R) OR DEFINED(PQ_Jaehrlichkeit_SpontaneRutschung_R) OR DEFINED(PQ_Jaehrlichkeit_Hangmure_R));
+      !!@ name = "CheckProzessquelleKennung"       
+      !!@ ilivalid.msg_de = "Die Kennung ist innerhalb dieses Teilauftrags nicht eindeutig!"  
+      UNIQUE Kennung, Teilauftrag_R;
     END;
 
     !! Hilfsview für Constraint
