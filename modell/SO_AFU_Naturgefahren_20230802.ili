@@ -61,8 +61,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         spontane_Rutschung,
         Hangmure,
         Stein_Blockschlag,
-        Fels_Bergsturz,
-        Eisschlag
+        Fels_Bergsturz
       );
 
       !! Art der Nachfuehrung der Gefahrenkarte
@@ -86,7 +85,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       !! Auftraggeber 
       Fachstelle : MANDATORY TEXT*80;
       !! Jahr, in welchem der Auftrag abgeschlossen wurde.
-      Abschlussjahr : MANDATORY 2020 .. 2040;
+      Abschlussjahr : MANDATORY 1970 .. 2050;
       !! Art der Gefahrenbeurteilung -> siehe Wertebereich Deklarationen
       Deklaration : MANDATORY Deklaration;
       Bemerkung : MTEXT*255;
@@ -116,7 +115,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       !! Abklaerungsperimeter = Perimeter, welcher untersucht werden soll 
       Name : MANDATORY TEXT*80;
       !! True, falls für Wasser-Teilauftrag die Kennwerte gemäss Modell geliefert werden.
-      Wasserkennwerte: BOOLEAN;
+      Wasserkennwerte: MANDATORY BOOLEAN;
       !! Für Ausnahmefall der Abklärung einer freien Jährlichkeit mittels Klasse BefundeJaehrlichkeit ist hier
       !! die abzuklärende Jährlichkeit gesetzt. Im Normallfall NULL.
       Jaehrlichkeit : Jaehrlichkeit;
@@ -236,12 +235,11 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         permanente_Rutschung,
         Stein_Blockschlag,
         Fels_Bergsturz,
-        Eisschlag,        
-        Einsturz,
+                Einsturz,
         Absenkung        
       ) ORDERED;
      
-      !! Wertebereich fuer Prozessquellenbeschreibung fuer Prozess Stein/Blockschlag
+      !! Wertebereich fuer Prozessquellenbeschreibung fuer Prozess Stein/Blockschlag und Berg/Felssturz
       AspektForm = (
         zylindrisch,
         kubisch,
@@ -436,16 +434,16 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Bemerkung : MTEXT*255;
     END Prozessquelle;
 
-    /* Informationen zu Form uns Ausdehnung der Prozessquelle SteinBlockschlag für die entsprechende Jährlichkeit
+    /* Informationen zu Form und Ausdehnung der Prozessquelle SteinBlockschlag für die entsprechende Jährlichkeit
      */
     CLASS PQ_Jaehrlichkeit_SteinBlockschlag =
       Jaehrlichkeit : MANDATORY Jaehrlichkeit;
       Polygon : MANDATORY Einzelflaeche;
       !! Beschreibung der Geologie 
       Beschr_Geologie : MANDATORY MTEXT*255;  
-      Volumen : MANDATORY 0.000 .. 999999999.999 [Units.m3];
       Form : MANDATORY AspektForm;
-    END PQ_Jaehrlichkeit_SteinBlockschlag;
+      Volumen : MANDATORY 0.000 .. 999999999.999 [Units.m3];
+          END PQ_Jaehrlichkeit_SteinBlockschlag;
 
     /* Informationen zu Form und Ausdehnung der Prozessquelle BergFelssturz für die entsprechende Jährlichkeit
      */
@@ -462,8 +460,8 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Jaehrlichkeit : MANDATORY Jaehrlichkeit;
       Polygon : MANDATORY Einzelflaeche;
       Beschr_Lockermaterial : MANDATORY MTEXT*255;
-      Mob_Schicht_Machtigkeit : MANDATORY 0.0 .. 999.0;
-      Krit_Hangneigung : MANDATORY 0..90;
+      Mob_Schicht_Machtigkeit : MANDATORY 0.0 .. 999.0 [INTERLIS.m];
+      Krit_Hangneigung : MANDATORY 0..90 [Units.Angle_Degree];
     END PQ_Jaehrlichkeit_Rutsch_Mure_Base;
 
     /* Informationen zu Ausdehnung, ... der Prozessquelle SpontaneRutschung für die entsprechende Jährlichkeit
@@ -481,7 +479,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     /* Abstrakte Klasse fuer Befunde.
        Prozess Wasser: Ueberschwemmung statisch/dynamisch, Uebermurung, Ufererosion
        Prozess Rutsch: Hangmure, Spontane/Permanente Rutschung
-       Prozess Sturz: Stein-/Blockschlag, Berg-/Felssturz, Eisschlag
+       Prozess Sturz: Stein-/Blockschlag, Berg-/Felssturz
        Prozess Einsturz/Absenkung: Einsturz, Absenkung
        Konkretisiert werden die Befunde durch saemtliche Teilprozesse, Kennwerte fuer Wasserprozesse und freie Befunde mit Jaehrlichkeit. */
     CLASS Befund_Basis (ABSTRACT) =
@@ -525,12 +523,6 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       IWCode : MANDATORY IWCodeBergFelssturz;
     END BefundBergFelssturz;
     
-    !! Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Sturz sein 
-    CLASS BefundEisschlag
-    EXTENDS Befund_TextPQ = 
-      IWCode : MANDATORY IWCodeStandard;
-    END BefundEisschlag;
-
     !! Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Rutsch sein 
     CLASS BefundHangmure
     EXTENDS Befund_Basis =
