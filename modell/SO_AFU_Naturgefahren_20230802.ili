@@ -145,7 +145,6 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       ea_Absenkung : Beurteilungsart;
       s_Stein_Blockschlag : Beurteilungsart;
       s_Berg_Felssturz : Beurteilungsart;
-      s_Eisschlag : Beurteilungsart;
       r_Hangmure : Beurteilungsart;
       r_Spontane_Rutschung : Beurteilungsart;
       r_Permanente_Rutschung : Beurteilungsart;
@@ -234,8 +233,8 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         Hangmure,
         permanente_Rutschung,
         Stein_Blockschlag,
-        Fels_Bergsturz,
-                Einsturz,
+        Fels_Bergsturz,     
+        Einsturz,
         Absenkung        
       ) ORDERED;
      
@@ -443,7 +442,18 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Beschr_Geologie : MANDATORY MTEXT*255;  
       Form : MANDATORY AspektForm;
       Volumen : MANDATORY 0.000 .. 999999999.999 [Units.m3];
-          END PQ_Jaehrlichkeit_SteinBlockschlag;
+    END PQ_Jaehrlichkeit_SteinBlockschlag;
+
+    /* Informationen zu Form und Ausdehnung der Prozessquelle BergFelssturz für die entsprechende Jährlichkeit
+     */
+    CLASS PQ_Jaehrlichkeit_BergFelssturz =
+      Jaehrlichkeit : MANDATORY Jaehrlichkeit;
+      Polygon : MANDATORY Einzelflaeche;
+      !! Beschreibung der Geologie 
+      Beschr_Geologie : MANDATORY MTEXT*255;  
+      Form : MANDATORY AspektForm;
+      Volumen : MANDATORY 0 .. 999999999 [Units.m3];
+    END PQ_Jaehrlichkeit_BergFelssturz;
 
     /* Informationen zu Form und Ausdehnung der Prozessquelle BergFelssturz für die entsprechende Jährlichkeit
      */
@@ -519,10 +529,10 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     
     !! Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Sturz sein 
     CLASS BefundBergFelssturz
-    EXTENDS Befund_TextPQ =   
+    EXTENDS Befund_Basis =   
       IWCode : MANDATORY IWCodeBergFelssturz;
     END BefundBergFelssturz;
-    
+
     !! Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Rutsch sein 
     CLASS BefundHangmure
     EXTENDS Befund_Basis =
