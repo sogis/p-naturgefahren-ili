@@ -206,8 +206,6 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       MANDATORY CONSTRAINT NOT(Teilauftrag_R->Hauptprozess == #Sturz) OR DEFINED(s_Stein_Blockschlag);
       !!@ ilivalid.msg_de = "Teilprozess Beurteilung 's_Berg_Felssturz' muss bei diesem Hauptprozess zwingend ausgefüllt werden!" 
       MANDATORY CONSTRAINT NOT(Teilauftrag_R->Hauptprozess == #Sturz) OR DEFINED(s_Berg_Felssturz);
-      !!@ ilivalid.msg_de = "Teilprozess Beurteilung 's_Eisschlag' muss bei diesem Hauptprozess zwingend ausgefüllt werden!" 
-      MANDATORY CONSTRAINT NOT(Teilauftrag_R->Hauptprozess == #Sturz) OR DEFINED(s_Eisschlag);
       !!@ ilivalid.msg_de = "Teilprozess Beurteilung 'r_Hangmure' muss bei diesem Hauptprozess zwingend ausgefüllt werden!" 
       MANDATORY CONSTRAINT NOT(Teilauftrag_R->Hauptprozess == #Rutschung) OR DEFINED(r_Hangmure);
       !!@ ilivalid.msg_de = "Teilprozess Beurteilung 'r_Spontane_Rutschung' muss bei diesem Hauptprozess zwingend ausgefüllt werden!" 
@@ -449,6 +447,17 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Form : MANDATORY AspektForm;
     END PQ_Jaehrlichkeit_SteinBlockschlag;
 
+    /* Informationen zu Form und Ausdehnung der Prozessquelle BergFelssturz für die entsprechende Jährlichkeit
+     */
+    CLASS PQ_Jaehrlichkeit_BergFelssturz =
+      Jaehrlichkeit : MANDATORY Jaehrlichkeit;
+      Polygon : MANDATORY Einzelflaeche;
+      !! Beschreibung der Geologie 
+      Beschr_Geologie : MANDATORY MTEXT*255;  
+      Form : MANDATORY AspektForm;
+      Volumen : MANDATORY 0 .. 999999999 [Units.m3];
+    END PQ_Jaehrlichkeit_BergFelssturz;
+
     CLASS PQ_Jaehrlichkeit_Rutsch_Mure_Base (ABSTRACT) = 
       Jaehrlichkeit : MANDATORY Jaehrlichkeit;
       Polygon : MANDATORY Einzelflaeche;
@@ -636,6 +645,11 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Prozessquelle_R -<> {1} Prozessquelle;
     END PQ_Jaehrlichkeit_Hangmure__Prozessquelle;
 
+    ASSOCIATION PQ_Jaehrlichkeit_BergFelssturz__Prozessquelle =
+      PQ_Jaehrlichkeit_BergFelssturz_R -- {0..*} PQ_Jaehrlichkeit_BergFelssturz;
+      Prozessquelle_R -<> {1} Prozessquelle;
+    END PQ_Jaehrlichkeit_BergFelssturz__Prozessquelle;
+
     ASSOCIATION PQ_Jaehrlichkeit_SteinBlockschlag__BefundSteinBlockschlag =
       BefundSteinBlockschlag_R -- {1..*} BefundSteinBlockschlag;
       PQ_Jaehrlichkeit_SteinBlockschlag_R -- {1} PQ_Jaehrlichkeit_SteinBlockschlag;
@@ -650,6 +664,11 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       BefundHangmure_R -- {1..*} BefundHangmure;
       PQ_Jaehrlichkeit_Hangmure_R -- {1} PQ_Jaehrlichkeit_Hangmure;
     END PQ_Jaehrlichkeit_Hangmure__BefundHangmure;
+
+    ASSOCIATION PQ_Jaehrlichkeit_BergFelssturz__BefundBergFelssturz =
+      BefundBergFelssturz_R -- {1..*} BefundBergFelssturz;
+      PQ_Jaehrlichkeit_BergFelssturz_R -- {1} PQ_Jaehrlichkeit_BergFelssturz;
+    END PQ_Jaehrlichkeit_BergFelssturz__BefundBergFelssturz;
 
     ASSOCIATION Prozessquelle__Befund_TextPQ =
       Befund_TextPQ_R -- {0..*} Befund_TextPQ;
@@ -685,27 +704,16 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_300) OR (IWCode == #blau_mittel_300)) OR (PQ_Jaehrlichkeit_SteinBlockschlag_R->Jaehrlichkeit == 300);
       !!@ name = "CheckBefundIm AbklPerimeter"
       !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters!"  
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.IsInside(PQ_Jaehrlichkeit_SteinBlockschlag_R->Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R->Geometrie, THIS, "Geometrie");    
+      !!MANDATORY CONSTRAINT GeoW_FunctionsExt.IsInside(PQ_Jaehrlichkeit_SteinBlockschlag_R->Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R->Geometrie, THIS, "Geometrie");    
     END;
 
     CONSTRAINTS OF BefundBergFelssturz =
       !!@ name = "CheckBefundBergFelssturzHauptprozess"
       !!@ ilivalid.msg_de = "BefundBergFelssturz muss Hauptprozess>Sturz zugeordnet sein"
-      MANDATORY CONSTRAINT Prozessquelle_R->Teilauftrag_R->Hauptprozess == #Sturz;
+      MANDATORY CONSTRAINT PQ_Jaehrlichkeit_BergFelssturz_R->Prozessquelle_R->Teilauftrag_R->Hauptprozess == #Sturz;
       !!@ name = "BefundBergFelssturzKeineUeberragung"
       !!@ ilivalid.msg_de = "ungültige Überragung bei Befund mit gleichem IWCode und Prozessquelle!"
-      SET CONSTRAINT INTERLIS.areAreas(GeoW_FunctionsExt.GetInGroups(GeoW_FunctionsExt.GetInGroups(ALL, Prozessquelle_R), IWCode),UNDEFINED, >> Geometrie);
-    END;
-
-    CONSTRAINTS OF BefundEisschlag =
-      !!@ name = "CheckBefundBergEisschlagHauptprozess"
-      !!@ ilivalid.msg_de = "BefundEisschlag muss Hauptprozess>Sturz zugeordnet sein"
-      MANDATORY CONSTRAINT Prozessquelle_R->Teilauftrag_R->Hauptprozess == #Sturz;
-      !!@ name = "BefundEisschlagKeineUeberragung"
-      !!@ ilivalid.msg_de = "ungültige Überragung bei Befund mit gleichem IWCode und Prozessquelle!"
-      SET CONSTRAINT INTERLIS.areAreas(GeoW_FunctionsExt.GetInGroups(GeoW_FunctionsExt.GetInGroups(ALL, Prozessquelle_R), IWCode),UNDEFINED, >> Geometrie);
-      !!@ name = "CheckBefundEisschlagJaehrlichkeit"
-      !!@ ilivalid.msg_de = "Die Jaehrlichkeit stimmt nicht mit der Jaehrlichkeit der Prozessquelle überein!"
+      SET CONSTRAINT INTERLIS.areAreas(GeoW_FunctionsExt.GetInGroups(GeoW_FunctionsExt.GetInGroups(ALL, PQ_Jaehrlichkeit_BergFelssturz_R->Prozessquelle_R), IWCode),UNDEFINED, >> Geometrie);
     END;
 
     CONSTRAINTS OF BefundHangmure =
