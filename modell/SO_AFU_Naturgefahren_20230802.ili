@@ -155,9 +155,10 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Bemerkung : MTEXT*255;
       !!@ name = "CheckAbklperimeterFlaechenGroesse"
       !!@ ilivalid.msg_de = "Der Abklärungsperimeter muss grösser 100m2 sein!"  
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS,"Geometrie") > 100; 
+      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS,"Geometrie") > 100;
+      !!@ name = "CheckAbklperimeterInnerhalbSO"
       !!@ ilivalid.msg_de = "Der Abklärungsperimeter muss innerhalb des Kantons liegen!"  
-      !!MANDATORY CONSTRAINT GeoW_FunctionsExt.IsInside("swissBOUNDARIES3D_ili2_LV95_V1_3", "tbd" ,THIS, "Geometrie"); !!Constraint aus Kategorie "generisch"
+      MANDATORY CONSTRAINT GeoW_FunctionsExt.IsInsideExternalDatasetResource("ilivalidator-custom-functions-geometries-0.0.8.jar", "SO_Hoheitsgrenzen_Publikation_20170626.Hoheitsgrenzen.Kantonsgrenze", "c6db23e0-0536-4055-a50c-11d2d1e4c6ef" ,THIS, "Geometrie"); 
       !!@ name = "CheckAbklperimeterKeineLoecher"
       !!@ ilivalid.msg_de = "In der Abklärungsperimeter-Geometrie sind keine Löcher erlaubt!"    
       MANDATORY CONSTRAINT GeoW_FunctionsExt.GetInnerRingsCount(THIS,  "Geometrie") == 0; 
@@ -481,8 +482,6 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       !!@ name = "CheckBefundKeineLoecher"
       !!@ ilivalid.msg_de = "In der Befund-Geometrie sind keine Löcher erlaubt!"  
       MANDATORY CONSTRAINT GeoW_FunctionsExt.GetInnerRingsCount(THIS, "Geometrie") == 0; 
-      !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters!"  
-      !!MANDATORY CONSTRAINT GeoW_FunctionsExt.IsInside(THIS, "Geometrie", ">Befund>BefundProzessquelle>TeilauftragRaumbezug", "Geometrie"); !!Constraint aus Kategorie "generisch"
       !!@ name = "CheckBefundFlaechenGroesse"
       !!@ ilivalid.msg_de = "Der Befund muss grösser 100m2 sein!"  
       MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
@@ -683,7 +682,10 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       !!@ ilivalid.msg_de = "Die Jaehrlichkeit stimmt nicht mit der Jaehrlichkeit der Prozessquelle überein!"
       MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_30) OR (IWCode == #rot_mittel_30) OR (IWCode == #blau_schwach_30)) OR (PQ_Jaehrlichkeit_SteinBlockschlag_R->Jaehrlichkeit == 30);
       MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_100) OR (IWCode == #blau_mittel_100)) OR (PQ_Jaehrlichkeit_SteinBlockschlag_R->Jaehrlichkeit == 100);
-      MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_300) OR (IWCode == #blau_mittel_300)) OR (PQ_Jaehrlichkeit_SteinBlockschlag_R->Jaehrlichkeit == 300);    
+      MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_300) OR (IWCode == #blau_mittel_300)) OR (PQ_Jaehrlichkeit_SteinBlockschlag_R->Jaehrlichkeit == 300);
+      !!@ name = "CheckBefundIm AbklPerimeter"
+      !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters!"  
+      MANDATORY CONSTRAINT GeoW_FunctionsExt.IsInside(PQ_Jaehrlichkeit_SteinBlockschlag_R->Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R->Geometrie, THIS, "Geometrie");    
     END;
 
     CONSTRAINTS OF BefundBergFelssturz =
