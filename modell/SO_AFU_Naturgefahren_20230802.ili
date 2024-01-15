@@ -724,7 +724,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_30) OR (IWCode == #rot_mittel_30) OR (IWCode == #blau_schwach_30)) OR (PQ_Jaehrlichkeit_SteinBlockschlag_R->Jaehrlichkeit == 30);
       MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_100) OR (IWCode == #blau_mittel_100)) OR (PQ_Jaehrlichkeit_SteinBlockschlag_R->Jaehrlichkeit == 100);
       MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_300) OR (IWCode == #blau_mittel_300)) OR (PQ_Jaehrlichkeit_SteinBlockschlag_R->Jaehrlichkeit == 300);
-      !!@ name = "CheckBefundIm AbklPerimeter"
+      !!@ name = "CheckBefundImAbklPerimeter"
       !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters!"  
       MANDATORY CONSTRAINT NOT(GeoW_FunctionsExt.IsInside(THIS, "PQ_Jaehrlichkeit_SteinBlockschlag_R->Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R", "Geometrie"));    
     END;
