@@ -91,7 +91,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Bemerkung : MTEXT*255;
       !!@ name = "CheckAuftragEintrag"
       !!@ ilivalid.msg_de = "Die Klasse Auftrag bedingt mindestens 1 Eintrag!"  
-      MANDATORY CONSTRAINT INTERLIS.objectCount(THIS)==1;
+      SET CONSTRAINT INTERLIS.objectCount(THIS)>=1;
       !!@ name = "CheckAuftragKennungen"
       !!@ ilivalid.msg_de = "Es gibt mehrere identische Kennungen!"  
       UNIQUE Kennung;
