@@ -123,7 +123,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Jaehrlichkeit : Jaehrlichkeit;
       !!@ name = "CheckTeilauftragWasserKennwert"
       !!@ ilivalid.msg_de = "Bei einem Teilauftrag mit Hauptprozess 'Wasser' muessen Kennwerte geliefert werden!" 
-      MANDATORY CONSTRAINT (Hauptprozess != #Wasser) OR DEFINED(Wasserkennwerte);
+      MANDATORY CONSTRAINT (Hauptprozess != #Wasser) OR Wasserkennwerte;
     END Teilauftrag;
 
     /* 
