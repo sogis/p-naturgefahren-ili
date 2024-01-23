@@ -694,7 +694,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     
       !!@ name = "CheckWasserkennwerte"  
       !!@ ilivalid.msg_de = "Es muss mindestens ein Objekt jeder Kennwert-Klasse verknuepft sein, da Wasserkennwerte auf TRUE gesetzt ist."
-      MANDATORY CONSTRAINT Prozessquelle_R->Teilauftrag_R->Wasserkennwerte AND INTERLIS.objectCount(Befund_TextPQ_R) >= 1
+      MANDATORY CONSTRAINT Prozessquelle_R->Teilauftrag_R->Wasserkennwerte AND INTERLIS.objectCount(Befund_TextPQ_R) >= 1;
 
     END Prozessquelle__Befund_TextPQ;
 
@@ -720,13 +720,13 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       !!@ name = "CheckBefundSteinBlockschlagKeineUeberragung"
       !!@ ilivalid.msg_de = "ungueltige Ueberragung bei Befund mit gleichem IWCode und Prozessquelle!"
       SET CONSTRAINT INTERLIS.areAreas(GeoW_FunctionsExt.GetInGroups(GeoW_FunctionsExt.GetInGroups(ALL, "PQ_Jaehrlichkeit_SteinBlockschlag_R->Prozessquelle_R"), "IWCode"),UNDEFINED, >> Geometrie);
-      !!@ name = "CheckBefundSteinBlockschlagJaehrlichkeit-1"
+      !!@ name = "CheckBefundSteinBlockschlagJaehrlichkeit-30"
       !!@ ilivalid.msg_de = "Die Jaehrlichkeit stimmt nicht mit der Jaehrlichkeit der Prozessquelle ueberein!"
       MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_30) OR (IWCode == #rot_mittel_30) OR (IWCode == #blau_schwach_30)) OR (PQ_Jaehrlichkeit_SteinBlockschlag_R->Jaehrlichkeit == 30);
-      !!@ name = "CheckBefundSteinBlockschlagJaehrlichkeit-2"
+      !!@ name = "CheckBefundSteinBlockschlagJaehrlichkeit-100"
       !!@ ilivalid.msg_de = "Die Jaehrlichkeit stimmt nicht mit der Jaehrlichkeit der Prozessquelle ueberein!"
       MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_100) OR (IWCode == #blau_mittel_100)) OR (PQ_Jaehrlichkeit_SteinBlockschlag_R->Jaehrlichkeit == 100);
-      !!@ name = "CheckBefundSteinBlockschlagJaehrlichkeit-3"
+      !!@ name = "CheckBefundSteinBlockschlagJaehrlichkeit-300"
       !!@ ilivalid.msg_de = "Die Jaehrlichkeit stimmt nicht mit der Jaehrlichkeit der Prozessquelle ueberein!"
       MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_300) OR (IWCode == #blau_mittel_300)) OR (PQ_Jaehrlichkeit_SteinBlockschlag_R->Jaehrlichkeit == 300);
       !!@ name = "CheckBefundSteinBlockschlagImAbklPerimeter"
@@ -753,13 +753,13 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       !!@ name = "BefundHangmureKeineUeberragung"
       !!@ ilivalid.msg_de = "ungueltige Ueberragung bei Befund mit gleichem IWCode und Prozessquelle!" 
       SET CONSTRAINT INTERLIS.areAreas(GeoW_FunctionsExt.GetInGroups(GeoW_FunctionsExt.GetInGroups(ALL, "PQ_Jaehrlichkeit_Hangmure_R->Prozessquelle_R"), "IWCode"),UNDEFINED, >> Geometrie);
-      !!@ name = "CheckBefundHangmureJaehrlichkeit-1"
+      !!@ name = "CheckBefundHangmureJaehrlichkeit-30"
       !!@ ilivalid.msg_de = "Die Jaehrlichkeit stimmt nicht mit der Jaehrlichkeit der Prozessquelle ueberein!"
       MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_30) OR (IWCode == #rot_mittel_30) OR (IWCode == #blau_schwach_30)) OR (PQ_Jaehrlichkeit_Hangmure_R->Jaehrlichkeit == 30);
-      !!@ name = "CheckBefundHangmureJaehrlichkeit-2"
+      !!@ name = "CheckBefundHangmureJaehrlichkeit-100"
       !!@ ilivalid.msg_de = "Die Jaehrlichkeit stimmt nicht mit der Jaehrlichkeit der Prozessquelle ueberein!"
       MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_100) OR (IWCode == #blau_mittel_100)) OR (PQ_Jaehrlichkeit_Hangmure_R->Jaehrlichkeit == 100);
-      !!@ name = "CheckBefundHangmureJaehrlichkeit-3"
+      !!@ name = "CheckBefundHangmureJaehrlichkeit-300"
       !!@ ilivalid.msg_de = "Die Jaehrlichkeit stimmt nicht mit der Jaehrlichkeit der Prozessquelle ueberein!"
       MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_300) OR (IWCode == #blau_mittel_300)) OR (PQ_Jaehrlichkeit_Hangmure_R->Jaehrlichkeit == 300); 
       !!@ name = "CheckBefundHangmureImAbklPerimeter"
@@ -816,13 +816,13 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       !!@ name = "CheckBefundSpontaneRutschungKeineUeberragung"
       !!@ ilivalid.msg_de = "ungueltige Ueberragung bei Befund mit gleichem IWCode und Prozessquelle!"  
       SET CONSTRAINT INTERLIS.areAreas(GeoW_FunctionsExt.GetInGroups(GeoW_FunctionsExt.GetInGroups(ALL, "PQ_Jaehrlichkeit_SpontaneRutschung_R->Prozessquelle_R"), "IWCode"),UNDEFINED, >> Geometrie);
-      !!@ name = "CheckBefundSpontaneRutschungJaehrlichkeit-1"
+      !!@ name = "CheckBefundSpontaneRutschungJaehrlichkeit-30"
       !!@ ilivalid.msg_de = "Die Jaehrlichkeit stimmt nicht mit der Jaehrlichkeit der Prozessquelle ueberein!"
       MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_30) OR (IWCode == #rot_mittel_30) OR (IWCode == #blau_schwach_30)) OR (PQ_Jaehrlichkeit_SpontaneRutschung_R->Jaehrlichkeit == 30);
-      !!@ name = "CheckBefundSpontaneRutschungJaehrlichkeit-2"
+      !!@ name = "CheckBefundSpontaneRutschungJaehrlichkeit-100"
       !!@ ilivalid.msg_de = "Die Jaehrlichkeit stimmt nicht mit der Jaehrlichkeit der Prozessquelle ueberein!"
       MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_100) OR (IWCode == #blau_mittel_100)) OR (PQ_Jaehrlichkeit_SpontaneRutschung_R->Jaehrlichkeit == 100);
-      !!@ name = "CheckBefundSpontaneRutschungJaehrlichkeit-3"
+      !!@ name = "CheckBefundSpontaneRutschungJaehrlichkeit-300"
       !!@ ilivalid.msg_de = "Die Jaehrlichkeit stimmt nicht mit der Jaehrlichkeit der Prozessquelle ueberein!"
       MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_300) OR (IWCode == #blau_mittel_300)) OR (PQ_Jaehrlichkeit_SpontaneRutschung_R->Jaehrlichkeit == 300); 
       !!@ name = "CheckBefundSpontaneRutschungImAbklPerimeter"
