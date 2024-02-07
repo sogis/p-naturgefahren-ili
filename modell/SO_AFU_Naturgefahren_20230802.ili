@@ -158,8 +158,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS,"Geometrie") > 100;
       !!@ name = "CheckAbklperimeterInnerhalbSO"
       !!@ ilivalid.msg_de = "Der Abklärungsperimeter muss innerhalb des Kantons liegen!"  
-      !!MANDATORY CONSTRAINT GeoW_FunctionsExt.IsInsideExternalDatasetResource("ch.so.agi.av.hoheitsgrenzen.xtf", "SO_Hoheitsgrenzen_Publikation_20170626.Hoheitsgrenzen.Kantonsgrenze", "c6db23e0-0536-4055-a50c-11d2d1e4c6ef" ,THIS, "Geometrie");
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.IsInsideExternalDataset("SO_Hoheitsgrenzen_Publikation_20170626.Hoheitsgrenzen.Kantonsgrenze.Geometrie", "c6db23e0-0536-4055-a50c-11d2d1e4c6ef" ,THIS, "Geometrie"); 
+      MANDATORY CONSTRAINT GeoW_FunctionsExt.IsInsideExternalDatasetResource("ch.so.agi.av.hoheitsgrenzen.xtf", "SO_Hoheitsgrenzen_Publikation_20170626.Hoheitsgrenzen.Kantonsgrenze", "c6db23e0-0536-4055-a50c-11d2d1e4c6ef" ,THIS, "Geometrie");
       !!@ name = "CheckAbklperimeterKeineLoecher"
       !!@ ilivalid.msg_de = "In der Abklärungsperimeter-Geometrie sind keine Loecher erlaubt!"    
       MANDATORY CONSTRAINT GeoW_FunctionsExt.GetInnerRingsCount(THIS,  "Geometrie") == 0; 
