@@ -714,7 +714,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     END Prozessquelle__Fliessrichtungspfeil;
 
     CONSTRAINTS OF BefundSteinBlockschlag =
-      !!@ name = "CheckFliessrichtungspfeilHauptprozess"
+      !!@ name = "CheckBefundSteinBlockschlagHauptprozess"
       !!@ ilivalid.msg_de = "BefundSteinBlockschlag muss Hauptprozess>Sturz zugeordnet sein"
       MANDATORY CONSTRAINT PQ_Jaehrlichkeit_SteinBlockschlag_R->Prozessquelle_R->Teilauftrag_R->Hauptprozess == #Sturz;
       !!@ name = "CheckBefundSteinBlockschlagKeineUeberragung"
@@ -738,7 +738,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       !!@ name = "CheckBefundBergFelssturzHauptprozess"
       !!@ ilivalid.msg_de = "BefundBergFelssturz muss Hauptprozess>Sturz zugeordnet sein"
       MANDATORY CONSTRAINT PQ_Jaehrlichkeit_BergFelssturz_R->Prozessquelle_R->Teilauftrag_R->Hauptprozess == #Sturz;
-      !!@ name = "BefundBergFelssturzKeineUeberragung"
+      !!@ name = "CheckBefundBergFelssturzKeineUeberragung"
       !!@ ilivalid.msg_de = "ungueltige Ueberragung bei Befund mit gleichem IWCode und Prozessquelle!"
       SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCodeEnum(GeoW_FunctionsExt.GetInGroups(ALL, "PQ_Jaehrlichkeit_BergFelssturz_R->Prozessquelle_R"), "Geometrie" ,"IWCode");
       !!@ name = "CheckBefundBergFelssturzImAbklPerimeter"
@@ -750,7 +750,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       !!@ name = "CheckBefundHangmureHauptprozess"
       !!@ ilivalid.msg_de = "BefundHangmure muss Hauptprozess>Rutschung zugeordnet sein"
       MANDATORY CONSTRAINT PQ_Jaehrlichkeit_Hangmure_R->Prozessquelle_R->Teilauftrag_R->Hauptprozess == #Rutschung;
-      !!@ name = "BefundHangmureKeineUeberragung"
+      !!@ name = "CheckBefundHangmureKeineUeberragung"
       !!@ ilivalid.msg_de = "ungueltige Ueberragung bei Befund mit gleichem IWCode und Prozessquelle!" 
       SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCodeEnum (GeoW_FunctionsExt.GetInGroups(ALL, "PQ_Jaehrlichkeit_Hangmure_R->Prozessquelle_R"), "Geometrie" ,"IWCode");
       !!@ name = "CheckBefundHangmureJaehrlichkeit-30"
