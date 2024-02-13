@@ -503,8 +503,8 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       !!@ ilivalid.msg_de = "In der Befund-Geometrie sind keine Loecher erlaubt!"  
       MANDATORY CONSTRAINT GeoW_FunctionsExt.GetInnerRingsCount(THIS, "Geometrie") == 0; 
       !!@ name = "CheckBefundFlaechenGroesse"
-      !!@ ilivalid.msg_de = "Der Befund muss groesser als 100m2 sein!"  
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 100;
+      !!@ ilivalid.msg_de = "Der Befund muss groesser als 5m2 sein!"  
+      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;
     END Befund_Basis;
 
     /* Basisklasse fuer alle direkt der geometrielosen Prozessquelle zugewiesenen Befunde */
