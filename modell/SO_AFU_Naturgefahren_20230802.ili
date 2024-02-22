@@ -711,7 +711,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       MANDATORY CONSTRAINT PQ_Jaehrlichkeit_SteinBlockschlag_R->Prozessquelle_R->Teilauftrag_R->Hauptprozess == #Sturz;
       !!@ name = "CheckBefundSteinBlockschlagKeineUeberragung"
       !!@ ilivalid.msg_de = "Ungültiger Überstand bei Befund mit gleichem IWCode und Prozessquelle."
-      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCodeEnum(GeoW_FunctionsExt.GetInGroups(ALL, "PQ_Jaehrlichkeit_SteinBlockschlag_R->Prozessquelle_R"), "Geometrie" ,"IWCode");
+      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCode(GeoW_FunctionsExt.GetInGroups(ALL, "PQ_Jaehrlichkeit_SteinBlockschlag_R->Prozessquelle_R"), "Geometrie" ,"IWCode");
       !!@ name = "CheckBefundSteinBlockschlagJaehrlichkeit-30"
       !!@ ilivalid.msg_de = "Die Jährlichkeit stimmt nicht mit der Jährlichkeit der Prozessquelle überein."
       MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_30) OR (IWCode == #rot_mittel_30) OR (IWCode == #blau_schwach_30)) OR (PQ_Jaehrlichkeit_SteinBlockschlag_R->Jaehrlichkeit == 30);
@@ -738,7 +738,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       MANDATORY CONSTRAINT PQ_Jaehrlichkeit_BergFelssturz_R->Prozessquelle_R->Teilauftrag_R->Hauptprozess == #Sturz;
       !!@ name = "CheckBefundBergFelssturzKeineUeberragung"
       !!@ ilivalid.msg_de = "Ungültiger Überstand bei Befund mit gleichem IWCode und Prozessquelle."
-      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCodeEnum(GeoW_FunctionsExt.GetInGroups(ALL, "PQ_Jaehrlichkeit_BergFelssturz_R->Prozessquelle_R"), "Geometrie" ,"IWCode");
+      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCode(GeoW_FunctionsExt.GetInGroups(ALL, "PQ_Jaehrlichkeit_BergFelssturz_R->Prozessquelle_R"), "Geometrie" ,"IWCode");
       !!@ name = "CheckBefundBergFelssturzImAbklPerimeter"
       !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters."  
       MANDATORY CONSTRAINT (GeoW_FunctionsExt.IsInside(GeoW_FunctionsExt.Union(PQ_Jaehrlichkeit_BergFelssturz_R->Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R, "Geometrie"), THIS, "Geometrie")); 
@@ -756,7 +756,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       MANDATORY CONSTRAINT PQ_Jaehrlichkeit_Hangmure_R->Prozessquelle_R->Teilauftrag_R->Hauptprozess == #Rutschung;
       !!@ name = "CheckBefundHangmureKeineUeberragung"
       !!@ ilivalid.msg_de = "Ungültiger Überstand bei Befund mit gleichem IWCode und Prozessquelle." 
-      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCodeEnum (GeoW_FunctionsExt.GetInGroups(ALL, "PQ_Jaehrlichkeit_Hangmure_R->Prozessquelle_R"), "Geometrie" ,"IWCode");
+      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCode (GeoW_FunctionsExt.GetInGroups(ALL, "PQ_Jaehrlichkeit_Hangmure_R->Prozessquelle_R"), "Geometrie" ,"IWCode");
       !!@ name = "CheckBefundHangmureJaehrlichkeit-30"
       !!@ ilivalid.msg_de = "Die Jährlichkeit stimmt nicht mit der Jährlichkeit der Prozessquelle überein."
       MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_30) OR (IWCode == #rot_mittel_30) OR (IWCode == #blau_schwach_30)) OR (PQ_Jaehrlichkeit_Hangmure_R->Jaehrlichkeit == 30);
@@ -792,7 +792,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       MANDATORY CONSTRAINT Prozessquelle_R->Teilauftrag_R->Hauptprozess == #Absenkung_Einsturz;
       !!@ name = "CheckBefundAbsenkungKeineUeberragung"
       !!@ ilivalid.msg_de = "Ungültiger Überstand bei Befund mit gleichem IWCode und Prozessquelle."
-      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCodeEnum(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"IWCode");
+      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCode(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"IWCode");
       !!@ name = "CheckBefundAbsenkungImAbklPerimeter"
       !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters."  
       MANDATORY CONSTRAINT (GeoW_FunctionsExt.IsInside(GeoW_FunctionsExt.Union(Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R, "Geometrie"), THIS, "Geometrie"));
@@ -810,7 +810,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       MANDATORY CONSTRAINT Prozessquelle_R->Teilauftrag_R->Hauptprozess == #Absenkung_Einsturz;
       !!@ name = "CheckBefundEinsturzKeineUeberragung"
       !!@ ilivalid.msg_de = "Ungültiger Überstand bei Befund mit gleichem IWCode und Prozessquelle."  
-      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCodeEnum(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"IWCode");
+      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCode(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"IWCode");
       !!@ name = "CheckBefundEinsturzImAbklPerimeter"
       !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters."  
       MANDATORY CONSTRAINT (GeoW_FunctionsExt.IsInside(GeoW_FunctionsExt.Union(Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R, "Geometrie"), THIS, "Geometrie")); 
@@ -843,7 +843,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       MANDATORY CONSTRAINT PQ_Jaehrlichkeit_SpontaneRutschung_R->Prozessquelle_R->Teilauftrag_R->Hauptprozess == #Rutschung;
       !!@ name = "CheckBefundSpontaneRutschungKeineUeberragung"
       !!@ ilivalid.msg_de = "Ungültiger Überstand bei Befund mit gleichem IWCode und Prozessquelle."  
-      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCodeEnum(GeoW_FunctionsExt.GetInGroups(ALL, "PQ_Jaehrlichkeit_SpontaneRutschung_R->Prozessquelle_R"), "Geometrie" ,"IWCode");
+      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCode(GeoW_FunctionsExt.GetInGroups(ALL, "PQ_Jaehrlichkeit_SpontaneRutschung_R->Prozessquelle_R"), "Geometrie" ,"IWCode");
       !!@ name = "CheckBefundSpontaneRutschungJaehrlichkeit-30"
       !!@ ilivalid.msg_de = "Die Jährlichkeit stimmt nicht mit der Jährlichkeit der Prozessquelle überein."
       MANDATORY CONSTRAINT NOT((IWCode == #rot_stark_30) OR (IWCode == #rot_mittel_30) OR (IWCode == #blau_schwach_30)) OR (PQ_Jaehrlichkeit_SpontaneRutschung_R->Jaehrlichkeit == 30);
@@ -864,7 +864,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       MANDATORY CONSTRAINT Prozessquelle_R->Teilauftrag_R->Hauptprozess == #Wasser;
       !!@ name = "CheckBefundUebermurungKeineUeberragung"
       !!@ ilivalid.msg_de = "Ungültiger Überstand bei Befund mit gleichem IWCode und Prozessquelle."  
-      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCodeEnum(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"IWCode");
+      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCode(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"IWCode");
       !!@ name = "CheckBefundUebermurungImAbklPerimeter"
       !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters."  
       MANDATORY CONSTRAINT (GeoW_FunctionsExt.IsInside(GeoW_FunctionsExt.Union(Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R, "Geometrie"), THIS, "Geometrie"));
@@ -882,7 +882,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       MANDATORY CONSTRAINT Prozessquelle_R->Teilauftrag_R->Hauptprozess == #Wasser;
       !!@ name = "CheckBefundUeberschwemmungDynamischKeineUeberragung"
       !!@ ilivalid.msg_de = "Ungültiger Überstand bei Befund mit gleichem IWCode und Prozessquelle."  
-      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCodeEnum(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"IWCode");
+      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCode(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"IWCode");
       !!@ name = "CheckBefundUeberschwemmungDynamischImAbklPerimeter"
       !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters."  
       MANDATORY CONSTRAINT (GeoW_FunctionsExt.IsInside(GeoW_FunctionsExt.Union(Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R, "Geometrie"), THIS, "Geometrie"));
@@ -900,7 +900,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       MANDATORY CONSTRAINT Prozessquelle_R->Teilauftrag_R->Hauptprozess == #Wasser;
       !!@ name = "CheckBefundUeberschwemmungStatischKeineUeberragung"
       !!@ ilivalid.msg_de = "Ungültiger Überstand bei Befund mit gleichem IWCode und Prozessquelle."    
-      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCodeEnum(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"IWCode");
+      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCode(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"IWCode");
       !!@ name = "CheckBefundUeberschwemmungStatischImAbklPerimeter"
       !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters."  
       MANDATORY CONSTRAINT (GeoW_FunctionsExt.IsInside(GeoW_FunctionsExt.Union(Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R, "Geometrie"), THIS, "Geometrie"));
@@ -922,15 +922,18 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       !!@ name = "CheckBefundJaehrlichkeitImAbklPerimeter"
       !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters."  
       MANDATORY CONSTRAINT (GeoW_FunctionsExt.IsInside(GeoW_FunctionsExt.Union(Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R, "Geometrie"), THIS, "Geometrie"));
+      !!@ name = "CheckBefundJaehrlichkeitKeineUeberragung"  
+      !!@ ilivalid.msg_de = "ungueltige Ueberragung bei Befund mit gleicher Jaehrlichkeit und Prozessquelle!"
+      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCode(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"Jaehrlichkeit");
     END;
 
     CONSTRAINTS OF KennwertUeberschwemmungFliesstiefe =
       !!@ name = "CheckKennwertUeberschwemmungFliesstiefeKeineUeberragungH"  
       !!@ ilivalid.msg_de = "Ungültiger Überstand bei Befund mit gleicher Fliesstiefe und Prozessquelle." 
-      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCodeEnum(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"h");
+      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCode(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"h");
       !!@ name = "CheckKennwertUeberschwemmungFliesstiefeKeineUeberragungJaehrlichkeit"  
       !!@ ilivalid.msg_de = "Ungültiger Überstand bei Befund mit gleicher Jährlichkeit und Prozessquelle."  
-      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCodeEnum(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"Jaehrlichkeit");
+      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCode(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"Jaehrlichkeit");
       !!@ name = "KennwertUeberschwemmungFliesstiefeFlaechenGroesse"
       !!@ ilivalid.msg_de = "Der Befund muss grösser als 5m2 sein."  
       MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;  
@@ -939,7 +942,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     CONSTRAINTS OF KennwertUeberschwemmungFliessgeschwindigkeit =
       !!@ name = "CheckKennwertUeberschwemmungFliessgeschwindigkeitKeineUeberragungH" 
       !!@ ilivalid.msg_de = "Ungültiger Überstand bei Befund mit gleicher Jährlichkeit und Prozessquelle."
-      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCodeEnum(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"Jaehrlichkeit");
+      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCode(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"Jaehrlichkeit");
       !!@ name = "KennwertUeberschwemmungFliessgeschwindigkeitFlaechenGroesse"
       !!@ ilivalid.msg_de = "Der Befund muss grösser als 5m2 sein."  
       MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5; 
@@ -948,10 +951,10 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     CONSTRAINTS OF KennwertUebermurungFliesstiefe =
       !!@ name = "CheckKennwertUebermurungFliesstiefeKeineUeberragungH" 
       !!@ ilivalid.msg_de = "Ungültiger Überstand bei Befund mit gleicher Fliesstiefe und Prozessquelle." 
-      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCodeEnum(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"h");
+      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCode(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"h");
       !!@ name = "CheckKennwertUebermurungFliesstiefeKeineUeberragungJaehrlichkeit"  
       !!@ ilivalid.msg_de = "Ungültiger Überstand bei Befund mit gleicher Jährlichkeit und Prozessquelle."  
-      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCodeEnum(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"Jaehrlichkeit");
+      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCode(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"Jaehrlichkeit");
       !!@ name = "KennwertUebermurungFliesstiefeFlaechenGroesse"
       !!@ ilivalid.msg_de = "Der Befund muss grösser als 5m2 sein."  
       MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5; 
@@ -960,7 +963,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     CONSTRAINTS OF KennwertUebermurungFliessgeschwindigkeit =
       !!@ name = "CheckKennwertUebermurungFliessgeschwindigkeitKeineUeberragungH" 
       !!@ ilivalid.msg_de = "Ungültiger Überstand bei Befund mit gleicher Jährlichkeit und Prozessquelle."   
-      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCodeEnum(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"Jaehrlichkeit");
+      SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCode(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"Jaehrlichkeit");
       !!@ name = "KennwertUebermurungFliessgeschwindigkeitFlaechenGroesse"
       !!@ ilivalid.msg_de = "Der Befund muss grösser als 5m2 sein."  
       MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5; 
