@@ -11,12 +11,12 @@ INTERLIS 2.3;
                        Constraints deklarativ eingefuegt
   2022-11-30 | jek   | Modellname mit _Pilot_ ergänzt, Datum aktualisiert.
   2023-08-02 | jek   | Anpassungen gemäss Erkenntnissen aus Pilot Himmelried.
-  2024-02-20 | GeoW  | Komplettierung Constraints, JaehrlichkeitListe neu geordnet 
+  2024-02-26 | GeoW  | Komplettierung Constraints, JaehrlichkeitListe neu geordnet 
  ==============================================================================
 */
 !!@ technicalContact=mailto:agi@bd.so.ch
 MODEL SO_AFU_Naturgefahren_20230802 (de) 
-  AT "http://geo.so.ch/models/AFU" VERSION "2024-02-20" =
+  AT "http://geo.so.ch/models/AFU" VERSION "2024-02-26" =
 
   IMPORTS UNQUALIFIED Units, Time, CoordSys;
   IMPORTS GeometryCHLV95_V1;
@@ -159,7 +159,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS,"Geometrie") > 100;
       !!@ name = "CheckAbklperimeterInnerhalbSO"
       !!@ ilivalid.msg_de = "Der Abklärungsperimeter muss innerhalb des Kantons liegen."  
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.IsInsideExternalDatasetResource("ch.so.agi.av.hoheitsgrenzen.xtf", "SO_Hoheitsgrenzen_Publikation_20170626.Hoheitsgrenzen.Kantonsgrenze", "c6db23e0-0536-4055-a50c-11d2d1e4c6ef" ,THIS, "Geometrie");
+      MANDATORY CONSTRAINT GeoW_FunctionsExt.IsInsideExternalXtfResource("ch.so.agi.av.hoheitsgrenzen.xtf", "SO_Hoheitsgrenzen_Publikation_20170626.Hoheitsgrenzen.Kantonsgrenze", "c6db23e0-0536-4055-a50c-11d2d1e4c6ef" ,THIS, "Geometrie");
       !!@ name = "CheckAbklperimeterKeineLoecher"
       !!@ ilivalid.msg_de = "In der Abklärungsperimeter-Geometrie sind keine Löcher erlaubt."    
       MANDATORY CONSTRAINT GeoW_FunctionsExt.GetInnerRingsCount(THIS,  "Geometrie") == 0; 
