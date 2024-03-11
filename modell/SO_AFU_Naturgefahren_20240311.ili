@@ -5,19 +5,19 @@ INTERLIS 2.3;
   Version    | wer   | Aenderung
  ------------------------------------------------------------------------------
   2022-01-01 | geo7  | Erstellung Fachmodell
-  2022-07-31 | GeoW  | Review und Optimierung fuer QGIS-Einsatz 
-  2022-09-22 | GeoW  | OID Deklaration Teilauftraege ergänzt, Constraints: Methodennamen korrigiert
+  2022-07-31 | GeoW  | Review und Optimierung für QGIS-Einsatz 
+  2022-09-22 | GeoW  | OID Deklaration Teilaufträge ergänzt, Constraints: Methodennamen korrigiert
   2022-11-24 | GeoW  | OID in TeilauftragRaumbezug auf ANYOID gesetzt, Kommentare bereinigt, 
-                       Constraints deklarativ eingefuegt
+                       Constraints deklarativ eingefügt
   2022-11-30 | jek   | Modellname mit _Pilot_ ergänzt, Datum aktualisiert.
   2023-08-02 | jek   | Anpassungen gemäss Erkenntnissen aus Pilot Himmelried.
-  2024-02-26 | GeoW  | Komplettierung Constraints, JaehrlichkeitListe neu geordnet 
-  2024-03-05 | jek   | Vereinheitlichung auf Mehrzeilen-Kommentare
+  2024-02-26 | GeoW  | Komplettierung Constraints, JährlichkeitListe neu geordnet 
+  2024-03-11 | jek   | Views für Area-Bedingungen (Pendent), Mehrzeilen-Kommentare
  ==============================================================================
 */
 !!@ technicalContact=mailto:agi@bd.so.ch
-MODEL SO_AFU_Naturgefahren_20230802 (de) 
-  AT "http://geo.so.ch/models/AFU" VERSION "2024-02-26" =
+MODEL SO_AFU_Naturgefahren_20240311 (de) 
+  AT "http://geo.so.ch/models/AFU" VERSION "2024-03-11" =
 
   IMPORTS UNQUALIFIED Units, Time, CoordSys;
   IMPORTS GeometryCHLV95_V1;
@@ -32,15 +32,15 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
 
     /** Beschreibung des Auftrags. Hier wird definiert,
       - wer bestellt (Auftraggeber, z.B. Kanton)
-      - bei wem (Auftragnehmer =  Buero)
-      - fuer welches Gebiet (hier nur: Abklaerungsperimeter, Prozessquelle wird unter Befunde definiert)
-      - welche Produkte (Nachfuehrung, GKnM, etc.)
-      - welche Teilprozesse und Szenarien (Grundszenarien, freie Jaehrlichkeiten, etc.)
-      Der Auftragnehmer muss am Ende des Auftrages im Abklaerungsperimeter deklarieren, bis zu welchem Grad die Beurteilung vorgenommen wurde. */
+      - bei wem (Auftragnehmer =  Büro)
+      - für welches Gebiet (hier nur: Abklärungsperimeter, Prozessquelle wird unter Befunde definiert)
+      - welche Produkte (Nachführung, GKnM, etc.)
+      - welche Teilprozesse und Szenarien (Grundszenarien, freie Jährlichkeiten, etc.)
+      Der Auftragnehmer muss am Ende des Auftrages im Abklärungsperimeter deklarieren, bis zu welchem Grad die Beurteilung vorgenommen wurde. */
     TOPIC Auftraege =
 
     DOMAIN
-      /** Werte fuer Deklaration der Beurteilung */
+      /** Werte für Deklaration der Beurteilung */
       Beurteilungsart = (
         nicht_beurteilt,
         beurteilung_nicht_noetig,
@@ -50,7 +50,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         beurteilt_und_in_abklaerung
       ) ORDERED;
 
-      /** Wertebereiche fuer Prozessquellenbeschreibung Hauptprozesse */
+      /** Wertebereiche für Prozessquellenbeschreibung Hauptprozesse */
       Hauptprozess = (
         Wasser,
         Rutschung,
@@ -58,7 +58,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         Absenkung_Einsturz
       );
 
-      /** Wertebereich fuer Teilprozesse der Hauptprozesse Rutsch und Sturz */
+      /** Wertebereich für Teilprozesse der Hauptprozesse Rutsch und Sturz */
       TeilprozessRutschSturz = (
         spontane_Rutschung,
         Hangmure,
@@ -66,18 +66,18 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         Fels_Bergsturz
       );
 
-      /** Art der Nachfuehrung der Gefahrenkarte */
+      /** Art der Nachführung der Gefahrenkarte */
       Deklaration = (
         Nachfuehrung,
         Beurteilung_nach_Massnahmen,
         Neubeurteilung
       ) ORDERED;
 
-    /** Auftragnehmer, Buero welches fuer Auftrag/Befund verantwortlich ist */
+    /** Auftragnehmer, Büro welches für Auftrag/Befund verantwortlich ist */
     CLASS Autor =
-      /** Name des Bueros */
+      /** Name des Büros */
       Buero : MANDATORY TEXT*80;
-      /** Standort des Bueros/Filiale, welche den Auftrag abwickelt  */
+      /** Standort des Büros/Filiale, welche den Auftrag abwickelt  */
       Filiale : MANDATORY TEXT*80;
     END Autor;
 
@@ -108,7 +108,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
 
     /** 
       Mit dem Teilauftrag wird der entsprechende Hauptprozess einwirkungs- oder prozessquellenorientiert beurteilt.
-      Ein einwirkungsorientierter Teilauftrag beurteilt alle fuer den Einwirkungsraum relevanten Prozessquellen.
+      Ein einwirkungsorientierter Teilauftrag beurteilt alle für den Einwirkungsraum relevanten Prozessquellen.
       Die prozessquellenorientierte Beurteilung benennt explizit die zu beurteilenden Prozessquellen. Diese "alten"  
       Prozessquellen werden beim Datenabgleich automatisch durch die neu beurteilten ersetzt.
     */
@@ -116,27 +116,27 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       /** Im Teilauftrag abgeklärter Hauptprozess. Abgeklärte Teilprozesse siehe Abklärungsperimeter. */
       Hauptprozess : MANDATORY Hauptprozess;
       Bemerkung : MTEXT*255;
-      /** Abklaerungsperimeter = Perimeter, welcher untersucht werden soll */
+      /** Abklärungsperimeter = Perimeter, welcher untersucht werden soll */
       Name : MANDATORY TEXT*80;
-      /** True, falls fuer Wasser-Teilauftrag die Kennwerte gemäss Modell geliefert werden. */
+      /** True, falls für Wasser-Teilauftrag die Kennwerte gemäss Modell geliefert werden. */
       Wasserkennwerte: MANDATORY BOOLEAN;
-      /** Fuer Ausnahmefall der Abklärung einer freien Jährlichkeit mittels Klasse BefundeJaehrlichkeit ist hier
+      /** Für Ausnahmefall der Abklärung einer freien Jährlichkeit mittels Klasse BefundeJaehrlichkeit ist hier
       die abzuklärende Jährlichkeit gesetzt. Im Normallfall NULL. */
       Jaehrlichkeit : Jaehrlichkeit;
       !!@ name = "CheckTeilauftragWasserKennwert"
-      !!@ ilivalid.msg_de = "Bei einem Teilauftrag mit Hauptprozess 'Wasser' muessen Kennwerte geliefert werden." 
+      !!@ ilivalid.msg_de = "Bei einem Teilauftrag mit Hauptprozess 'Wasser' müssen Kennwerte geliefert werden." 
       MANDATORY CONSTRAINT (Hauptprozess != #Wasser) OR Wasserkennwerte;
     END Teilauftrag;
 
     /** 
-    1-n Perimeter, fuer welche die Einwirkungen der Teilprozesse gemäss Beurteilungsart
+    1-n Perimeter, für welche die Einwirkungen der Teilprozesse gemäss Beurteilungsart
     abgeklärt wurde. Im einfachsten Fall wird nur ein einziger Perimeter erfasst, welcher 
-    den Teilaufträgen (Hauptprozesse) zugewiesen ist. Die Beurteilungsart ist fuer alle
+    den Teilaufträgen (Hauptprozesse) zugewiesen ist. Die Beurteilungsart ist für alle
     Teilprozesse angegeben.
-    Bsp. komplexer Fall: Fuer ein Aussenquartier muessen lediglich die Wassergefahren geklärt 
+    Bsp. komplexer Fall: Für ein Aussenquartier müssen lediglich die Wassergefahren geklärt 
     werden. Folglich mehrere Perimeter im Auftrag. Der "Aussenquartier-Perimeter" ist lediglich
     dem Teilauftrag mit Hauptprozess=Wasser zugeordnet. Er hat nur die Beurteilungen der 
-    Wasser-Teilprozesse ausgefuellt. Fuer alle Gefahren der anderen Hauptprozesse folgt 
+    Wasser-Teilprozesse ausgefüllt. Für alle Gefahren der anderen Hauptprozesse folgt 
     im "Aussenquartier-Perimeter" implizit die Beurteilungsart "nicht beurteilt".
     */
     CLASS Abklaerungsperimeter =
@@ -231,15 +231,15 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
   END Auftraege;
 
   /** Im TOPIC Befunde werden die Prozessquellen definiert und die Befunde der Gefahrenbeurteilungen gespeichert. 
-     Pro Teilprozess wird je eine eigene Klasse zur Verfuegung gestellt. 
-     Fuer die Teilprozesse Ueberschwemmung und Uebermurung koennen zusaetzlich Kennwerte in eigenen Klassen gespeichert werden. 
-     Fuer Prozesse mit einer Jaehrlichkeit koennen auch Szenarien mit freier Jaehrlichkeit gespeichert werden. */
+     Pro Teilprozess wird je eine eigene Klasse zur Verfügung gestellt. 
+     Für die Teilprozesse Ueberschwemmung und Uebermurung können zusätzlich Kennwerte in eigenen Klassen gespeichert werden. 
+     Für Prozesse mit einer Jährlichkeit können auch Szenarien mit freier Jährlichkeit gespeichert werden. */
   TOPIC Befunde =
     DEPENDS ON Auftraege;
 
     DOMAIN
 
-      /** Wertebereiche fuer Prozessquellenbeschreibung Teilprozesse */
+      /** Wertebereiche für Prozessquellenbeschreibung Teilprozesse */
       Teilprozess = (
         Ueberschwemmung_statisch,
         Ueberschwemmung_dynamisch,
@@ -254,7 +254,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         Absenkung        
       ) ORDERED;
      
-      /** Wertebereich fuer Prozessquellenbeschreibung fuer Prozess Stein/Blockschlag und Berg/Felssturz */
+      /** Wertebereich für Prozessquellenbeschreibung für Prozess Stein/Blockschlag und Berg/Felssturz */
       AspektForm = (
         zylindrisch,
         kubisch,
@@ -262,14 +262,14 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         tetraedrisch
       );
 
-      /** Wertebereich fuer Befunde mit Jaehrlichkeiten --> Intensitaet */
+      /** Wertebereich für Befunde mit Jährlichkeiten --> Intensität */
         Intensitaet = (
         schwach,
         mittel,
         stark
         ) ORDERED;
 
-      /** Wertebereiche fuer Prozess Rutsch: Beschleunigung */
+      /** Wertebereiche für Prozess Rutsch: Beschleunigung */
         rBeschleunigung = (
         keine,
         !!< 2fach Mittelwert von v  */
@@ -280,16 +280,16 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         stark
         ) ORDERED;
 
-      /** Wertebereich fuer Prozess Rutsch: Differentialbewegung */
+      /** Wertebereich für Prozess Rutsch: Differentialbewegung */
       rDifferentialbewegung = (
         keine,
         /** bis 2 cm/Jahr/10m  */
         gering,
-        /** groesser 2 cm/Jahr/10m  */
+        /** grösser 2 cm/Jahr/10m  */
         hoch
       ) ORDERED;
 
-      /** Wertebereich fuer Prozess Rutsch: Korrektur */
+      /** Wertebereich für Prozess Rutsch: Korrektur */
       rKorrektur = (
         keine,
         Entschaerfung1,
@@ -308,10 +308,10 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         aktiv
       ) ORDERED;
 
-      /** Wertebereich fuer Prozess Rutsch: Tiefe Gleitflaeche */
+      /** Wertebereich für Prozess Rutsch: Tiefe Gleitfläche */
       rTiefeGleitflaeche = (
         keine,
-        /** oberflaechlich: Tiefe 0 < t <= 2 m */
+        /** oberflächlich: Tiefe 0 < t <= 2 m */
         oberflaechlich,
         /** mitteltief: Tiefe 2 < t <= 10 m */
         mitteltief,
@@ -323,7 +323,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         unbestimmt
       ) ORDERED;
      
-      /** Wertebereich fuer Teilprozess Ueberschwemmung: Fliesstiefe [cm] */
+      /** Wertebereich für Teilprozess Ueberschwemmung: Fliesstiefe [cm] */
       wFliesstiefeUeberschwemmung = (
         von_0_bis_25_cm,
         von_25_bis_50_cm,
@@ -338,19 +338,19 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         mehr_als_400_cm
       ) ORDERED;
 
-      /** Wertebereich fuer Teilprozess Uebermurung: Fliesstiefe [cm] */
+      /** Wertebereich für Teilprozess Uebermurung: Fliesstiefe [cm] */
       wFliesstiefeUebermurung = (
         bis_100_cm,
         mehr_als_100_cm
       ) ORDERED;
 
-      /** Standardwertebereich fuer Teilprozess Uebermurung: Fliessgeschwindigkeit [m/s] */
+      /** Standardwertebereich für Teilprozess Uebermurung: Fliessgeschwindigkeit [m/s] */
       wUebermurungFliessgeschwindigkeit = (
         bis_1_m_s,
         mehr_als_1_m_s
       ) ORDERED;
 
-      /** Standard Wertebereich fuer Prozess Ueberschwemmung: Fliessgeschwindigkeit [m/s] */
+      /** Standard Wertebereich für Prozess Ueberschwemmung: Fliessgeschwindigkeit [m/s] */
       wUeberschwemmungFliessgeschwindigkeit = (
         von_0_bis_0_5_m_s,
         von_0_5_bis_1_m_s,
@@ -361,8 +361,8 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         mehr_als_5_m_s
       ) ORDERED;
  
-      /** Wertebereich fuer Teilprozesse Ueberschwemmung statisch & dynamisch, Spontane Rutschung;
-         Restgefaehrdung mit Intensitaeten; */
+      /** Wertebereich für Teilprozesse Ueberschwemmung statisch & dynamisch, Spontane Rutschung;
+         Restgefährdung mit Intensitäten; */
       IWCodeStandard = (
         rot_stark_30,
         rot_stark_100,
@@ -384,8 +384,8 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         restgefaehrdung_schwach
       ) ORDERED;
 
-      /** Wertebereich fuer Steinschlag und Blockschlag;
-      Restgefaehrdung mit Intensitaeten; */
+      /** Wertebereich für Steinschlag und Blockschlag;
+      Restgefährdung mit Intensitäten; */
       IWCodeSteinBlockschlag = (
           rot_stark_30,
           rot_stark_100,
@@ -404,7 +404,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
           restgefaehrdung_schwach
         ) ORDERED;
 
-      /** Wertebereich fuer Teilprozess: Uebermurung */
+      /** Wertebereich für Teilprozess: Uebermurung */
       IWCodeUebermurung = (
         rot_stark_30,
         rot_stark_100,
@@ -418,7 +418,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         restgefaehrdung_mittel
         ) ORDERED;
 
-      /** Wertebereich fuer Teilprozess: Berg- und Felssturz */
+      /** Wertebereich für Teilprozess: Berg- und Felssturz */
       IWCodeBergFelssturz = (
         rot_stark_30,
         rot_stark_100,
@@ -426,7 +426,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         restgefaehrdung_stark
       ) ORDERED;
 
-      /** Wertebereich fuer Permanente Rutschung, Absenkung, Einsturz */
+      /** Wertebereich für Permanente Rutschung, Absenkung, Einsturz */
       IWCodePermanent = (
         rot_stark_permanent,
         blau_mittel_permanent,
@@ -436,7 +436,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
         restgefaehrdung_schwach
       ) ORDERED;
 
-      /** Wertebereich fuer Absenkung und Einsturz */
+      /** Wertebereich für Absenkung und Einsturz */
       IWCodeAbsenkungEinsturz = (
         blau_mittel_permanent,
         gelb_schwach_permanent
@@ -449,7 +449,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Bemerkung : MTEXT*255;
     END Prozessquelle;
 
-    /** Informationen zu Form und Ausdehnung der Prozessquelle SteinBlockschlag fuer die entsprechende Jährlichkeit
+    /** Informationen zu Form und Ausdehnung der Prozessquelle SteinBlockschlag für die entsprechende Jährlichkeit
      */
     CLASS PQ_Jaehrlichkeit_SteinBlockschlag =
       Jaehrlichkeit : MANDATORY Jaehrlichkeit;
@@ -460,7 +460,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Volumen : MANDATORY 0.000 .. 999999999.999 [Units.m3];
     END PQ_Jaehrlichkeit_SteinBlockschlag;
 
-    /** Informationen zu Form und Ausdehnung der Prozessquelle BergFelssturz fuer die entsprechende Jährlichkeit
+    /** Informationen zu Form und Ausdehnung der Prozessquelle BergFelssturz für die entsprechende Jährlichkeit
      */
     CLASS PQ_Jaehrlichkeit_BergFelssturz =
       Jaehrlichkeit : MANDATORY Jaehrlichkeit;
@@ -479,31 +479,31 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Krit_Hangneigung : MANDATORY 0..90 [Units.Angle_Degree];
     END PQ_Jaehrlichkeit_Rutsch_Mure_Base;
 
-    /** Informationen zu Ausdehnung, ... der Prozessquelle SpontaneRutschung fuer die entsprechende Jährlichkeit
+    /** Informationen zu Ausdehnung, ... der Prozessquelle SpontaneRutschung für die entsprechende Jährlichkeit
      */
     CLASS PQ_Jaehrlichkeit_SpontaneRutschung
       EXTENDS PQ_Jaehrlichkeit_Rutsch_Mure_Base = 
     END PQ_Jaehrlichkeit_SpontaneRutschung;
 
-    /** Informationen zu Ausdehnung, ... der Prozessquelle Hangmure fuer die entsprechende Jährlichkeit
+    /** Informationen zu Ausdehnung, ... der Prozessquelle Hangmure für die entsprechende Jährlichkeit
      */
     CLASS PQ_Jaehrlichkeit_Hangmure
       EXTENDS PQ_Jaehrlichkeit_Rutsch_Mure_Base = 
     END PQ_Jaehrlichkeit_Hangmure;
 
-    /** Abstrakte Klasse fuer Befunde.
+    /** Abstrakte Klasse für Befunde.
        Prozess Wasser: Ueberschwemmung statisch/dynamisch, Uebermurung, Ufererosion
        Prozess Rutsch: Hangmure, Spontane/Permanente Rutschung
        Prozess Sturz: Stein-/Blockschlag, Berg-/Felssturz
        Prozess Einsturz/Absenkung: Einsturz, Absenkung
-       Konkretisiert werden die Befunde durch saemtliche Teilprozesse, Kennwerte fuer Wasserprozesse und freie Befunde mit Jaehrlichkeit. */
+       Konkretisiert werden die Befunde durch sämtliche Teilprozesse, Kennwerte für Wasserprozesse und freie Befunde mit Jaehrlichkeit. */
     CLASS Befund_Basis (ABSTRACT) =
       Geometrie : MANDATORY SURFACE WITH (STRAIGHTS) VERTEX GeometryCHLV95_V1.Coord2 WITHOUT OVERLAPS > 0.1;
       RestgefaehrdungJaehrlichkeit : JaehrlichkeitRestgefaehrdung;
       Bemerkung : MTEXT*255;
     END Befund_Basis;
 
-    /** Basisklasse fuer alle direkt der geometrielosen Prozessquelle zugewiesenen Befunde */
+    /** Basisklasse für alle direkt der geometrielosen Prozessquelle zugewiesenen Befunde */
     CLASS Befund_TextPQ (ABSTRACT) 
       EXTENDS Befund_Basis = 
     END Befund_TextPQ;
@@ -539,7 +539,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     END BefundHangmure;
     
     /** Konkretisiert die Klasse Befund.
-    Fuer den Teilprozess permanente Rutschung sind die Kennwerte zu Rutschgeschwindigkeit, Tiefe der Gleitflaeche, Differentialbewegung, Beschleunigung und Korrekturwerte anzugeben.
+    Für den Teilprozess permanente Rutschung sind die Kennwerte zu Rutschgeschwindigkeit, Tiefe der Gleitflaeche, Differentialbewegung, Beschleunigung und Korrekturwerte anzugeben.
     Konkretisiert die Klasse Befund. Prozessquelle -> Hauptprozess muss Rutsch sein */
     CLASS BefundPermanenteRutschung
     EXTENDS Befund_TextPQ =
@@ -575,7 +575,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     EXTENDS Befund_TextPQ =
     END BefundUfererosion;
 
-    /** Befunde fuer freie Jaehrlichkeit. Hier sind Jaehrlichkeit, Intensitaet Teilprozess anzugeben. */
+    /** Befunde für freie Jährlichkeit. Hier sind Jährlichkeit, Intensität Teilprozess anzugeben. */
     CLASS BefundJaehrlichkeit
     EXTENDS Befund_TextPQ =
       Jaehrlichkeit : MANDATORY Jaehrlichkeit; 
@@ -583,38 +583,38 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       Teilprozess : MANDATORY Teilprozess;
     END BefundJaehrlichkeit;
 
-    /** Befunde mit Kennwert (Fliesstiefe) fuer Prozess Ueberschwemmung.
+    /** Befunde mit Kennwert (Fliesstiefe) für Prozess Ueberschwemmung.
      */
     CLASS KennwertUeberschwemmungFliesstiefe
     EXTENDS Befund_TextPQ =
-      /** Moegliche Werte gemaess wFliesstiefe. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */
+      /** Mögliche Werte gemäss wFliesstiefe. Es sind gemäss Auftrag die Standard- oder detaillierten Werte abzufüllen. */
       h : MANDATORY wFliesstiefeUeberschwemmung;
       Jaehrlichkeit : MANDATORY JaehrlichkeitListe;
     END KennwertUeberschwemmungFliesstiefe;
 
-    /** Befunde mit Kennwert (Fliessgeschwindigkeit) fuer Prozess Ueberschwemmung. */
+    /** Befunde mit Kennwert (Fliessgeschwindigkeit) für Prozess Ueberschwemmung. */
     CLASS KennwertUeberschwemmungFliessgeschwindigkeit
     EXTENDS Befund_TextPQ =
-      /** Moegliche Werte gemaess wUeberschwemmungFliessgeschwindigkeit. 
-      Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */
+      /** Mögliche Werte gemäss wUeberschwemmungFliessgeschwindigkeit. 
+      Es sind gemäss Auftrag die Standard- oder detaillierten Werte abzufüllen. */
       v : MANDATORY wUeberschwemmungFliessgeschwindigkeit;
       Jaehrlichkeit : MANDATORY JaehrlichkeitListe;
     END KennwertUeberschwemmungFliessgeschwindigkeit;
 
-    /** Befunde mit Kennwert (Fliesstiefe) fuer Prozess Uebermurung
+    /** Befunde mit Kennwert (Fliesstiefe) für Prozess Uebermurung
        Prozessquelle -> Hauptprozess muss Wasser sein */
     CLASS KennwertUebermurungFliesstiefe
     EXTENDS Befund_TextPQ =
-      /** Moegliche Werte gemaess wFliesstiefe. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */
+      /** Mögliche Werte gemäss wFliesstiefe. Es sind gemäss Auftrag die Standard- oder detaillierten Werte abzufüllen. */
       h : MANDATORY wFliesstiefeUebermurung;
       Jaehrlichkeit : MANDATORY JaehrlichkeitListe;
     END KennwertUebermurungFliesstiefe;
 
-    /** Befunde mit Kennwert (Fliessgeschwindigkeit) fuer Prozess Uebermurung
+    /** Befunde mit Kennwert (Fliessgeschwindigkeit) für Prozess Uebermurung
        Prozessquelle -> Hauptprozess muss Wasser sein */
     CLASS KennwertUebermurungFliessgeschwindigkeit
     EXTENDS Befund_TextPQ =
-      /** Moegliche Werte gemaess wUebermurungFliessgeschwindigkeit. Es sind gemaess Auftrag die Standard- oder detaillierten Werte abzufuellen. */
+      /** Mögliche Werte gemäss wUebermurungFliessgeschwindigkeit. Es sind gemäss Auftrag die Standard- oder detaillierten Werte abzufüllen. */
       v : MANDATORY wUebermurungFliessgeschwindigkeit;
       Jaehrlichkeit : MANDATORY JaehrlichkeitListe;
     END KennwertUebermurungFliessgeschwindigkeit;
@@ -623,7 +623,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       /** Ein Teilauftrag hat entweder keine oder eine Prozessquelle.
          Hat ein Teilauftrag KEINE Prozessquelle, ist durch den Auftragnehmer eine Prozessquelle zu definieren. */
       Prozessquelle_R -- {0..*} Prozessquelle;
-      Teilauftrag_R (EXTERNAL) -- {1} SO_AFU_Naturgefahren_20230802.Auftraege.Teilauftrag;
+      Teilauftrag_R (EXTERNAL) -- {1} SO_AFU_Naturgefahren_20240311.Auftraege.Teilauftrag;
     END Teilauftrag__Prozessquelle;
 
     ASSOCIATION PQ_Jaehrlichkeit_SteinBlockschlag__Prozessquelle =
@@ -919,7 +919,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters."  
       MANDATORY CONSTRAINT (GeoW_FunctionsExt.IsInside(GeoW_FunctionsExt.Union(Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R, "Geometrie"), UNDEFINED, THIS, "Geometrie"));
       !!@ name = "CheckBefundJaehrlichkeitKeineUeberragung"  
-      !!@ ilivalid.msg_de = "ungueltige Ueberragung bei Befund mit gleicher Jaehrlichkeit und Prozessquelle!"
+      !!@ ilivalid.msg_de = "ungültige Ueberragung bei Befund mit gleicher Jaehrlichkeit und Prozessquelle!"
       SET CONSTRAINT NGK_SO_FunctionsExt.IsInsideAreaByCode(GeoW_FunctionsExt.GetInGroups(ALL, "Prozessquelle_R"), "Geometrie" ,"Jaehrlichkeit");
     END;
 
@@ -974,7 +974,7 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
       UNIQUE Kennung, Teilauftrag_R;
     END;
 
-    /** Hilfsview fuer Constraint */
+    /** Hilfsview für Constraint */
     VIEW Helper_BefundUeberschwemmung
       UNION OF BUsD ~ BefundUeberschwemmungDynamisch, BUsS ~ BefundUeberschwemmungStatisch;
       =
@@ -982,4 +982,4 @@ MODEL SO_AFU_Naturgefahren_20230802 (de)
     END Helper_BefundUeberschwemmung;
   END Befunde;  
 
-END SO_AFU_Naturgefahren_20230802.
+END SO_AFU_Naturgefahren_20240311.
