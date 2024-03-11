@@ -12,7 +12,7 @@ INTERLIS 2.3;
   2022-11-30 | jek   | Modellname mit _Pilot_ ergänzt, Datum aktualisiert.
   2023-08-02 | jek   | Anpassungen gemäss Erkenntnissen aus Pilot Himmelried.
   2024-02-26 | GeoW  | Komplettierung Constraints, JährlichkeitListe neu geordnet 
-  2024-03-11 | jek   | Views für Area-Bedingungen (Pendent), Mehrzeilen-Kommentare
+  2024-03-11 | jek   | Mehrzeilen-Kommentare, Bereinigungen
  ==============================================================================
 */
 !!@ technicalContact=mailto:agi@bd.so.ch
@@ -56,14 +56,6 @@ MODEL SO_AFU_Naturgefahren_20240311 (de)
         Rutschung,
         Sturz,
         Absenkung_Einsturz
-      );
-
-      /** Wertebereich für Teilprozesse der Hauptprozesse Rutsch und Sturz */
-      TeilprozessRutschSturz = (
-        spontane_Rutschung,
-        Hangmure,
-        Stein_Blockschlag,
-        Fels_Bergsturz
       );
 
       /** Art der Nachführung der Gefahrenkarte */
@@ -973,13 +965,7 @@ MODEL SO_AFU_Naturgefahren_20240311 (de)
       !!@ ilivalid.msg_de = "Die Kennung ist innerhalb dieses Teilauftrags nicht eindeutig."  
       UNIQUE Kennung, Teilauftrag_R;
     END;
-
-    /** Hilfsview für Constraint */
-    VIEW Helper_BefundUeberschwemmung
-      UNION OF BUsD ~ BefundUeberschwemmungDynamisch, BUsS ~ BefundUeberschwemmungStatisch;
-      =
-      Geometrie: Einzelflaeche;
-    END Helper_BefundUeberschwemmung;
+    
   END Befunde;  
 
 END SO_AFU_Naturgefahren_20240311.
