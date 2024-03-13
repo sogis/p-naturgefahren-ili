@@ -13,11 +13,12 @@ INTERLIS 2.3;
   2023-08-02 | jek   | Anpassungen gemäss Erkenntnissen aus Pilot Himmelried.
   2024-02-26 | GeoW  | Komplettierung Constraints, JährlichkeitListe neu geordnet 
   2024-03-11 | jek   | Mehrzeilen-Kommentare, Bereinigungen
+  2024-03-13 | GeoW  | Bereinigung Constraints Befunds-Klassen
  ==============================================================================
 */
 !!@ technicalContact=mailto:agi@bd.so.ch
 MODEL SO_AFU_Naturgefahren_20240311 (de) 
-  AT "http://geo.so.ch/models/AFU" VERSION "2024-03-11" =
+  AT "http://geo.so.ch/models/AFU" VERSION "2024-03-13" =
 
   IMPORTS UNQUALIFIED Units, Time, CoordSys;
   IMPORTS GeometryCHLV95_V1;
@@ -712,9 +713,6 @@ MODEL SO_AFU_Naturgefahren_20240311 (de)
       !!@ name = "CheckBefundSteinBlockschlagImAbklPerimeter"
       !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters."  
       MANDATORY CONSTRAINT (GeoW_FunctionsExt.IsInside(GeoW_FunctionsExt.Union(PQ_Jaehrlichkeit_SteinBlockschlag_R->Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R, "Geometrie"), UNDEFINED, THIS, "Geometrie"));
-      !!@ name = "CheckBefundSteinBlockschlagKeineLoecher"
-      !!@ ilivalid.msg_de = "In der Befund-Geometrie sind keine Löcher erlaubt."  
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetInnerRingsCount(THIS, "Geometrie") == 0; 
       !!@ name = "CheckBefundSteinBlockschlagFlaechenGroesse"
       !!@ ilivalid.msg_de = "Der Befund muss grösser als 5m2 sein."  
       MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;      
@@ -730,9 +728,6 @@ MODEL SO_AFU_Naturgefahren_20240311 (de)
       !!@ name = "CheckBefundBergFelssturzImAbklPerimeter"
       !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters."  
       MANDATORY CONSTRAINT (GeoW_FunctionsExt.IsInside(GeoW_FunctionsExt.Union(PQ_Jaehrlichkeit_BergFelssturz_R->Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R, "Geometrie"), UNDEFINED, THIS, "Geometrie"));
-      !!@ name = "CheckBefundBergFelssturzKeineLoecher"
-      !!@ ilivalid.msg_de = "In der Befund-Geometrie sind keine Löcher erlaubt."  
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetInnerRingsCount(THIS, "Geometrie") == 0; 
       !!@ name = "CheckBefundBergFelssturzFlaechenGroesse"
       !!@ ilivalid.msg_de = "Der Befund muss grösser als 5m2 sein."  
       MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;    
@@ -757,9 +752,6 @@ MODEL SO_AFU_Naturgefahren_20240311 (de)
       !!@ name = "CheckBefundHangmureImAbklPerimeter"
       !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters."  
       MANDATORY CONSTRAINT (GeoW_FunctionsExt.IsInside(GeoW_FunctionsExt.Union(PQ_Jaehrlichkeit_Hangmure_R->Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R, "Geometrie"), UNDEFINED, THIS, "Geometrie"));
-      !!@ name = "CheckBefundHangmureKeineLoecher"
-      !!@ ilivalid.msg_de = "In der Befund-Geometrie sind keine Löcher erlaubt."  
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetInnerRingsCount(THIS, "Geometrie") == 0; 
       !!@ name = "CheckBefundHangmureFlaechenGroesse"
       !!@ ilivalid.msg_de = "Der Befund muss grösser als 5m2 sein."  
       MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;   
@@ -772,6 +764,9 @@ MODEL SO_AFU_Naturgefahren_20240311 (de)
       !!@ name = "CheckBefundUfererosionImAbklPerimeter"
       !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters."  
       MANDATORY CONSTRAINT (GeoW_FunctionsExt.IsInside(GeoW_FunctionsExt.Union(Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R, "Geometrie"), UNDEFINED, THIS, "Geometrie"));
+      !!@ name = "CheckBefundUfererosionKeineLoecher"
+      !!@ ilivalid.msg_de = "In der Befund-Geometrie sind keine Löcher erlaubt."  
+      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetInnerRingsCount(THIS, "Geometrie") == 0; 
     END;
   
     CONSTRAINTS OF BefundAbsenkung =
@@ -784,9 +779,6 @@ MODEL SO_AFU_Naturgefahren_20240311 (de)
       !!@ name = "CheckBefundAbsenkungImAbklPerimeter"
       !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters."  
       MANDATORY CONSTRAINT (GeoW_FunctionsExt.IsInside(GeoW_FunctionsExt.Union(Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R, "Geometrie"), UNDEFINED, THIS, "Geometrie"));
-      !!@ name = "CheckBefundAbsenkungKeineLoecher"
-      !!@ ilivalid.msg_de = "In der Befund-Geometrie sind keine Löcher erlaubt."  
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetInnerRingsCount(THIS, "Geometrie") == 0; 
       !!@ name = "CheckBefundAbsenkungFlaechenGroesse"
       !!@ ilivalid.msg_de = "Der Befund muss grösser als 5m2 sein."  
       MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5; 
@@ -802,9 +794,6 @@ MODEL SO_AFU_Naturgefahren_20240311 (de)
       !!@ name = "CheckBefundEinsturzImAbklPerimeter"
       !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters."  
       MANDATORY CONSTRAINT (GeoW_FunctionsExt.IsInside(GeoW_FunctionsExt.Union(Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R, "Geometrie"), UNDEFINED, THIS, "Geometrie"));
-      !!@ name = "CheckBefundEinsturzKeineLoecher"
-      !!@ ilivalid.msg_de = "In der Befund-Geometrie sind keine Löcher erlaubt."  
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetInnerRingsCount(THIS, "Geometrie") == 0; 
       !!@ name = "CheckBefundEinsturzFlaechenGroesse"
       !!@ ilivalid.msg_de = "Der Befund muss grösser als 5m2 sein."  
       MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5; 
@@ -817,9 +806,6 @@ MODEL SO_AFU_Naturgefahren_20240311 (de)
       !!@ name = "CheckBefundPermanenteRutschungImAbklPerimeter"
       !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters."  
       MANDATORY CONSTRAINT (GeoW_FunctionsExt.IsInside(GeoW_FunctionsExt.Union(Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R, "Geometrie"), UNDEFINED, THIS, "Geometrie"));
-      !!@ name = "CheckBefundPermanenteRutschungKeineLoecher"
-      !!@ ilivalid.msg_de = "In der Befund-Geometrie sind keine Löcher erlaubt."  
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetInnerRingsCount(THIS, "Geometrie") == 0; 
       !!@ name = "CheckBefundPermanenteRutschungFlaechenGroesse"
       !!@ ilivalid.msg_de = "Der Befund muss grösser als 5m2 sein."  
       MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5; 
@@ -844,6 +830,9 @@ MODEL SO_AFU_Naturgefahren_20240311 (de)
       !!@ name = "CheckBefundSpontaneRutschungImAbklPerimeter"
       !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters."  
       MANDATORY CONSTRAINT (GeoW_FunctionsExt.IsInside(GeoW_FunctionsExt.Union(PQ_Jaehrlichkeit_SpontaneRutschung_R->Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R, "Geometrie"), UNDEFINED, THIS, "Geometrie"));
+      !!@ name = "CheckBefundSpontaneRutschungFlaechenGroesse"
+      !!@ ilivalid.msg_de = "Der Befund muss grösser als 5m2 sein."  
+      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5; 
     END;      
 
     CONSTRAINTS OF BefundUebermurung =
@@ -856,9 +845,6 @@ MODEL SO_AFU_Naturgefahren_20240311 (de)
       !!@ name = "CheckBefundUebermurungImAbklPerimeter"
       !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters."  
       MANDATORY CONSTRAINT (GeoW_FunctionsExt.IsInside(GeoW_FunctionsExt.Union(Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R, "Geometrie"), UNDEFINED, THIS, "Geometrie"));
-      !!@ name = "CheckBefundUebermurungKeineLoecher"
-      !!@ ilivalid.msg_de = "In der Befund-Geometrie sind keine Löcher erlaubt."  
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetInnerRingsCount(THIS, "Geometrie") == 0; 
       !!@ name = "CheckBefundUebermurungFlaechenGroesse"
       !!@ ilivalid.msg_de = "Der Befund muss grösser als 5m2 sein."  
       MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5; 
@@ -874,9 +860,6 @@ MODEL SO_AFU_Naturgefahren_20240311 (de)
       !!@ name = "CheckBefundUeberschwemmungDynamischImAbklPerimeter"
       !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters."  
       MANDATORY CONSTRAINT (GeoW_FunctionsExt.IsInside(GeoW_FunctionsExt.Union(Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R, "Geometrie"), UNDEFINED, THIS, "Geometrie"));
-      !!@ name = "CheckBefundUeberschwemmungDynamischKeineLoecher"
-      !!@ ilivalid.msg_de = "In der Befund-Geometrie sind keine Löcher erlaubt."  
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetInnerRingsCount(THIS, "Geometrie") == 0; 
       !!@ name = "CheckBefundUeberschwemmungDynamischFlaechenGroesse"
       !!@ ilivalid.msg_de = "Der Befund muss grösser als 5m2 sein."  
       MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5; 
@@ -892,9 +875,6 @@ MODEL SO_AFU_Naturgefahren_20240311 (de)
       !!@ name = "CheckBefundUeberschwemmungStatischImAbklPerimeter"
       !!@ ilivalid.msg_de = "Befund liegt nicht innerhalb des Abklärungsperimeters."  
       MANDATORY CONSTRAINT (GeoW_FunctionsExt.IsInside(GeoW_FunctionsExt.Union(Prozessquelle_R->Teilauftrag_R->Abklaerungsperimeter_R, "Geometrie"), UNDEFINED, THIS, "Geometrie"));
-      !!@ name = "CheckBefundUeberschwemmungStatischKeineLoecher"
-      !!@ ilivalid.msg_de = "In der Befund-Geometrie sind keine Löcher erlaubt."  
-      MANDATORY CONSTRAINT GeoW_FunctionsExt.GetInnerRingsCount(THIS, "Geometrie") == 0; 
       !!@ name = "CheckBefundUeberschwemmungStatischFlaechenGroesse"
       !!@ ilivalid.msg_de = "Der Befund muss grösser als 5m2 sein."  
       MANDATORY CONSTRAINT GeoW_FunctionsExt.GetArea(THIS, "Geometrie") > 5;  
